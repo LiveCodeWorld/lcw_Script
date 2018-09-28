@@ -1,0 +1,115 @@
+﻿script "lcw_Script"
+--> MetaData
+-
+license: GPLv3
+name: projectName
+type: home
+version: 0.1
+
+
+--> Events
+-
+getprop project_Deps
+   return "lcw,lcw_Tools,lcw_Authoring,lcw_GIT"
+end project_Deps
+
+on preOpenStack 
+   if the short name of the defaultstack is not the short name of me then
+      pass preOpenStack
+   else
+      project_Init
+   end if
+end preOpenStack
+
+on project_Init
+   set the cursor to watch
+   set the loc of me to the screenloc    
+   put the project_Deps of me into projectNames
+   env_LoadProject projectNames
+   set the project_Start of me to true
+end project_Init
+
+
+--> Deps
+-
+command env_LoadProject projectNames
+   replace comma with CR in projectNames
+   put "Loading project 'projectName'..." into someComment
+   
+   repeat for each line projectName in projectNames
+      lcw_Notify merge (someComment), "Loading projects"
+      
+      put env_GetProjectFolder (projectName) into projectFolder
+      if projectFolder is not empty then next repeat -- already loaded and presumed active
+      
+      -- guess projectHomeStackPath
+      put the filename of me into someHomeStackPath
+      put env_ConstructProjectHomePath (projectName, someHomeStackPath) into projectHomeStackPath
+      -- and if it is not there download from github
+      if exists (stack projectHomeStackPath) is false then
+         github_DownloadProject projectName, lcwRoot
+         put the result into projectHomeStackPath
+      end if
+      
+      -- go has the advantage of giving the option of showing an interface
+      -- has the same effect as manuallup opening = consistant
+      go to stack projectHomeStackPath
+      -- we try dispatch "preOpenStack for now
+      -- dispatch "preOpenStack" to stack projectHomeStackPath
+   end repeat
+end env_LoadProject
+
+command lcw_Notify someMessage, pTitle
+   try
+      if pTitle is empty then put "LiveCode World Notification" into pTitle
+      put "osascript -e" && "'" & "display notification" && quote & someMessage & quote into someShell
+      put "with title" && quote & pTitle & quote after someShell
+      put "'" after someShell
+      put shell (someShell) into shellResult
+   catch e
+      put someComment
+   end try
+end lcw_Notify
+
+function env_ConstructProjectHomePath otherProjectName, someHomeStackPath
+   set the itemdelimiter to slash
+   put someHomeStackPath into lcwRoot
+   put empty into item -2 to -1 of lcwRoot
+   put lcwRoot & otherProjectName & slash & otherProjectName & ".livecode" into projectHomeStackPath
+   return projectHomeStackPath
+end env_ConstructProjectHomePath
+
+command github_DownloadProject projectName, lcwRoot
+   -- this should use git to clone a project to the lcwRoot folder
+   -- and return the path to the projects home stack folder
+   
+   -- stub for now
+   put empty into projectHomeStackPath
+   if projectHomeStackPath is empty then
+      put lcwRoot
+      answer warning merge ("Failed to download project 'projectName'!")
+      exit to top
+   end if
+end github_DownloadProject
+
+function env_GetProjectFolder projectName
+   put env_GetProjectArray() into envProjectArray
+   return envProjectArray [projectName]
+end env_GetProjectFolder
+
+command env_SetProjectFolder projectName, pProjectFolder
+   put env_GetProjectArray() into envProjectArray
+   if pProjectFolder is empty then
+      delete variable envProjectArray [projectName]
+   else
+      put pProjectFolder into envProjectArray [projectName]
+   end if
+   env_SetProjectArray envProjectArray
+   return envProjectArray
+end env_SetProjectFolder
+
+function env_GetProjectArray
+   global gLCW
+   put gLCW ["environment"]["project"] into envProjectArray
+   return envProjectArray
+end env_GetProjectArray
