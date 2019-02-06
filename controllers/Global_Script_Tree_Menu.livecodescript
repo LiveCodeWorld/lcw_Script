@@ -21,8 +21,16 @@ on menu_DisplayObjectGraph sObject
    display_ObjectDepArray sObject
 end menu_DisplayObjectGraph
 
+on menu_DisplayTemplate sObject, templateName
+   display_ScriptTemplate templateName
+end menu_DisplayTemplate
+
 on _
 end _
+
+on submenu_Script
+   return "Global | Script | Menu"
+end submenu_Script
 
 on submenu_Folders
    return "Global | Script | Folders | Menu"
@@ -53,16 +61,9 @@ end _
 on _
 end _
 
-on submenu_Script
-   return "Global | Script | Menu"
-end submenu_Script
-
 on submenu_Project
    return "Global | Project | Stack | Menu"
 end submenu_Project
-
-on _
-end _
 
 on submenu_ScriptMainstack
    return "Global | Script | Mainstack | Menu"
@@ -71,5 +72,10 @@ end submenu_ScriptMainstack
 
 --> Global | Script | Tree | Menu | Deps
 -
+getprop template_Names [mTarget]
+    return scaffold_ListShortFiles()
+end template_Names
+
+
 --> Global | Script | Tree | Menu | Disabled
 -

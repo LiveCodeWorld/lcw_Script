@@ -7,75 +7,33 @@ type: home
 version: 0.1
 
 
---> Events
+--> Props
 -
 getprop project_Deps
    return "lcw,lcw_Tools,lcw_Authoring,lcw_GIT"
 end project_Deps
 
+
+--> Events
+-
 on preOpenStack 
    if the short name of the defaultstack is not the short name of me then
       pass preOpenStack
    else
-      project_Init
+      lcw_Init
+      env_RecursivelyLoadProjects
    end if
 end preOpenStack
-
-on project_Init
-   set the cursor to watch
-   set the loc of me to the screenloc    
-   put the project_Deps of me into projectNames
-   env_LoadProject projectNames
-end project_Init
 
 
 --> Deps
 -
-command env_LoadProject projectNames
-   replace comma with CR in projectNames
-   put "Loading project '[[projectName]]'..." into commentTemplate
-   
-   repeat for each line projectName in projectNames  
-      put env_GetProjectFolder (projectName) into projectFolder
-      if projectFolder is not empty then next repeat -- already loaded and presumed active
-      
-      -- guess projectHomeStackPath
-      put the filename of me into someHomeStackPath
-      put env_ConstructProjectHomePath (projectName, someHomeStackPath) into projectHomeStackPath
-      if exists (stack projectHomeStackPath) is false then next repeat
-       
-      put merge (commentTemplate) into someComment
-      dispatch "lcw_Notify" with someComment,"Loading projects"
-      
-      -- go to stack projectHomeStackPath
-      dispatch "project_Init" to stack projectHomeStackPath
-      
-      put merge (commentTemplate) into someComment
-      dispatch "lcw_Notify" with someComment,"Loading projects"
-   end repeat
-   
-   put the filename of me into lcwHomeStackFile
-   put the project_Name of me into projectName
-   project_InitialiseFolder lcwHomeStackFile
-   project_LoadModules lcwHomeStackFile
-   dispatch "lcw_Notify" with someComment,"Loading projects"
-end env_LoadProject
-
-function env_ConstructProjectHomePath otherProjectName, someHomeStackPath
+command lcw_Init
+   -- make sure LCW is loaded so we can open from finder
    set the itemdelimiter to slash
-   put someHomeStackPath into lcwRoot
-   put empty into item -2 to -1 of lcwRoot
-   put lcwRoot & otherProjectName & slash & otherProjectName & ".livecode" into projectHomeStackPath
-   return projectHomeStackPath
-end env_ConstructProjectHomePath
-
-function env_GetProjectFolder projectName
-   put env_GetProjectArray() into envProjectArray
-   return envProjectArray [projectName]
-end env_GetProjectFolder
-
-function env_GetProjectArray
-   global gLCW
-   put gLCW ["environment"]["project"] into envProjectArray
-   return envProjectArray
-end env_GetProjectArray
+   put the effective filename of the defaultstack into lcwHomePath
+   put "lcw/lcw.livecode" into item -2 to -1 of lcwHomePath
+   if there is a stack lcwHomePath then
+      dispatch "lcw_Init" to stack lcwHomePath
+   end if
+end lcw_Init

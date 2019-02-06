@@ -1,0 +1,22 @@
+﻿script "Global_Script_Menu"
+--> MetaData
+-
+license: GPLv3
+name: Global_Script_Menu
+type: controller
+version: 0.5
+
+
+--> Global | Script | Menu
+-
+on menu_Test sObject
+   beep
+   put sObject
+end menu_Test
+
+
+--> Global | Script | Menu | Props
+-
+
+--> Global | Script | Menu | Disabled
+-
