@@ -116,24 +116,28 @@ end display_StackDeps
 
 --> Display | Not tested recently
 -
-command display_RigStackLibs
+command display_RigStackLibs pDisplayView
    server_LoadDetails "rest.livecode.world"
    --
    put rig_ListStackFiles() into shortStackFiles
    put server_GetURL() into serverURL
-   put display_FindView ("Stack Libraries", serverURL) into displayView
-   if exists (displayView) then
-      set the displayed_index of displayView to shortStackFiles
-   else
+   --
+   if exists (pDisplayView) is false then
+      put display_FindView ("Stack Libraries", serverURL) into pDisplayView
+   end if
+   
+   if exists (pDisplayView) then
+      set the displayed_index of pDisplayView to shortStackFiles
+   else 
       display_Lines shortStackFiles, serverURL, "mDoubleUp_CheckRigStack", "Stack Libraries", true
-      put the result into displayView
+      put the result into pDisplayView
       --
       put rig_GetFolder ("stacks") into folderPath
-      set the folder_Path of displayView to folderPath
-      set the title_Menu of displayView to "Global | Display | Rig | Stacks | Menu"
+      set the folder_Path of pDisplayView to folderPath
+      set the title_Menu of pDisplayView to "Global | Display | Rig | Stacks | Menu"
    end if
-   set the line_Menu of displayView to "Global | Display | Rig | Stacks | Line | Menu"
-   return displayView
+   set the line_Menu of pDisplayView to "Global | Display | Rig | Stacks | Line | Menu"
+   return pDisplayView
 end display_RigStackLibs
 
 command display_Stacks stackNames, pIndexView, pStackTitle

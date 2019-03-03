@@ -4,7 +4,12 @@
 license: GPLv3
 name: lib_ScriptEditor
 type: library
-version: 0.2
+version: 0.3
+
+/*
+This library interfaces with the Livecode Script Editor to allow handlers to find out what tabs are active and being displayed.
+It also allows you to create new panes for you custom interfaces.
+*/
 
 
 --> Working on
@@ -16,7 +21,7 @@ function scriptEditor_PaneObject paneName
    put the long id of control paneName of paneGroup into paneObject
    return paneObject
 end scriptEditor_PaneObject
-   
+
 
 --> ScriptEditor | Pane
 -
@@ -157,6 +162,15 @@ end scriptEditor_SetPaneTabsGroupBehavior
 
 --> ScriptEditor | Tabs
 -
+function scriptEditor_ListTabNames
+   put scriptEditor_ListTabScriptObjects() into tabScriptObjects   
+   repeat for each line tabScriptObject in tabScriptObjects
+      put the short name of tabScriptObject into tabName
+      put tabName & CR after tabNames
+   end repeat
+   return tabNames
+end scriptEditor_ListTabNames
+
 function scriptEditor_ListTabScriptObjects
    send "revSEGetTargetObjects" to rev_ScriptEditorGroup()
    put the result into ruggedIDs

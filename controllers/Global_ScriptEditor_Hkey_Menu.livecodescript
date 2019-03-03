@@ -21,6 +21,13 @@ end insert_SendHkey
 on _
 end _
 
+on insert_HelpMenu
+   return "Global | Hkey | Help | Menu"
+end insert_HelpMenu
+
+on _
+end _
+
 on menu_DisplayHkeySvg hKey
    put hkey_SvgFile (hKey) into svgFile
    if scriptEditor_PaneExists ("Deps") then
@@ -33,6 +40,10 @@ end menu_DisplayHkeySvg
 
 on _
 end _
+
+on submenu_HandlerFiles
+   return "Global | Handler | Calls | Menu"
+end submenu_HandlerFiles
 
 on submenu_HandlerLibrary
    return "Global | Handler | Library | Menu"

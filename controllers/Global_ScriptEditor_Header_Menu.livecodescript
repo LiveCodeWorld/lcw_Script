@@ -34,15 +34,6 @@ on menu_Init
    objects_MakeFriendly historyObjects, orderedFriendlyObjects, friendlyArray
    put friendlyArray into LocalArray ["friendlyArray"]
    put keys (friendlyArray) into LocalArray ["recentObjects"]
-   
-   put project_IsActive ("lcw_Wiki") into helpActive
-   put helpActive into LocalArray ["helpActive"]
-   
-   if helpActive then
-      put scriptEditor_Object() into sObject
-      put the help_Url [true] of sObject into helpURL
-      put helpURL into LocalArray ["helpURL"]
-   end if
 end menu_Init
 
 
@@ -67,21 +58,9 @@ on menu_SaveEdited
    stack_SaveEdited "all"
 end menu_SaveEdited
 
-on _
-end _
-
-on menu_Help sObject
-   help_Launch sObject
-end menu_Help
-
-on menu_CreateHelp sObject
-   help_Create sObject
-   help_Launch sObject
-end menu_CreateHelp
-
-on menu_UpdateHelp sObject
-   help_Update sObject
-end menu_UpdateHelp
+on submenu_Help
+   return "Global | Script | Help | Menu"
+end submenu_Help
 
 on _
 end _
@@ -213,36 +192,6 @@ end edited_StackNames
 
 --> Global | ScriptEditor | Header | Menu | Disabled
 -
-getprop disabed_UpdateHelp
-   switch
-      case LocalArray ["helpURL"] is empty
-      case LocalArray ["helpActive"] is false
-         return "delete"
-      default
-         return false
-   end switch
-end disabed_UpdateHelp
-
-getprop disabled_Help
-   switch
-      case LocalArray ["helpURL"] is empty
-      case LocalArray ["helpActive"] is false
-         return "delete"
-      default
-         return false
-   end switch
-end disabled_Help
-
-getprop disabled_CreateHelp
-   switch
-      case LocalArray ["helpURL"] is not empty
-      case LocalArray ["helpActive"] is false
-         return "delete"
-      default
-         return false
-   end switch
-end disabled_CreateHelp
-
 getprop disabled_ObjectProperties [scriptObject]
    put the stack_Name of scriptObject into stackName
    if the scriptonly of stack stackName is true then

@@ -169,6 +169,27 @@ on submenu_Object
    return "Global | Script | Object | Menu"
 end submenu_Object
 
+on menu_EditBehavior seGroup, whichBehavior
+   switch whichBehavior
+      case "Compile"
+         put scriptEditor_CompileButtonBehavior() into bObject
+         break
+      case "Menu"
+         put scriptEditor_HistoryButtonBehavior() into bObejct
+         break
+      case "Script"
+         put scriptEditor_ScriptFieldBehavior() into bObject
+         break
+      case "Handler"
+         put scriptEditor_HandlerListBehavior() into bObject
+         break
+      case "Search"
+         put scriptEditor_FindFieldBehavior() into bObject
+         break
+   end switch
+   edit the script of bObject
+end menu_EditBehavior
+
 on _
 end _
 

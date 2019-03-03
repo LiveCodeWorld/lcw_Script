@@ -58,8 +58,8 @@ end exported_HandlerHkeyArray
 
 --> Display | Handler Graph
 -
-command display_HandlerGraph hKey
-   -- used often by handler menu in script editor
+command display_CreateHandlerGraph hKey
+   -- used by "Global_Hkey_Walk_Menu"
    -- traverses the hkey dependency graph using a slow crawl of Livecode objects
    set the cursor to watch
    --
@@ -70,7 +70,7 @@ command display_HandlerGraph hKey
    put the result into imageFile
    --
    display_HkeySVG hkey
-end display_HandlerGraph
+end display_CreateHandlerGraph
 
 command display_HandlerDeps hKeyLine
    -- Test again (based on array export code)

@@ -1,0 +1,273 @@
+﻿script "lib_HandlerCalls"
+--> MetaData
+-
+license: GPLv3
+name: lib_HandlerCalls
+type: library
+version: 0.1
+
+/*
+This library is the central place to organise all code that deals with extracting script calls from a handler.
+It was taken from "libOPN_Calls".
+
+There are several ways to refer to handlers:
+-  as a handler of a sript object "handler"
+-  using an hKey reference
+-  using the global hArray database
+
+Call links in the library are stored a simple short hkeys.
+They are stored in two places, a a simple link.txt file with a list of CR separated short hKeys,
+and in the projects metadata array file as metadataArray ["filteredCalls"], and metadataArray ["allCalls"].
+
+Eventually should decide which to use (probably get rid of links.txt, and maybe loose both and replace with an sqLite db.
+*/
+
+
+--> Working on
+-
+--> Hkey | Calls
+-
+getprop handler_Calls [shortHkey]
+   put the script_Handler [shortHkey] of the target into someHandler
+   put handler_ExtractCalls (someHandler) into handlerCalls
+   return handlerCalls
+end handler_Calls
+
+function handler_ExtractCalls someHandler, pSkipHkeyComponents, pSkipHkeyProps
+   put handler_ConstructCallArray (someHandler, pSkipHkeyComponents, pSkipHkeyProps) into metadataArray 
+   return metadataArray ["hkeyCalls"]
+end handler_ExtractCalls
+
+function handler_ExtractFilteredCalls someHandler, pSkipHkeyComponents, pSkipHkeyProps
+   put handler_ConstructCallArray (someHandler, pSkipHkeyComponents, pSkipHkeyProps) into metadataArray 
+   return metadataArray ["filteredCalls"]
+end handler_ExtractFilteredCalls
+
+function handler_ConstructCallArray someHandler, pSkipHkeyComponents, pSkipHkeyProps
+   -- this is slow, and needs to be as fast as possible as we want to call it on every script compile!
+   -- should be modified to include "pass"
+   
+   local allCalls
+   
+   put word 1 to -1 of someHandler into someHandler
+   delete line 1 of someHandler
+   delete line -1 of someHandler
+   
+   put false into repeatUntilEndOfComment
+   repeat for each line someLine in someHandler
+      if repeatUntilEndOfComment is true then
+         put char -2 to -1 of someLine into endCommentBit
+         if endCommentBit = "*/" then
+            put false into repeatUntilEndOfComment
+         end if
+         next repeat
+      else if char 1 to 2 of word 1 of someLine = "/*" then
+         put true into repeatUntilEndOfComment
+         next repeat
+      else
+         -- first lt's deal with single line comments
+         repeat for each item commentBlock in "--,#"
+            if someLine contains commentBlock then
+               put text_StripQuoted (someLine) into commentLine
+               
+               put wordOffset (commentBlock, commentLine) into wordNum
+               if wordNum > 0 then
+                  put word wordNum to -1 of commentLine into someComment
+                  
+                  if char -1 of word 2 of someComment = ":" then
+                     set the itemdelimiter to ":"
+                     put word 2 of item 1 of someComment into someKey
+                     put word 1 to -1 of item 2 of commentLine into someValue
+                     set the itemdelimiter to ","
+                     
+                     put metadataArray [someKey] into someIndex
+                     line_Add someValue, someIndex
+                     put someIndex into metadataArray [someKey]
+                  end if
+                  
+                  -- delete the comments part
+                  delete word wordNum to -1 of someLine
+               end if
+            end if
+         end repeat
+         
+         if the number of words of someLine = 0 then next repeat
+         
+         put someLine into testLine
+         replace " then " with CR in testLine
+         replace " else " with CR in testLine
+         repeat for each line testBit in testLine
+            put token 1 of testBit into testComand
+            if testComand is empty then next repeat
+            
+            switch
+               case ide_IsDictionaryTerm (testComand) is true
+                  break
+               case testComand = "dispatch"
+                  put token 2 of testBit into dispatchCommand
+                  put dispatchCommand,"c" into shortHKey
+                  
+                  handler_AddToCallArray tempArray, shortHKey, metadataArray, someHandler, pSkipHkeyComponents, pSkipHkeyProps
+                  
+                  delete token 1 to 3 of someLine  -- let's look at the rest of the line
+                  break
+               case testComand is among the items of "send,call"
+                  put token 2 of testBit into sendMessage
+                  put token 1 of sendMessage into sendComand
+                  put sendComand,"c" into shortHKey
+                  
+                  handler_AddToCallArray tempArray, shortHKey, metadataArray, someHandler, pSkipHkeyComponents, pSkipHkeyProps
+                  
+                  delete token 1 to 3 of someLine  -- let's look at the rest of the line
+                  break
+               default
+                  -- first word and not a LiveCode term
+                  put testComand,"c" into shortHKey
+                  
+                  handler_AddToCallArray tempArray, shortHKey, metadataArray, someHandler, pSkipHkeyComponents, pSkipHkeyProps
+                  
+                  delete token 1 of someLine  -- let's look at the rest of the line
+            end switch
+         end repeat
+         
+         put _ExtractFunctionCalls (someLine, false) into fNames
+         repeat for each line fName in fNames
+            put fName,"f" into shortHKey
+            
+            handler_AddToCallArray tempArray, shortHKey, metadataArray, someHandler, pSkipHkeyComponents, pSkipHkeyProps
+         end repeat
+         
+         -- could still have other stuff on line
+         set the wholematches to true
+         put wordoffset ("the", someLine) into theWordNum
+         if theWordNum is 0 then next repeat
+         
+         put theWordNum - 1 into setGetPutWordNum
+         put word setGetPutWordNum to -1 of someLine into testLineBit
+         
+         put 3 into handlerTokenNum
+         put token handlerTokenNum of testLineBit into hName
+         if ide_IsDictionaryTerm (hName) is true then next repeat
+         
+         -- now check getprop / setprop calls ("the xxx [zzz] of")
+         
+         put handlerTokenNum + 1 into ofTokenNum
+         get token ofTokenNum of testLineBit
+         if it is "[" then
+            put handlerTokenNum + 4 into ofTokenNum
+            get token ofTokenNum of testLineBit
+         end if
+         
+         if it is "of" then
+            put token 1 of testLineBit into setGetPut
+            if setGetPut is "set" and "to" is among the words of someLine then
+               if "_" is not in hName then
+                  -- we assume by convention that a virtual property has the form
+                  next repeat
+               end if
+               put hName,"s" into shortHKey
+               
+               handler_AddToCallArray tempArray, shortHKey, metadataArray, someHandler, pSkipHkeyComponents, pSkipHkeyProps
+            else -- if setGetPut is among the items of "case,if,get,put" then
+               if "_" is not in hName then
+                  -- we assume by convention that a virtual property has the form
+                  next repeat
+               end if
+               put hName,"g" into shortHKey
+               
+               handler_AddToCallArray tempArray, shortHKey, metadataArray, someHandler, pSkipHkeyComponents, pSkipHkeyProps
+            end if
+         end if
+      end if
+   end repeat
+   
+   put tempArray ["hkeyCalls"] into someArray
+   put keys (someArray) into metadataArray ["hkeyCalls"]
+   put tempArray ["filteredCalls"] into someArray
+   put keys (someArray) into metadataArray ["filteredCalls"]
+   
+   put sha1_Hash (someHandler) into handlerHash
+   put handlerHash into metadataArray ["sha1"]
+   -- hkey_AddToKeyWordArray metadataArray, hKey, handlerHash
+   
+   return metadataArray
+end handler_ConstructCallArray
+
+command handler_AddToCallArray @tempArray, shortHKey, handlerArray, someHandler, pSkipHkeyComponents, pSkipHkeyProps
+   -- currently no filtering
+   put hkeyLine_FromHkey (shortHkey) into hTableLine
+   put empty into tempArray ["hkeyCalls"][hTableLine]
+   put empty into tempArray ["filteredCalls"][hTableLine]
+   return empty
+end handler_AddToCallArray
+
+function handler_ConstructMetadataArray hKey, pHandler, pSkipHkeyComponents, pSkipHkeyProps
+   if pHandler is empty then
+      put hkey_ExtractHandlerFromObject (hKey) into pHandler
+   end if
+   put handler_ConstructCallArray (pHandler) into metadataArray
+   hkey_AddToKeyWordArray metadataArray, hKey, handlerHash
+   return metadataArray
+end handler_ConstructMetadataArray
+
+
+--> Hkey | Handler | Calls
+-
+function hkey_ExtractHandlerCalls hKey
+   put hkey_ExtractHandlerFromObject (hKey) into handlerCalls
+   put handler_ExtractCalls (someHandler) into handlerCalls
+   return handlerCalls   
+end hkey_ExtractHandlerCalls
+
+
+--> Private
+-
+private function _ExtractFunctionCalls scriptLine, pIncludeBuiltinFunctions
+   -- recursive function
+   local fNames
+   
+   put text_StripQuoted (scriptLine) into scriptLine
+   -- put "(\w+)\s*" & "\((.*)\)" into greedyExpression -- error with handlers that use "." notation
+   -- if matchtext(scriptLine, greedyExpression, wordBefore, bracketedStuff) is true then
+   
+   put "\((.*)\)" into bracketExpression
+   if matchchunk (scriptLine, bracketExpression, startBracketedStuff, endBracketedStuff) is true then
+      put char startBracketedStuff to endBracketedStuff of scriptLine into bracketedStuff
+      get char 1 to (startBracketedStuff - 1) of scriptLine
+      put token -2 of it into wordBefore
+      if wordBefore is among the chars of "[()]" then
+         -- hack
+         put empty into wordBefore
+      end if
+      
+      if bracketedStuff contains "(" then
+         put _ExtractFunctionCalls (bracketedStuff, pIncludeBuiltinFunctions) into innerFunctions
+         
+         if pIncludeBuiltinFunctions is true then
+            repeat for each line innerFunction in innerFunctions
+               line_Add innerFunction, fNames
+            end repeat
+         else
+            repeat for each line innerFunction in innerFunctions
+               if ide_IsDictionaryTerm(innerFunction) is false then
+                  line_Add innerFunction, fNames
+               end if
+            end repeat
+         end if
+      end if
+      
+      if wordBefore is not empty then
+         if pIncludeBuiltinFunctions is true then
+            line_Add wordBefore, fNames
+         else
+            if ide_IsDictionaryTerm (wordBefore) is false then
+               line_Add wordBefore, fNames
+            end if
+         end if
+      end if
+      return word 1 to -1 of fNames
+   else
+      return empty
+   end if
+end _ExtractFunctionCalls
+
