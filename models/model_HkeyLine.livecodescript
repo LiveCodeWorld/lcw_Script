@@ -121,7 +121,6 @@ function hkeyLine_GetHandlers hkeyLines, hTable, someScript
    repeat for each line hkeyLine in hkeyLines
       put hkeyLine_GetHandler (hkeyLine, hTable, someScript) into foundHandler
       if foundHandler is empty then next repeat
-      
       put foundHandler & CR & CR after foundHandlers
    end repeat
    delete char -2 to -1 of foundHandlers

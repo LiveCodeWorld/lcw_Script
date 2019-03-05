@@ -34,8 +34,11 @@ getprop script_Type
          case stackPath begins with stackPath
             return "ide"
       end switch
+   else if word 1 of scriptType = "Script" then
+      -- hack: old "script library" way of labeling
+      delete word 1 of scriptType
    end if
-   return scriptType
+   return word 1 to -1 of scriptType
 end script_Type
 
 setprop script_Type scriptType

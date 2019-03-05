@@ -105,6 +105,12 @@ getprop script_Hkeys [fetchHow]
    end switch
 end script_Hkeys
 
+getprop script_HandlerNames [pNotPrivate]
+   put the revAvailableHandlers of the target into handlerTable
+   put hTable_GetHandlerNames (handlerTable, pNotPrivate) into hNames
+   return hNames
+end script_HandlerNames
+
 getprop script_ShortHKeys
    -- this is the new version of shortHekys
    -- should be able to use "the revAvailableHandlers" instead

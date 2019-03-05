@@ -102,14 +102,14 @@ setprop exported_Script [pExportCalls] someScript
 end exported_Script
 
 getprop script_IsDifferent
-   -- even if the only difference is whitespace
+   -- even if the only difference is whitespace (we tolerate empty space at start and end of scripts)
    -- which means a diff program may show no diference when this returns true
    put the long id of the target into targetObject
    try
       put the script of targetObject into someScript
       put the exported_Script of targetObject into exportedScript
       if exportedScript is empty then return false -- added as if there is no exported script to compare it is no different
-      put exportedScript is not someScript into someBoolean
+      put word 1 to -1 of exportedScript is not word 1 to -1 of someScript into someBoolean
       return someBoolean
    catch someError
       return empty  -- script may be protected
@@ -153,7 +153,7 @@ function script_ReconstructFromExported dataFolder, pDontMerge
       put dataFolder & "handlers/" into handlersFolder
       if there is a folder handlersFolder then
          put merge (rawScript) into fullScript
-         return fullScript
+         return fullScript & CR -- extra CR as IDE adds this to scripts displayed
       else
          return rawScript
       end if

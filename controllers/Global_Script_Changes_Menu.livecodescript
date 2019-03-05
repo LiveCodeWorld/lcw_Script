@@ -4,20 +4,17 @@
 license: GPLv3
 name: Global_Script_Changes_Menu
 type: controller
-version: 0.2
+version: 0.3
 
 
 --> Global | Script | Changes | Menu
 -
+on menu_DisplayRecentChanges indexView
+   display_RecentExports 300, indexView, true
+end menu_DisplayRecentChanges
+
 on menu_FilterForChanged indexView
-   put the displayed_Index of indexView into scriptObjects
-   repeat for each line scriptObject in scriptObjects
-      if the script_IsDifferent of scriptObject is true then
-         put scriptObject & CR after changedScriptObjects
-      end if
-   end repeat
-   delete char -1 of changedScriptObjects
-   set the displayed_Index of indexView to changedScriptObjects
+   display_RecentExports empty, indexView, false
 end menu_FilterForChanged
 
 on _

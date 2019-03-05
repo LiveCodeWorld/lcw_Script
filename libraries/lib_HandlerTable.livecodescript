@@ -33,6 +33,7 @@ function hTable_GetHkeys hTable, hObject
 end hTable_GetHkeys
 
 function hTable_GetShortHkeys hTable
+   sort numeric lines of hTable by word 3 of each
    repeat for each line someLine in hTable
       put word 1 to 2 of someLine into hTableLine
       put hTableLine & CR after hTableLines
@@ -40,6 +41,19 @@ function hTable_GetShortHkeys hTable
    delete char -1 of hTableLines
    return hTableLines
 end hTable_GetShortHkeys
+
+function hTable_GetHandlerNames hTable, pNotPrivate
+   if pNotPrivate is true then
+      filter hTable without "P*"
+   end if
+   sort numeric lines of hTable by word 3 of each
+   repeat for each line someLine in hTable
+      put word 2 of someLine into hName
+      put hName & CR after hNames
+   end repeat
+   delete char -1 of hNames
+   return hNames
+end hTable_GetHandlerNames
 
 
 --> hTable | Flexible
@@ -107,8 +121,7 @@ end htable_GetExact
 
 command htable_ExactLineOffsets searchHkeyLine, hTable, @startLineNum, @endLineNum
    hkeyLine_Normalize searchHkeyLine
-   -- searches hTable for the hType and hName in searchHkeyLine
-   -- as fast as possible
+   -- searches hTable for the hType and hName in searchHkeyLine (as fast as possible)
    put word 1 to 2 of searchHkeyLine into shortHkeyLine
    repeat for each line hLine in hTable
       if word 1 to 2 of hLine = shortHkeyLine then

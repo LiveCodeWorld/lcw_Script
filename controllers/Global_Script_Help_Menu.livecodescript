@@ -30,12 +30,13 @@ on menu_Help sObject
 end menu_Help
 
 on menu_CreateHelp sObject
-   help_CreateFromObject sObject
+   lcw_CreateObjectHelp sObject
    help_Launch sObject
 end menu_CreateHelp
 
 on menu_UpdateHelp sObject
-   help_Update sObject
+   lcw_UpdateObjectHelp sObject
+   help_Launch sObject
 end menu_UpdateHelp
 
 

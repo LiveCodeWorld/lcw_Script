@@ -34,12 +34,7 @@ end menu_Init
 --> Global | Hkey | Help | Menu
 -
 on menu_HandlerHelp hKey
-   put hkey_ConstructHelpUrl (hKey, true) into someURL
-   if someURL is empty then
-      help_CreateFromHandler hKey
-      put hkey_ConstructHelpUrl (hKey) into someURL
-   end if
-   launch url someURL
+   help_HkeyLaunch hKey, true
 end menu_HandlerHelp
 
 on menu_TransporterHelp hKey
@@ -53,7 +48,7 @@ end menu_TransporterHelp
 
 on menu_MenuHandlerHelp hKey
    breakpoint
-   put hkey_ConstructHelpUrl (hKey, true) into someURL
+   put help_ConstructHkeyUrl (hKey, true) into someURL
    if someURL is empty then
       help_CreateFromHandler hKey
    else
@@ -69,20 +64,25 @@ on menu_UpdateHelpGraph hKey
          transport_StorePageArray hKey, pageArray
          break
       default
-         put pageArray_FetchHandler (hKey) into pageArray
+         put lcw_FetchHandlerArray (hKey) into pageArray
          --
          put hkey_GetDotText (hKey) into dotText
          pageArray_ReplaceGraph pageArray, dotText
          --
-         pageArray_StoreHandler hKey, pageArray
+         lcw_StoreHandlerArray hKey, pageArray
    end switch
 end menu_UpdateHelpGraph
+
+on menu_UpdateMetadata hKey
+   lcw_UpdateHandlerHelp hKey
+   help_HkeyLaunch hKey, true
+end menu_UpdateMetadata
 
 
 --> Global | Hkey | Help | Menu | Disabled
 -
 getprop disabled_UpdateHelpGraph [hKey]
-   put hkey_ConstructHelpUrl (hKey, true) into someURL
+   put help_ConstructHkeyUrl (hKey, true) into someURL
    if someURL is not empty then
       -- if LocalArray ["isTransport"] is true then
       return false

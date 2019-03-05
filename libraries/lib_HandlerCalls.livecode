@@ -33,6 +33,27 @@ getprop handler_Calls [shortHkey]
    return handlerCalls
 end handler_Calls
 
+getprop handler_PublicCalls [shortHkey]
+   if shortHKey is empty then return empty
+   hkeyLine_Normalize shortHKey
+   
+   put the long id of the target into hObject
+   put the revAvailableHandlers of hObject into hTable
+   put the script of hObject into someScript
+   put hkeyLine_GetHandler (shortHKey, hTable, someScript) into someHandler
+   if someHandler is empty then return empty
+   put handler_ExtractCalls (someHandler) into handlerCalls
+   
+   repeat for each line callHkey in handlerCalls
+      put "P" & callHkey into privateCallHkey
+      htable_ExactLineOffsets privateCallHkey, hTable, startLineNum, endLineNum
+      if the result is true then next repeat
+      
+      put callHkey & CR after publicCalls
+   end repeat
+   return publicCalls
+end handler_PublicCalls
+
 function handler_ExtractCalls someHandler, pSkipHkeyComponents, pSkipHkeyProps
    put handler_ConstructCallArray (someHandler, pSkipHkeyComponents, pSkipHkeyProps) into metadataArray 
    return metadataArray ["hkeyCalls"]

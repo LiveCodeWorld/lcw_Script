@@ -110,21 +110,22 @@ end handler_Get
 -
 function hkey_GetType hKey, pCheck
    hkey_Deconstruct hKey, hName, hType, hObject, hNum
-   switch hType
+   put the result into goodHkey
+   switch word 1 of goodHkey
       case "pf" -- should not be
          return "private function"
       case "f"
          return "function"
       case "pm" -- should not be
          return "private command"
-      case "m"
-         return "command"
-      case "o"
-         return "command" -- could be "event" or "message"
       case "g"
          return "getprop"
       case "s"
          return "setprop"
+      default
+         -- case "m"
+         -- case "o"
+         return "command" -- could be "event" or "message"
    end switch
 end hkey_GetType
 

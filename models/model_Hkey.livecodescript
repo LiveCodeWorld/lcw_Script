@@ -238,7 +238,7 @@ function hkey_FetchOverlayData hKey
    if encodedArray is empty then return empty
    put arraydecode (encodedArray) into overlayData
    return overlayData
-end hkey_FetchOverlayData 
+end hkey_FetchOverlayData
 
 command hkey_SaveOverlayData hKey, overlayData
    put hkey_OverlayDataFile (hKey) into someFile
