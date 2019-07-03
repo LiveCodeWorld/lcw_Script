@@ -19,8 +19,20 @@ See also lib_FindHkey
 */
 
 
---> Working on
+--> Props
 -
+getprop hkey_Line [hKey]
+   put the revAvailableHandlers of the target into hTable
+   hkey_Normalize hKey
+   put the result into shortHkey
+   repeat for each line hTableLine in hTable
+      if word 1 to 2 of hTableLine = word 1 to 2 of shortHkey then
+         return hTableLine
+      end if
+   end repeat
+   return empty
+end hkey_Line
+
 getprop hkey_Lines
    -- latest version of hKeys
    -- see "script_Hkeys" and "script_FirstHkeys"
@@ -30,6 +42,20 @@ getprop hkey_Lines
    put hTable_GetHkeys (hTable, hObject) into hkeyLines
    return hkeyLines
 end hkey_Lines
+
+
+--> Working on
+-
+command hkeyLine_Normalize @hKey
+   breakpoint
+   hkey_Normalize hKey
+end hkeyLine_Normalize
+
+command hkey_Normalize @hKey
+   put hkeyLine_FromHkey (hKey) into hKey
+   put word 1 to 2 of hKey into shortHkey
+   return shortHkey
+end hkey_Normalize
 
 function hkeyLine_ConstructStart hKey
    hkey_Deconstruct hKey, hName, hType, hObject, hNum
@@ -67,20 +93,14 @@ end hkeyLine_ConstructStart
 
 --> Hkey | Do both
 -
-function hkey_Construct hName, hType, hObject, pHandlerNum
+function hkey_Construct hName, hType, hObject
    if exists (hObject) then
       put revRuggedID (hObject) into hObject
    else
       put "Missing" into hObject
    end if
-   
-   -- new version
    put hKeyLine_FromTripple (hName, hType, hObject) into hKeyLine
    return hKeyLine
-   
-   -- old version
-   if pHandlerNum is empty then put 1 into pHandlerNum
-   return hName,hType,hObject,pHandlerNum
 end hkey_Construct
 
 function hkey_FromShort shortHkeys, hObject
@@ -138,12 +158,6 @@ end hkeyLine_GetHandler
 
 --> hKeyLine
 -
-command hkeyLine_Normalize @hKey
-   put hkeyLine_FromHkey (hKey) into hKey
-   put word 1 to 2 of hKey into shortHkey
-   return shortHkey
-end hkeyLine_Normalize
-
 function hkeyLine_FromHkey hKey
    hkey_Deconstruct hKey, hName, hType, hObject, hNum
    put hKeyLine_FromTripple (hName, hType, hObject) into hkeyLine

@@ -58,15 +58,37 @@ end exported_HandlerHkeyArray
 
 --> Display | Handler Graph
 -
-command display_CreateHandlerGraph hKey
+on hkey_Rename hkey
+   hkey_Deconstruct hkey, hName, hType, hObject, hNum
+   switch
+      case hName is among the items of "jsonImport,josnExport,mock_DropJson"
+         return empty
+      case hName begins with "rig"
+         put "revIgniter" into hObject -- could be "stack 'revIgniter'"?
+         put hKeyLine_FromTripple (hName, hType, hObject) into hkey
+         return hkey
+      default
+         return hKey
+   end switch
+end hkey_Rename
+
+on graph_TidyLinkArray @hkeyArray
+   -- before graph arrays have been created
+   -- let's just process hkeyArray for general hKey purposes
+   put the long id of me into processObject
+   hkeyArray_Process hkeyArray, processObject
+end graph_TidyLinkArray
+
+command display_CreateHandlerGraph hKey, pClusterBoolean
    -- used by "Global_Hkey_Walk_Menu"
    -- traverses the hkey dependency graph using a slow crawl of Livecode objects
    set the cursor to watch
+   put the long id of me into processObject
    --
    hkey_Deconstruct hKey, hName, hType, hObject, hNum
    put the project_Name of hObject into projectName
    --
-   graph_HkeyDependency hkey, projectName, "hierarchical"
+   graph_HkeyDependency hkey, projectName, "hierarchical", pClusterBoolean, processObject
    put the result into imageFile
    --
    display_HkeySVG hkey
@@ -94,9 +116,8 @@ end display_HandlerDeps
 
 --> Display | Handler Graph
 -
-command graph_HkeyDependency hKey, pProjectName, pGraphStyle, pClusterBoolean
+command graph_HkeyDependency hKey, pProjectName, pGraphStyle, pClusterBoolean, processObject
    -- traverses the hkey dependency graph using a slow crawl of Livecode objects
-   
    put empty into overlayName -- defaults to pGraphStyle or "hierarchical"
    if pClusterBoolean is not false then 
       put empty into clusterRank
@@ -109,7 +130,7 @@ command graph_HkeyDependency hKey, pProjectName, pGraphStyle, pClusterBoolean
    put hkey_MetadataFolder (hKey) into hkeyMetadataFolder
    folder_CreateNested hkeyMetadataFolder
    --
-   overlay_CreateGraph hkeyMetadataFolder, hkeyArray, overlayName, hKey, pGraphStyle, clusterRank, empty, "svg"
+   overlay_CreateGraph hkeyMetadataFolder, hkeyArray, overlayName, hKey, pGraphStyle, clusterRank, empty, "svg", processObject
    --
    put hkey_SvgFile (hKey, pGraphStyle) into svgFile
    return svgFile

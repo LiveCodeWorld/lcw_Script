@@ -3,7 +3,7 @@
 -
 license: GPLv3
 name: Global_Hkey_Help_Menu
-type: controller
+type: menu
 version: 0.1
 
 
@@ -30,12 +30,77 @@ on menu_Init tObject, hKey
    end switch
 end menu_Init
 
+getprop disabled_CreateMenuPage [hKey]
+   put hkey_GetMenuTitle (hKey) into gMenuTitle
+   put help_FetchMenuHelpArray (gMenuTitle) into pageArray
+   if pageArray is empty then
+      return false
+   else
+      return true
+   end if
+end disabled_CreateMenuPage
+
+-- getprop disabled_CreateSubdomain [hKey]
+put lcw_FetchMenuItemHelpArray (hKey, true) into pageArray
+if pageArray is empty then
+   return false
+else
+   return true
+end if
+end disabled_CreateSubdomain
+
+getprop disabled_MenuHandlerHelp [hKey]
+   if LocalArray ["isMenu"] is true then
+      return false
+   else
+      return "delete"
+   end if
+end disabled_MenuHandlerHelp
+
+getprop disabled_MenuItemHelp [hKey]
+   put lcw_FetchMenuItemHelpArray (hKey) into pageArray
+   if pageArray is empty then
+      return false
+   else
+      return true
+   end if
+end disabled_MenuItemHelp
+
+getprop disabled_HandlerHelp [hKey]
+   if LocalArray ["isHandler"] is true then
+      return false
+   else
+      return "delete"
+   end if
+end disabled_HandlerHelp
+
 
 --> Global | Hkey | Help | Menu
 -
 on menu_HandlerHelp hKey
-   help_HkeyLaunch hKey, true
+   help_LaunchMenuItem hKey
+   if the result is empty then
+      lcw_CreateHandlerHelp hKey
+      put the result into pageArray
+      if pageArray is not an array then
+         breakpoint
+      else
+         help_LaunchMenuItem hKey
+      end if
+   end if
 end menu_HandlerHelp
+
+on menu_MenuHandlerHelp hKey
+   help_LaunchMenuItem hKey
+   if the result is empty then
+      help_CheckUpdateMenuItem hKey
+      help_CreateMenuItem hKey
+      help_LaunchMenuItem hKey
+   end if
+end menu_MenuHandlerHelp
+
+on _
+end _
 
 on menu_TransporterHelp hKey
    put transport_HelpURL (hKey, true) into someURL
@@ -45,16 +110,6 @@ on menu_TransporterHelp hKey
    end if
    launch url someURL
 end menu_TransporterHelp
-
-on menu_MenuHandlerHelp hKey
-   breakpoint
-   put help_ConstructHkeyUrl (hKey, true) into someURL
-   if someURL is empty then
-      help_CreateFromHandler hKey
-   else
-      launch url someURL
-   end if
-end menu_MenuHandlerHelp
 
 on menu_UpdateHelpGraph hKey
    switch
@@ -74,9 +129,31 @@ on menu_UpdateHelpGraph hKey
 end menu_UpdateHelpGraph
 
 on menu_UpdateMetadata hKey
-   lcw_UpdateHandlerHelp hKey
-   help_HkeyLaunch hKey, true
+   switch
+      case hkey_IsMenuHandler (hKey)
+         help_UpdateMenuItem hKey
+         if the result is empty then
+            -- create new
+            breakpoint
+         end if
+         break
+      case hkey_IsTransportHandler (hKey)
+         transport_UpdateHelp hKey
+         put transport_HelpURL (hKey, true) into someURL
+         launch url someURL
+         break
+      default
+         lcw_UpdateHandlerHelp hKey
+         help_LaunchMenuItem hKey, true
+   end switch
 end menu_UpdateMetadata
+
+on _
+end _
+
+on submenu_Dev
+   return "Dev | Menu"
+end submenu_Dev
 
 
 --> Global | Hkey | Help | Menu | Disabled
@@ -91,22 +168,6 @@ getprop disabled_UpdateHelpGraph [hKey]
    end if
 end disabled_UpdateHelpGraph
 
-getprop disabled_MenuHandlerHelp [hKey]
-   if LocalArray ["isMenu"] is true then
-      return false
-   else
-      return "delete"
-   end if
-end disabled_MenuHandlerHelp
-
-getprop disabled_HandlerHelp [hKey]
-   if LocalArray ["isHandler"] is true then
-      return false
-   else
-      return "delete"
-   end if
-end disabled_HandlerHelp
-
 getprop disabled_TransporterHelp [hKey]
    if LocalArray ["isTransport"] is true then
       return false
@@ -114,3 +175,53 @@ getprop disabled_TransporterHelp [hKey]
       return "delete"
    end if
 end disabled_TransporterHelp
+
+
+--> Dev | Menu
+-
+on menu_CreateMenuPage hKey
+   put _Stackname (hKey) into stackName
+   put help_MenuPageTitle (stackName) into gMenuTitle
+   --
+   help_CreateMenu gMenuTitle
+   --
+   help_LaunchMenu stackName
+end menu_CreateMenuPage
+
+on menu_UpdateMenuPage hKey
+   put _Stackname (hKey) into stackName
+   put help_MenuPageTitle (stackName) into gMenuTitle
+   --
+   help_UpdateMenu gMenuTitle, "reference"
+   --
+   help_LaunchMenu stackName
+end menu_UpdateMenuPage
+
+on _
+end _
+
+on menu_CreateSubdomain hKey
+   help_CreateMenuSubdomain hKey
+   --
+   hkey_Deconstruct hKey, hName, hType, hObject, hNum
+   put the stack_Name of hObject into stackName
+   help_LaunchMenuSubdomain stackName
+end menu_CreateSubdomain
+
+on menu_UpdateSubdomain hKey
+   help_UpdateMenuSubdomain hKey, "reference"
+   --
+   hkey_Deconstruct hKey, hName, hType, hObject, hNum
+   put the stack_Name of hObject into stackName
+   help_LaunchMenuSubdomain stackName
+end menu_UpdateSubdomain
+
+
+--> Private
+-
+private function _Stackname hKey
+   hkey_Deconstruct hKey, hName, hType, hObject, hNum
+   put the stack_Name of hObject into stackName
+   return stackName
+end _Stackname
+

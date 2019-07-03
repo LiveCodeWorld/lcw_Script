@@ -22,7 +22,7 @@ local LocalArray
 
 --> Menu | Props
 -
-on menu_Init
+on menu_Init tObject
    -- a hack (we keep getting this reset by Livecode)
    ide_AddRevEditScriptStack "LCW"
    rev_AddBehaviorHacks
@@ -31,7 +31,7 @@ on menu_Init
    put sObject into LocalArray ["sObject"]
 end menu_Init
 
-getprop menu_Target [mTitlePath]
+getprop menu_Target [tObject]
    put LocalArray ["sObject"] into sObject
    return sObject
 end menu_Target
@@ -71,10 +71,3 @@ end submenu_Git
 on menu_ViewTools sObject
    display_ViewIndex sObject   
 end menu_ViewTools
-
-
---> Global | ScriptEditor | Recent | Watch | Menu | Props
--
-
---> Global | ScriptEditor | Recent | Watch | Menu | Disabled
--

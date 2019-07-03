@@ -7,6 +7,13 @@ type: controller
 version: 0.5
 
 
+--> Menu | Props
+-
+getprop editBehavior_Params
+   return "Compile,Menu,Script,Handler,Search"
+end editBehavior_Params
+
+
 --> Global | Script | Menu
 -
 on menu_EditBehavior seGroup, whichBehavior
@@ -29,10 +36,3 @@ on menu_EditBehavior seGroup, whichBehavior
    end switch
    edit the script of bObject
 end menu_EditBehavior
-
-
---> Global | Script | Menu | Props
--
-
---> Global | Script | Menu | Disabled
--

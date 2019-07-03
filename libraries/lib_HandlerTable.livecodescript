@@ -18,6 +18,42 @@ The "Flexible" handlers are not fully tested, and the logic might be not quite r
 */
 
 
+--> Props
+-
+getprop short_Hkeys [hFilter]
+   put the revAvailableHandlers of the target into hTable
+   put hTable_ListShortHkeys (hTable, hFilter) into shortHkeys
+   return shortHkeys
+end short_Hkeys
+
+getprop handler_Names [hFilter]
+   put the revAvailableHandlers of the target into hTable
+   put hTable_ListHanderNames (hTable, hFilter) into hNames
+   return hNames
+end handler_Names
+
+
+--> hTable | List
+-
+function hTable_ListHanderNames hTable, hFilter
+   if hFilter is not empty then filter hTable with hFilter
+   repeat for each line someLine in hTable
+      put word 2 of someLine & CR after shortHkeys
+   end repeat
+   delete char -1 of shortHkeys
+   return shortHkeys
+end hTable_ListHanderNames
+
+function hTable_ListShortHkeys hTable, hFilter
+   if hFilter is not empty then filter hTable with hFilter
+   repeat for each line someLine in hTable
+      put word 1 to 2 of someLine & CR after shortHkeys
+   end repeat
+   delete char -1 of shortHkeys
+   return shortHkeys
+end hTable_ListShortHkeys
+
+
 --> hTable
 -
 function hTable_GetHkeys hTable, hObject
@@ -69,7 +105,7 @@ function hTable_GetFlexible searchHkeyLine, hTable, tObject, pMatchPrivate
 end hTable_GetFlexible
 
 command hTable_FlexibleLineOffsets shortHkey, hTable, @startLineNum, @endLineNum, pMatchPrivate
-   hkeyLine_Normalize shortHkey
+   hkey_Normalize shortHkey
    
    -- this should get offsets for a call as a script would
    -- so it ignores the difference betweeen "on" and "command"
@@ -120,7 +156,7 @@ function htable_GetExact searchHkeyLine, hTable, tObject
 end htable_GetExact
 
 command htable_ExactLineOffsets searchHkeyLine, hTable, @startLineNum, @endLineNum
-   hkeyLine_Normalize searchHkeyLine
+   hkey_Normalize searchHkeyLine
    -- searches hTable for the hType and hName in searchHkeyLine (as fast as possible)
    put word 1 to 2 of searchHkeyLine into shortHkeyLine
    repeat for each line hLine in hTable
@@ -151,7 +187,7 @@ function htable_GetEither searchHkeyLine, hTable, tObject
 end htable_GetEither
 
 command htable_EitherLineOffsets searchHkeyLine, hTable, @startLineNum, @endLineNum
-   hkeyLine_Normalize searchHkeyLine
+   hkey_Normalize searchHkeyLine
    -- as fast as possible
    -- searches hTable for the hType and hName in searchHkeyLine
    -- matches either private of public handlers

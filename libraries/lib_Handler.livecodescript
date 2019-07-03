@@ -13,19 +13,52 @@ See also stack "model_Script"
 
 --> Props
 -
-getprop object_Hkey [hKey]
-   hkey_Deconstruct hKey, hName, hType, xObject, xNum
+getprop action_Key [aItems]
+   put the long id of the target into tObject
+   put item 1 of aItems into hName
+   put item 2 of aItems into aIcon
    --
+   put revRuggedID (tObject) into hObject
+   put hkeyLine_FromTripple (hName, "M", hObject) into hKey
+   --
+   if aName is empty then
+      return hKey
+   else
+      return hKey,aIcon
+   end if
+end action_Key
+
+command action_Deconstruct actionKey, @hName, @hObject, @aIcon
+   put item 1 of aKey into hKey
+   put item 2 of aKey into aIcon
+   hKey_Deconstruct hKey, hName, hType, hObject, hNum
+end action_Deconstruct
+
+function action_Construct hName, hObject, aIcon
+   put the handler_Key ["M test"] of hObject into hKey
+   if aIcon is empty then
+      return hKey
+   else
+      return hKey,aName
+   end if
+end action_Construct
+
+getprop object_Hkey [hKey]
+   return the handler_Key [hKey] of the target
+end object_Hkey
+
+getprop handler_Key [hKey]
    put the long id of the target into tObject
    put revRuggedID (tObject) into hObject
    --
-   put hkeyLine_FromTripple (hName, hType, hObject)
+   hkey_Deconstruct hKey, hName, hType, xObject, xNum
+   put hkeyLine_FromTripple (hName, hType, hObject) into hKey
    --
    return hKey
-end object_Hkey
+end handler_Key
 
 getprop handler_OverlayArray [shortHkey]
-   put the object_Hkey [shortHkey] of the target into hKey
+   put the handler_Key [shortHkey] of the target into hKey
    -- 
    put hkey_GetOverlayArray (hKey) into overlayArray
    return overlayArray
@@ -51,7 +84,7 @@ end handler_Folder
 
 getprop handler_InHierarchy [hKey]
    put the long id of the target into tObject
-   hkeyLine_Normalize hKey
+   hkey_Normalize hKey
    put the result into shortHkey
    
    put hkey_FoundArray (shortHKey, tObject) into foundArray

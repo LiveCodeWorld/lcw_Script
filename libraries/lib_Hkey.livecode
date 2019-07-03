@@ -19,6 +19,83 @@ with the "script_" extension being replaces by "hkey_"
 
 --> Working on
 -
+function hkey_IsMenuHandler hKey
+   -- not sure how best to check this
+   put hkey_GetMenuTitle (hKey) into mTitle
+   if mTitle is empty then
+      return false
+   else
+      return true
+   end if
+   
+   
+   hkey_Deconstruct hKey, hName, hType, hObject, hNum
+   -- put the script_Type of hObject into scriptType -- = "menu" ?
+   
+   set the itemdelimiter to "_"
+   if item 1 of hName = "menu" then
+      -- we should check if it an actual menu or just a handler somewhere
+      put the stack_Name of hObject into stackName
+      put project_ListUsedStackNames ("lcw_Menus") into libAndModelNames
+      set the wholematches to true
+      if stackName is among the lines of libAndModelNames then
+         return false
+      else
+         return true
+      end if
+   else
+      return false
+   end if
+end hkey_IsMenuHandler
+
+function hkey_GetMenuTitle hKey
+   -- see also "script_MenuTitles"
+   put hkey_GetSuiteTitle (hKey) into suiteTitle
+   if word -1 of suiteTitle = "Menu" then
+      return suiteTitle
+   else
+      return empty
+   end if
+end hkey_GetMenuTitle
+
+function hkey_GetSuiteTitle hKey
+   hkey_Deconstruct hKey, hName, hType, hObject, hNum
+   --
+   put the script of hObject into someScript
+   put the revAvailableHandlers of hObject into hTable
+   --
+   htable_ExactLineOffsets hKey, hTable, startLineNum, endLineNum
+   --
+   put line 1 to startLineNum - 1 of someScript into mTitleLines
+   filter mTitleLines with "--> *"
+   --
+   put line -1 of mTitleLines into suiteTitle
+   delete char 1 to 4 of suiteTitle
+   return word 1 to -1 of suiteTitle
+end hkey_GetSuiteTitle
+
+
+
+--> Hkey | Check
+-
+function hkey_IsTransportHandler hKey
+   hkey_Deconstruct hKey, hName, hType, hObject, hNum
+   put the script_Type of hObject = "transport" into someBoolean
+   return someBoolean
+end hkey_IsTransportHandler
+
+function hkey_InStackHierarchy hkey, someObject
+   put item 3 of hkey into hkeyObject
+   if exists(hkeyObject) is false then return empty
+   
+   put the long id of hkeyObject into hkeyObject
+   put object_GetHierarchy (someObject) into objectHierarchy
+   repeat for each line objectInStack in objectHierarchy
+      if hkeyObject = objectInStack then return true
+   end repeat
+   return false
+end hkey_InStackHierarchy
+
 
 --> hKey | Props
 -
@@ -67,8 +144,38 @@ getprop hkey_FetchHows
 end hkey_FetchHows
 
 
---> Working on
+--> Hkey | List
 -
+function hkey_ListObjects hKeys
+   repeat for each line hKey in hKeys
+      hkey_Deconstruct hKey, hName, hType, hObject, hNum
+      put hkey into objectArray [hObject]
+   end repeat
+   put keys (objectArray) into objectIndex
+   return objectIndex
+end hkey_ListObjects
+
+function hkey_ListStackNames hkeys
+   repeat for each line hkey in hkeys
+      hkey_Deconstruct hKey, hName, hType, hObject, hNum
+      if exists (hObject) is false then
+         put "Object does not exist" into dumpArray [hObject]
+      else
+         put the stack_name of hObject into stackName
+         put hObject into dumpArray [stackName]
+      end if
+   end repeat
+   return keys (dumpArray)
+end hkey_ListStackNames
+
+function hkey_ExtractObjects hkeys
+   repeat for each line hkey in hkeys
+      hkey_Deconstruct hkey, handlerName, handlerType, scriptObject, handlerNum
+      put hKey into dumpArray [scriptObject]
+   end repeat
+   return keys (dumpArray)
+end hkey_ExtractObjects
+
 
 --> Hkey | Keywords
 -
@@ -148,45 +255,6 @@ function text_SplitIntoWords someWord
    return uniqueIndex
 end text_SplitIntoWords
 
-function hkey_InStackHierarchy hkey, someObject
-   put item 3 of hkey into hkeyObject
-   if exists(hkeyObject) is false then return empty
-   
-   put the long id of hkeyObject into hkeyObject
-   put object_GetHierarchy (someObject) into objectHierarchy
-   repeat for each line objectInStack in objectHierarchy
-      if hkeyObject = objectInStack then return true
-   end repeat
-   return false
-end hkey_InStackHierarchy
-
-
---> Hkey | Check
--
-function hkey_IsTransportHandler hKey
-   hkey_Deconstruct hKey, hName, hType, hObject, hNum
-   put the script_Type of hObject = "transport" into someBoolean
-   return someBoolean
-end hkey_IsTransportHandler
-
-function hkey_IsMenuHandler hKey
-   hkey_Deconstruct hKey, hName, hType, hObject, hNum
-   set the itemdelimiter to "_"
-   if item 1 of hName = "menu" then
-      -- we should check if it an actual menu or just a handler somewhere
-      put the stack_Name of hObject into stackName
-      put project_ListUsedStackNames ("lcw_Menus") into libAndModelNames
-      set the wholematches to true
-      if stackName is among the lines of libAndModelNames then
-         return false
-      else
-         return true
-      end if
-   else
-      return false
-   end if
-end hkey_IsMenuHandler
-
 command hkey_EditAndSelectLines hKey, startLineNum, endLineNum
    hkey_Deconstruct hKey, handlerName, handlerType, scriptObject, handlerNum 
    script_EditAndSelectLines scriptObject, startLineNum, endLineNum
@@ -210,17 +278,6 @@ command script_EditAndSelectLines scriptObject, startLineNum, endLineNum
    -- field_SelectLines startLineNum, endLineNum, someField
    return someField
 end script_EditAndSelectLines
-
-
---> hKey | Objects
--
-function hkey_ExtractObjects hkeys
-   repeat for each line hkey in hkeys
-      hkey_Deconstruct hkey, handlerName, handlerType, scriptObject, handlerNum
-      put hKey into dumpArray [scriptObject]
-   end repeat
-   return keys (dumpArray)
-end hkey_ExtractObjects
 
 
 --> Hkeys

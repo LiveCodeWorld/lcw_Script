@@ -117,14 +117,13 @@ end display_StackDeps
 --> Display | Not tested recently
 -
 command display_RigStackLibs pDisplayView
-   server_LoadDetails "rest.livecode.world"
-   --
    put rig_ListStackFiles() into shortStackFiles
+   display_ServerStacks shortStackFiles, pDisplayView
+end display_RigStackLibs
+
+command display_ServerStacks shortStackFiles, pDisplayView
    put server_GetURL() into serverURL
-   --
-   if exists (pDisplayView) is false then
-      put display_FindView ("Stack Libraries", serverURL) into pDisplayView
-   end if
+   if exists (pDisplayView) is false then put display_FindView ("Stack Libraries", serverURL) into pDisplayView
    
    if exists (pDisplayView) then
       set the displayed_index of pDisplayView to shortStackFiles
@@ -138,7 +137,7 @@ command display_RigStackLibs pDisplayView
    end if
    set the line_Menu of pDisplayView to "Global | Display | Rig | Stacks | Line | Menu"
    return pDisplayView
-end display_RigStackLibs
+end display_ServerStacks
 
 command display_Stacks stackNames, pIndexView, pStackTitle
    if pStackTitle is empty then put "Stacks,Environment" into pStackTitle

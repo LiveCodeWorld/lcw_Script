@@ -36,6 +36,93 @@ on menu_Init
    put keys (friendlyArray) into LocalArray ["recentObjects"]
 end menu_Init
 
+getprop setMenu_Param
+   return ide_ShortTitle ("Recent")
+end setMenu_Param
+
+getprop setMenu_Params
+   put ide_ListShortMenuTitles ("Recent") into shortNames
+   return shortNames
+end setMenu_Params
+
+getprop recentScripts_Params
+   put LocalArray ["recentObjects"] into recentObjects
+   return recentObjects
+end recentScripts_Params
+
+getprop disabled_ObjectProperties [scriptObject]
+   put the stack_Name of scriptObject into stackName
+   if the scriptonly of stack stackName is true then
+      return "delete"
+   else
+      return false
+   end if
+end disabled_ObjectProperties
+
+getprop disabled_RecentScripts
+   put LocalArray ["recentObjects"] into recentObjects
+   if recentObjects is empty then
+      return true
+   else
+      return false
+   end if
+end disabled_RecentScripts
+
+getprop disabled_SaveRecentStacks
+   put LocalArray ["editedStackNames"] into editedStackNames
+   put LocalArray ["friendlyArray"] into friendlyArray
+   --
+   repeat for each line editedStackName in editedStackNames
+      repeat for each key recentObject in friendlyArray
+         if the short name of recentObject = editedStackName then
+            put editedStackName & CR after editedRecentStackNames
+         end if
+      end repeat
+   end repeat
+   delete char -1 of editedRecentStackNames
+   if editedRecentStackNames is empty then
+      return true
+   else
+      return false
+   end if
+end disabled_SaveRecentStacks
+
+getprop disabled_SaveEdited
+   put LocalArray ["editedStackNames"] into editedStackNames
+   if editedStackNames is empty then
+      -- return true
+      return "delete"
+   else
+      return false
+   end if
+end disabled_SaveEdited
+
+getprop disabled_DisplayLocalChanges [scriptObject]
+   if the script_IsDifferent of scriptObject is true then
+      return false
+   else
+      -- return true
+      return "delete"
+   end if
+end disabled_DisplayLocalChanges
+
+
+--> Menu | Props | Old
+-
+getprop m_Title
+   return ide_ShortTitle ("Recent")
+end m_Title
+
+getprop m_Titles
+   put ide_ListShortMenuTitles ("Recent") into shortNames
+   return shortNames
+end m_Titles
+
+getprop recent_Objects
+   put LocalArray ["recentObjects"] into recentObjects
+   return recentObjects
+end recent_Objects
+
 
 --> Global | ScriptEditor | Header | Menu
 -
@@ -150,103 +237,6 @@ end _
 on menu_SetMenu mTarget, mTitle
    ide_SetMenuTitle "Recent", mTitle
 end menu_SetMenu
-
-
-
---> Global | ScriptEditor | Header | Menu | Props
--
-getprop m_Title
-   return ide_ShortTitle ("Recent")
-end m_Title
-
-getprop m_Titles
-   put ide_ListShortMenuTitles ("Recent") into shortNames
-   return shortNames
-end m_Titles
-
--- getprop project_StackNames
-put project_FetchValue ("openStacks") into stackNames
-return stackNames
-end project_StackNames
-
-getprop recent_Objects
-   put LocalArray ["recentObjects"] into recentObjects
-   return recentObjects
-end recent_Objects
-
--- on menu_SaveEditedStacks mTarget, editedStackName
-stack_SaveEdited editedStackName
-end menu_SaveEditedStacks
-
--- disabled_SaveEditedStacks
-
--- getprop edited_StackNames
-put LocalArray ["editedStackNames"] into editedStackNames
-if editedStackNames is empty then
-   return empty
-else
-   return editedStackNames & ",-,Save All"
-end if
-end edited_StackNames
-
-
---> Global | ScriptEditor | Header | Menu | Disabled
--
-getprop disabled_ObjectProperties [scriptObject]
-   put the stack_Name of scriptObject into stackName
-   if the scriptonly of stack stackName is true then
-      return "delete"
-   else
-      return false
-   end if
-end disabled_ObjectProperties
-
-getprop disabled_RecentScripts
-   put LocalArray ["recentObjects"] into recentObjects
-   if recentObjects is empty then
-      return true
-   else
-      return false
-   end if
-end disabled_RecentScripts
-
-getprop disabled_SaveRecentStacks
-   put LocalArray ["editedStackNames"] into editedStackNames
-   put LocalArray ["friendlyArray"] into friendlyArray
-   --
-   repeat for each line editedStackName in editedStackNames
-      repeat for each key recentObject in friendlyArray
-         if the short name of recentObject = editedStackName then
-            put editedStackName & CR after editedRecentStackNames
-         end if
-      end repeat
-   end repeat
-   delete char -1 of editedRecentStackNames
-   if editedRecentStackNames is empty then
-      return true
-   else
-      return false
-   end if
-end disabled_SaveRecentStacks
-
-getprop disabled_SaveEdited
-   put LocalArray ["editedStackNames"] into editedStackNames
-   if editedStackNames is empty then
-      -- return true
-      return "delete"
-   else
-      return false
-   end if
-end disabled_SaveEdited
-
-getprop disabled_DisplayLocalChanges [scriptObject]
-   if the script_IsDifferent of scriptObject is true then
-      return false
-   else
-      -- return true
-      return "delete"
-   end if
-end disabled_DisplayLocalChanges
 
 
 --> Deps

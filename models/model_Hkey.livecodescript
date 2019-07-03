@@ -11,8 +11,76 @@ A model for indexing handlers.
 */
 
 
---> Hkey | MetaData | DotText
+--> hkey | Model | Arrays
 -
+/*
+A LinkArray is used to graph arrays. To do this LinkArrays provide a suite of tools that take complex keys and convert them into simple IDs,
+and dictionaries to translate from these IDS to the orginal keys.
+*/
+
+function hkey_GetLinkArray hKey, pOverlayName
+   put hkey_GetOverlayArray (hKey, pOverlayName) into overlayArray
+   put overlayArray ["data"]["linkArray"] into hkeyArray
+   return hkeyArray
+end hkey_GetLinkArray
+
+command hkey_SetLinkArray hKey, hkeyArray, pOverlayName
+   -- fixed to do a simple write
+   put hkey_FetchOverlayData (hKey) into overlayData
+   overlayData_NormalizeName pOverlayName, overlayData
+   --
+   put hkeyArray into overlayData [pOverlayName]["data"]["linkArray"]
+   --
+   hkey_SaveOverlayData hKey, overlayData
+   return overlayArray
+   
+   /*
+   -- makes no sense to set hkeyArray without setting the rest of the derived arrays
+   -- umm yes it does
+   put library_HandlerFile (hKey, empty, false) into overlayFolder
+   overlay_SetLinkArray overlayFolder, hkeyArray, pOverlayName, pGraphStyle
+   overlay_CreateGraph overlayFolder, hKeyArray, pOverlayName, pOverlayOf, pGraphStyle, pDotCluster, pMainstackHash, pImageFormat, pProcessObject
+   
+   put the result into overlayArray
+   return overlayArray
+   */
+end hkey_SetLinkArray
+
+function hkey_GetOverlayArray hKey, pOverlayName
+   put hkey_FetchOverlayData (hKey) into overlayData
+   overlayData_NormalizeName pOverlayName, overlayData
+   put overlayData [pOverlayName] into overlayArray
+   return overlayArray
+end hkey_GetOverlayArray
+
+function hkey_FetchOverlayData hKey
+   put hkey_OverlayDataFile (hKey) into someFile
+   -- put array_Fetch (hkeyArrayFile) into overlayData
+   put url ("binfile:" & someFile) into encodedArray
+   if encodedArray is empty then return empty
+   put arraydecode (encodedArray) into overlayData
+   return overlayData
+end hkey_FetchOverlayData
+
+command hkey_SaveOverlayData hKey, overlayData
+   put hkey_OverlayDataFile (hKey) into someFile
+   
+   if overlayData is an array then
+      put arrayencode (overlayData) into encodedArray
+      put encodedArray into url ("binfile:" & someFile)
+      return someFile
+   else if overlayData is empty then
+      put hkey_Files (hKey, pVersionName) into someFiles
+      set the itemdelimiter to "/"
+      repeat for each line someFile in someFiles
+         put item -1 of someFile into shortFile
+         if shortFile is among the items of "handler.txt/help.html" then next repeat
+         delete file someFile
+      end repeat
+      return empty
+   end if
+end hkey_SaveOverlayData
+
 
 --> Working on
 -
@@ -201,60 +269,3 @@ function hkey_GetDefaultGraphName
    put overlayArray_GetGraphProperty (overlayDefaultArray, "overlay_Name") into graphName
    return graphName
 end hkey_GetDefaultGraphName
-
-
---> hkey | Model | Arrays
--
-/*
-A LinkArray is used to graph arrays. To do this LinkArrays provide a suite of tools that take complex keys and convert them into simple IDs,
-and dictionaries to translate from these IDS to the orginal keys.
-*/
-
-function hkey_GetLinkArray hKey, pOverlayName
-   put hkey_GetOverlayArray (hKey, pOverlayName) into overlayArray
-   put overlayArray ["data"]["linkArray"] into hkeyArray
-   return hkeyArray
-end hkey_GetLinkArray
-
-command hkey_SetLinkArray hKey, hkeyArray, pOverlayName, pGraphStyle
-   -- makes no sense to set hkeyArray without setting the rest of the derived arrays
-   put library_HandlerFile (hKey, empty, false) into overlayFolder
-   overlay_SetLinkArray overlayFolder, hkeyArray, pOverlayName, pGraphStyle
-   put the result into overlayArray
-   return overlayArray
-end hkey_SetLinkArray
-
-function hkey_GetOverlayArray hKey, pOverlayName
-   put hkey_FetchOverlayData (hKey) into overlayData
-   overlayData_NormalizeName pOverlayName, overlayData
-   put overlayData [pOverlayName] into overlayArray
-   return overlayArray
-end hkey_GetOverlayArray
-
-function hkey_FetchOverlayData hKey
-   put hkey_OverlayDataFile (hKey) into someFile
-   -- put array_Fetch (hkeyArrayFile) into overlayData
-   put url ("binfile:" & someFile) into encodedArray
-   if encodedArray is empty then return empty
-   put arraydecode (encodedArray) into overlayData
-   return overlayData
-end hkey_FetchOverlayData
-
-command hkey_SaveOverlayData hKey, overlayData
-   put hkey_OverlayDataFile (hKey) into someFile
-   
-   if overlayData is an array then
-      put arrayencode (overlayData) into encodedArray
-      put encodedArray into url ("binfile:" & someFile)
-      return someFile
-   else if overlayData is empty then
-      put hkey_Files (hKey, pVersionName) into someFiles
-      set the itemdelimiter to "/"
-      repeat for each line someFile in someFiles
-         put item -1 of someFile into shortFile
-         if shortFile is among the items of "handler.txt/help.html" then next repeat
-         delete file someFile
-      end repeat
-      return empty
-   end if
-end hkey_SaveOverlayData

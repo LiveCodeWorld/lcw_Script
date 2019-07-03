@@ -23,7 +23,7 @@ For handlers that work on exported handlers see "model_HandlerLibrary"
 
 getprop script_Handler [shortHKey]
    if shortHKey is empty then return empty
-   hkeyLine_Normalize shortHKey
+   hkey_Normalize shortHKey
    
    put the long id of the target into hObject
    put the revAvailableHandlers of hObject into hTable
@@ -35,7 +35,7 @@ end script_Handler
 
 setprop script_Handler [shortHKey] someHandler
    if shortHKey is empty then return empty
-   hkeyLine_Normalize shortHKey
+   hkey_Normalize shortHKey
    
    put the long id of the target into hObject
    put the revAvailableHandlers of hObject into hTable

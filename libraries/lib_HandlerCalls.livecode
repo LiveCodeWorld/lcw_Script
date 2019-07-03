@@ -35,7 +35,7 @@ end handler_Calls
 
 getprop handler_PublicCalls [shortHkey]
    if shortHKey is empty then return empty
-   hkeyLine_Normalize shortHKey
+   hkey_Normalize shortHKey
    
    put the long id of the target into hObject
    put the revAvailableHandlers of hObject into hTable

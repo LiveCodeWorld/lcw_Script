@@ -40,7 +40,7 @@ function textStack_ConstructHandlerFile shortHkey, dataFolder
 end textStack_ConstructHandlerFile
 
 function textStack_ConstructHandlerFolder hKeyLine, dataFolder
-   hkeyLine_Normalize hKeyLine
+   hkey_Normalize hKeyLine
    text_AddTrailing dataFolder, slash
    put word 1 to 2 of hKeyLine into folderName
    put dataFolder & "handlers/" & folderName & "/" into handlerFolder
@@ -100,7 +100,7 @@ end hkey_DeleteFolder
 --> Handler | Calls | File
 -
 function hkey_CallsFile hKey
-   hkeyLine_Normalize hKey
+   hkey_Normalize hKey
    put the result into shortHkey
    hKeyLine_Deconstruct hKey, hName, hType, hObject
    if exists (hObject) is false then return empty
