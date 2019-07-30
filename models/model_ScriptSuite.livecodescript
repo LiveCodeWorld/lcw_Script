@@ -695,7 +695,7 @@ private function addSuiteScripts suiteName, suiteScripts, oldObjectScript, scrip
    put stripHandlersFromSuite(handlersToStrip, suiteScripts) into suiteScriptsToPaste
    
    if scriptHierachy <> empty then
-      repeat with ii = 1 to then number of lines of scriptHierachy
+      repeat with ii = 1 to the number of lines of scriptHierachy
          put line ii of scriptHierachy into scriptHierachyObject
          put the script of scriptHierachyObject into usedObjectScript
          put getHandlerNames(usedObjectScript) into handlersToStrip

@@ -11,12 +11,12 @@ local LocalArray
 
 --> Global | Script | Template | Menu
 -
-on menu_Save indexView   
+on menu_Save indexView
    scaffold_SaveDisplayed indexView
    put the result into templateName
-   
+   --
    put scaffold_GetTemplate (templateName) into savedText
-   
+   --
    lcw_Notify merge ("Stored text as scaffold template '[[templateName]]'")
 end menu_Save
 
@@ -194,4 +194,3 @@ command text_EditFile someFile
       put shell (someShell) into shellResult
    end if
 end text_EditFile
-

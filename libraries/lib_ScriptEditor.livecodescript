@@ -232,6 +232,6 @@ command scriptEditor_CreateNewTab someObject
    put rev_ScriptEditorGroup() into revScriptEditorGroup
    -- send "revSEAddTargetObject someObject" to revScriptEditorGroup
    dispatch "revSEAddTargetObject" to revScriptEditorGroup with someObject
-   put the result someError
+   put the result into someError
    return someError
 end scriptEditor_CreateNewTab
