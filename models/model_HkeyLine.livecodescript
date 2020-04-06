@@ -46,6 +46,44 @@ end hkey_Lines
 
 --> Working on
 -
+
+
+--> HkeyLine | Normalize
+-
+function hkeyLine_ScriptLineToType scriptLine
+   put word 1 of scriptLine into onWord
+   switch onWord
+      case "private"
+         put word 2 of scriptLine into onWord
+         put _ScriptLineToType (onWord) into hType
+         return "P" & hType
+      default
+         put _ScriptLineToType (onWord) into hType
+         return hType
+   end switch
+end hkeyLine_ScriptLineToType
+
+private function _ScriptLineToType onWord
+   switch onWord
+      case "after"
+         return "A"
+      case "before"
+         return "N"
+         break
+      case "function"
+         return "F"
+      case "on"
+      case "command"
+         return "M"
+      case "getprop"
+         return "G"
+      case "setprop"
+         return "S"
+      default
+         return empty
+   end switch
+end _ScriptLineToType
+
 command hkeyLine_Normalize @hKey
    breakpoint
    hkey_Normalize hKey

@@ -23,11 +23,15 @@ This needs looking into again.
 For now we look to move all access to this model so we can make changes globally.
 
 Uses "script_ExportAndIndexMenus"
+
+For old name format you can change ShortHandlerFile = "script.txt" -- old and "_ConstructHandlerFile" to "_ConstructOldHandlerFile"
 */
 
 --> Variables
 -
 local LocalArray -- used by the script_MergeLines function to restore the original script
+constant ShortHandlerFile = "lcw_Handler.txt" -- new
+-- constant ShortHandlerFile = "script.txt" -- old
 
 
 --> Merge | Export | _FetchHandler
@@ -40,8 +44,10 @@ As we only know objectScriptFolder (and not scriptObject) we must work things ou
 private function _FetchHandler hName, hType
    -- called when "script_ReconstructFromExported" does a "merge"
    put LocalArray ["objectScriptFolder"] into objectScriptFolder
-   put objectScriptFolder & "handlers/" & hType && hName & "/" into handlerFolder
-   put handlerFolder & "lcw_Handler.txt" into handlerFile
+   --
+   put _ConstructHandlerFile (hName, hType, objectScriptFolder) into handlerFile
+   -- put _ConstructOldHandlerFile (hName, hType, objectScriptFolder) into handlerFile
+   
    if there is a file handlerFile then
       put text_Get (handlerFile) into someHandler
       return someHandler
@@ -49,6 +55,53 @@ private function _FetchHandler hName, hType
       return empty
    end if
 end _FetchHandler
+
+private function _ConstructHandlerFile hName, hType, objectScriptFolder
+   -- g person_View
+   put objectScriptFolder & "handlers/" & hType && hName & "/" into handlerFolder
+   put handlerFolder & ShortHandlerFile into handlerFile
+   return handlerFile
+end _ConstructHandlerFile
+
+private function _ConstructOldHandlerFile hName, hType, objectScriptFolder
+   -- person_View_g
+   put objectScriptFolder & "handlers/" & hName & "_" & hType & "/" into handlerFolder
+   put handlerFolder & ShortHandlerFile into handlerFile
+   return handlerFile
+end _ConstructOldHandlerFile
+
+
+--> Working on
+-
+function script_ReconstructFromExported dataFolder, pDontMerge
+   text_AddTrailing dataFolder, slash
+   put textStack_ScriptFile (dataFolder, pDontCreate) into scriptFile
+   --
+   put text_Get (scriptFile) into rawScript
+   if pDontMerge is true then
+      return rawScript
+   else
+      put dataFolder into LocalArray ["objectScriptFolder"]
+      put dataFolder & "handlers/" into handlersFolder
+      if there is a folder handlersFolder then
+         put merge (rawScript) into fullScript
+         return fullScript & CR -- extra CR as IDE adds this to scripts displayed
+      else
+         return rawScript
+      end if
+   end if
+end script_ReconstructFromExported
+
+function textStack_ScriptFile dataFolder, pDontCreate
+   -- from "model_TextStack"
+   if pDontCreate is false then
+      folder_CreateNested dataFolder
+   else
+      text_AddTrailing dataFolder, slash
+   end if
+   put dataFolder & ShortHandlerFile into someFile
+   return someFile
+end textStack_ScriptFile
 
 
 --> Text | File
@@ -140,25 +193,6 @@ getprop script_MergeArray
    return scriptMergeArray
 end script_MergeArray
 
-
---> Script | Export
--
-function script_ReconstructFromExported dataFolder, pDontMerge
-   put textStack_ScriptFile (dataFolder, pDontCreate) into scriptFile
-   put text_Get (scriptFile) into rawScript
-   if pDontMerge is true then
-      return rawScript
-   else
-      put dataFolder into LocalArray ["objectScriptFolder"]
-      put dataFolder & "handlers/" into handlersFolder
-      if there is a folder handlersFolder then
-         put merge (rawScript) into fullScript
-         return fullScript & CR -- extra CR as IDE adds this to scripts displayed
-      else
-         return rawScript
-      end if
-   end if
-end script_ReconstructFromExported
 
 
 --> Script | Merge | Utils

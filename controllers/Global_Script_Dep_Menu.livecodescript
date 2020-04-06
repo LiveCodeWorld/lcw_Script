@@ -20,7 +20,7 @@ local LocalArray
 /*
 command graph_FilterProcessedArray @processedCalls, someKeyCall
    -- same as default
-   -- traps and filters hKeyArray for "display_ObjectGraph"
+   -- traps and filters hKeyArray for "display_CreateScriptObjectGraph"
    
    hkey_Deconstruct someKeyCall, hName, hType, hObject, hNum
    if hObject = "missing" then
@@ -69,7 +69,7 @@ end _
 on menu_DisplayObjectGraph sObject
    local pGraphStyle, pProcessObject, projectName
    --
-   display_ObjectGraph sObject, projectName, pGraphStyle, pProcessObject, false
+   display_CreateScriptObjectGraph sObject, projectName, pGraphStyle, pProcessObject, false
    --
    display_ObjectDepArray sObject
 end menu_DisplayObjectGraph

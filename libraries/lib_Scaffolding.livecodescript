@@ -4,21 +4,14 @@
 license: GPLv3
 name: lib_Scaffolding
 type: library
-version: 0.3
+version: 0.4
 
+/*
+This library is for storing and working with templates.
 
- --> Scaffold
--
-command scaffold_SaveDisplayed indexView
-   put the title_Text of indexView into tName
-   if tName = "Title" or tName is empty then
-      put lcw_Ask ("What naem would you like to give this template text?", tName) into tName
-   end if
-   put the view_Text of indexView into someText
-   scaffold_SetTemplate tName, someText
-   put the result into savedUrl
-   return tName
-end scaffold_SaveDisplayed
+In particular we are using this library to store standardised scripts that we need to copy and paste with small modifications in several places,
+like named  Controller / Menu and Behavior templates.
+*/
 
 
 --> Script Template

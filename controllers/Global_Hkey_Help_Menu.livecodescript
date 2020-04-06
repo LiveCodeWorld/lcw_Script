@@ -151,9 +151,9 @@ end menu_UpdateMetadata
 on _
 end _
 
-on submenu_Dev
+on submenu_HkeyHelpDev
    return "Dev | Menu"
-end submenu_Dev
+end submenu_HkeyHelpDev
 
 
 --> Global | Hkey | Help | Menu | Disabled

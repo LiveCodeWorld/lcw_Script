@@ -51,6 +51,16 @@ setprop script_Handler [shortHKey] someHandler
    return someScript
 end script_Handler
 
+command script_StripPropHandlers @someScript, hTable
+   sort descending numeric lines of hTable by word 3 of each
+   repeat for each line hTableLine in hTable
+      if word 1 of hTableLine is among the items of "G,S" then
+         put word 1 to 2 of hTableLine into shortHkey
+         script_DeleteHandler someScript, shortHkey, hTable
+      end if
+   end repeat
+end script_StripPropHandlers
+
 command script_DeleteHandler @someScript, hkeyLine, hTable
    htable_ExactLineOffsets hkeyLine, hTable, startLineNum, endLineNum
    put endLineNum + 1 into afterEndLineNum

@@ -92,6 +92,65 @@ getprop metadataProject_Folder [pDontCreate]
 end metadataProject_Folder
 
 
+--> Script | File | SVG
+-
+getprop scriptObject_SvgFile [shortSvgFile]
+   if shortSvgFile is empty then
+      put "hierarchical.svg" into shortSvgFile
+   end if
+   put the long id of the target into scriptObject
+   put scriptObject_GetSvgFile (scriptObject, shortSvgFile) into svgFile
+   return svgFile
+end scriptObject_SvgFile
+
+getprop script_SvgFile [graphStyle]
+   if graphStyle is empty then put "hierarchical" into shortFile
+   put the long id of the target into scriptObject
+   
+   put the metadataObject_Folder [pDontCreate] of scriptObject into metadataFolder
+   put metadataFolder & shortFile & ".svg" into svgFile
+   return svgFile
+end script_SvgFile
+
+getprop script_SvgShortFiles
+   put the long id of the target into scriptObject
+   put the metadataObject_Folder [pDontCreate] of scriptObject into metadataFolder
+   put files (metadataFolder) into shortSvgFiles
+   filter shortSvgFiles with "*.svg"
+   return shortSvgFiles
+end script_SvgShortFiles
+
+getprop script_SvgFiles
+   put the long id of the target into scriptObject
+   put the metadataObject_Folder [pDontCreate] of scriptObject into metadataFolder
+   put overlay_ListScriptSvgShortFiles (metadataFolder)into shortSvgFiles
+   put file_AddFolderToPaths (shortSvgFiles, overlayFolder, false, ".svg") into svgFiles
+   return svgFiles
+end script_SvgFiles
+
+getprop script_GraphImageFile [pOverlayName]
+   put the long id of the target into scriptObject
+   return scriptObject_ImageFile (scriptObject, pOverlayName)
+end script_GraphImageFile
+
+getprop script_ImageFiles
+   put the script_Files of the target into somePngs
+   filter somePngs with "*.png"
+   return somePngs
+end script_ImageFiles
+
+getprop script_GraphImageFile [pOverlayName]
+   put the long id of the target into scriptObject
+   return scriptObject_ImageFile (scriptObject, pOverlayName)
+end script_GraphImageFile
+
+getprop script_ImageFiles
+   put the script_Files of the target into somePngs
+   filter somePngs with "*.png"
+   return somePngs
+end script_ImageFiles
+
+
 --> Folder | Synonyms
 -
 getprop script_OverlayFolder [pDontCreate]
@@ -206,17 +265,6 @@ getprop script_CmapFile [pOverlayName]
    return someFile
 end script_CmapFile
 
-getprop script_GraphImageFile [pOverlayName]
-   put the long id of the target into scriptObject
-   return scriptObject_ImageFile (scriptObject, pOverlayName)
-end script_GraphImageFile
-
-getprop script_ImageFiles
-   put the script_Files of the target into somePngs
-   filter somePngs with "*.png"
-   return somePngs
-end script_ImageFiles
-
 getprop script_Files
    put the long id of the target into scriptObject
    put the textStack_MetadataFolder [true] of scriptObject into metadataFolder
@@ -227,6 +275,12 @@ end script_Files
 
 --> Files
 -
+function scriptObject_GetSvgFile scriptObject, shortSvgFile, pDontCreate
+   put the metadataObject_Folder [pDontCreate] of scriptObject into metadataFolder
+   put metadataFolder & shortSvgFile into svgFile
+   return svgFile
+end scriptObject_GetSvgFile
+
 function scriptObject_ImageFile scriptObject, pOverlayName
    put the textStack_MetadataFolder [true] of scriptObject into scriptFolder
    scriptObject_NormalizeGraphName pOverlayName, scriptFolder

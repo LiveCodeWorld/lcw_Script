@@ -32,6 +32,54 @@ getprop handler_Names [hFilter]
    return hNames
 end handler_Names
 
+getprop handler_From [hKeyOrNumber]
+   put the revAvailableHandlers of the target into hTable
+   --
+   if hKeyOrNumber is a number then
+      put hTable_GetHandler (hTable, hKeyOrNumber) into someHandler
+   else
+      put word 5 to -1 of line 1 of hTable into scriptObject
+      --
+      put hKeyLine_Construct (hKeyOrNumber, scriptObject) into hKey
+      htable_ExactLineOffsets hKey, hTable, startLineNum, endLineNum
+      if the result is false then return empty
+      
+      put the script of scriptObject into someScript
+      put line startLineNum to endLineNum of someScript into someHandler
+   end if
+   return someHandler
+end handler_From
+
+
+--> Working on
+-
+function hTable_GetHandler hTable, lineNum, pSomeScript
+   hTable_SetHandlerOffsets hTable, lineNum, startLineNum, endLineNum, scriptObject
+   if the result is false then return empty
+   --
+   if pSomeScript is empty then put the script of scriptObject into pSomeScript
+   --
+   put line startLineNum to endLineNum of pSomeScript into someHandler
+   return someHandler
+end hTable_GetHandler
+
+command hTable_SetHandlerOffsets hTable, lineNum, @startLineNum, @endLineNum, @scriptObject
+   -- given a lineNum within a handler return the handler lineNum offset
+   put word 5 to -1 of line 1 of hTable into scriptObject
+   put 0 into startLineNum
+   put 0 into endLineNum
+   --
+   sort numeric lines of hTable by word 3 of each
+   repeat for each line hTableLine in hTable
+      put word 3 of hTableLine into startLineNum
+      if startLineNum >= lineNum then
+         put word 4 of hTableLine into endLineNum
+         return true
+      end if
+   end repeat
+   return false
+end hTable_SetHandlerOffsets
+
 
 --> hTable | List
 -

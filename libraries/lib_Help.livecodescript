@@ -1,4 +1,4 @@
-﻿script "lib_Help" with behavior "behavior_RigLocalOveride"
+﻿script "lib_Help"
 --> MetaData
 -
 license: GPLv3
@@ -58,6 +58,9 @@ end script_MarkdownHandlerindex
 --> Working on
 -
 command help_Create pageTitle, scriptType, curlyData, pScriptHelp
+   -- put "handler.livecode.world" into helpDomain
+   put help_ConstructDomain (scriptType) into helpDomain
+   --
    put help_FetchNewPageArray (pageTitle, scriptType, curlyData, pScriptHelp) into pageArray
    --
    if pageArray is empty then
@@ -65,7 +68,8 @@ command help_Create pageTitle, scriptType, curlyData, pScriptHelp
    end if
    put fedwiki_ConstructSlug (pageTitle) into pageSlug
    --
-   pageArray_Store "handler.livecode.world", pageSlug, pageArray
+   pageArray_Store helpDomain, pageSlug, pageArray
+   --
    put the result into shellResult -- error, fetching ip address for droplet AtopiaDropletName
    if shellResult is empty then
       return pageArray
@@ -345,7 +349,7 @@ end help_FetchTemplateArray
 function help_FetchTemplateJson scriptType
    put help_ConstructDomain (scriptType) into fedwikiDomain
    put scriptType & "-" & "template" into pageSlug
-   put pageJson_Fetch (fedwikiDomain, pageSlug) into pageJSON
+   put fedwiki_FetchPageJson (fedwikiDomain, pageSlug) into pageJSON
    return pageJSON
 end help_FetchTemplateJson
 

@@ -4,7 +4,7 @@
 license: GPLv3
 name: Global_ScriptEditor_Header_Menu
 type: controller
-version: 0.5
+version: 0.6
 
 /*
 This menu is desinged to act as a constant header with a common set of tools,
@@ -34,7 +34,19 @@ on menu_Init
    objects_MakeFriendly historyObjects, orderedFriendlyObjects, friendlyArray
    put friendlyArray into LocalArray ["friendlyArray"]
    put keys (friendlyArray) into LocalArray ["recentObjects"]
+   --
+   put scriptEditor_Object() into sObject
+   put sObject into LocalArray ["sObject"]
 end menu_Init
+
+getprop menu_Target [tObject]
+   put LocalArray ["sObject"] into sObject
+   return sObject
+end menu_Target
+
+getprop editIdeMenu_Params
+   return ide_ListMenuElements()
+end editIdeMenu_Params
 
 getprop setMenu_Param
    return ide_ShortTitle ("Recent")
@@ -97,6 +109,15 @@ getprop disabled_SaveEdited
    end if
 end disabled_SaveEdited
 
+getprop disabled_MenuTools [scriptObject]
+   get the script_Type of scriptObject
+   if it = "controller" then
+      return false
+   else
+      return true
+   end if
+end disabled_MenuTools
+
 getprop disabled_DisplayLocalChanges [scriptObject]
    if the script_IsDifferent of scriptObject is true then
       return false
@@ -105,23 +126,6 @@ getprop disabled_DisplayLocalChanges [scriptObject]
       return "delete"
    end if
 end disabled_DisplayLocalChanges
-
-
---> Menu | Props | Old
--
-getprop m_Title
-   return ide_ShortTitle ("Recent")
-end m_Title
-
-getprop m_Titles
-   put ide_ListShortMenuTitles ("Recent") into shortNames
-   return shortNames
-end m_Titles
-
-getprop recent_Objects
-   put LocalArray ["recentObjects"] into recentObjects
-   return recentObjects
-end recent_Objects
 
 
 --> Global | ScriptEditor | Header | Menu
@@ -145,12 +149,27 @@ on menu_SaveEdited
    stack_SaveEdited "all"
 end menu_SaveEdited
 
+on _
+end _
+
 on submenu_Help
    return "Global | Script | Help | Menu"
 end submenu_Help
 
+on menu_SetMenu sObject, mTitle
+   ide_SetMenuTitle "Recent", mTitle
+end menu_SetMenu
+
+on menu_EditIdeMenu sObject, mElement
+   ide_EditMenu mElement
+end menu_EditIdeMenu
+
 on _
 end _
+
+on submenu_MenuTools
+   return "Global | MenuTools | Menu"
+end submenu_MenuTools
 
 on submenu_Go
    return "ScriptEditor | Go | Menu"
@@ -173,6 +192,18 @@ on menu_ObjectProperties sObject
    revIDEInspectObjects sObject
    -- object_Inspect sObject
 end menu_ObjectProperties
+
+on menu_FindLoadedStack sObject
+   -- put the stacksinuse into stackNames
+   put revLoadedStacks ("all") into stackNames
+   --
+   put "*" & the short name of sObject & "*" into someFilter
+   put lcw_Ask ("Filter stacksinuse with...", someFilter) into someFilter
+   --
+   filter stackNames with someFilter
+   put empty into pIndexView
+   display_Stacks stackNames, "Found Stacks"
+end menu_FindLoadedStack
 
 on menu_GoToStack sObject
    object_GoTo sObject
@@ -230,13 +261,6 @@ end menu_RestoreScriptTabs
 on menu_GatherStacks
    screen_GatherStacks
 end menu_GatherStacks
-
-on _
-end _
-
-on menu_SetMenu mTarget, mTitle
-   ide_SetMenuTitle "Recent", mTitle
-end menu_SetMenu
 
 
 --> Deps

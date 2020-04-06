@@ -68,12 +68,14 @@ on menu_ProjectOverlayDot scriptObject
 end menu_ProjectOverlayDot
 
 on menu_ProcessedHkeyArray scriptObject
-   put the projectOverlay_Array ["processedHkey.array"] of scriptObject into someArray
-   display_Array someArray, "projectOverlay_Array"
+   put the projectOverlay_Array ["processedHkey.array"] of scriptObject into hkeyArray
+   --
+   display_HkeyArray hKeyArray, scriptObject
 end menu_ProcessedHkeyArray
 
 on menu_ProjectOverlayData scriptObject
    put the projectOverlay_Array ["overlayData.array"] of scriptObject into someArray
+   --
    display_Array someArray, "projectOverlay_Array"
 end menu_ProjectOverlayData
 
@@ -153,7 +155,7 @@ getprop disabled_ProcessedHkeyArray [scriptObject]
    put there is not a file someFile into fileIsMissing
    return fileIsMissing
 end disabled_ProcessedHkeyArray
-   
+
 getprop disabled_ProjectOverlayFile [scriptObject]
    put the projectOverlay_File of scriptObject into someFile
    put there is not a file someFile into fileIsMissing

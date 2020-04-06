@@ -190,8 +190,8 @@ function handler_GetType handlerLine
    end switch
 end handler_GetType
 
-function handler_ConvertType handlerType
-   switch char 1 of word 1 of handlerType
+function handler_ConvertType onWord
+   switch char 1 of word 1 of onWord
       case "o"
          return "on"
       case "m"

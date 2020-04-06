@@ -161,12 +161,6 @@ getprop object_MetaDataTable [keysToRemove]
    return metaDataArray
 end object_MetaDataTable
 
-getprop script_GlobalTitles [suiteType]
-   put the script of the target into someScript
-   put script_ExtractGlobalTitles (someScript, suiteType) into globalMenuTitles
-   return globalMenuTitles
-end script_GlobalTitles
-
 getprop script_SuiteTitles
    put the script of the target into someScript
    return script_GetSuiteTitles (someScript)

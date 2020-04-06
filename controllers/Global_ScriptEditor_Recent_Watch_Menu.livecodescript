@@ -20,7 +20,7 @@ Modify to use "Global | ScriptEditor | Header | Menu"
 local LocalArray
 
 
---> Menu | Props
+--> Menu | Init
 -
 on menu_Init tObject
    -- a hack (we keep getting this reset by Livecode)
@@ -37,6 +37,13 @@ getprop menu_Target [tObject]
 end menu_Target
 
 
+--> Menu | Props
+-
+getprop displayTemplate_Params
+   return scaffold_ListShortFiles()
+end displayTemplate_Params
+
+
 --> Global | ScriptEditor | Recent | Watch | Menu
 -
 on insert_HeaderMenu
@@ -45,6 +52,14 @@ end insert_HeaderMenu
 
 on _
 end _
+
+on submenu_Create sObject
+   return "Global | Project | Create | Menu"
+end submenu_Create
+
+on menu_DisplayTemplate sObject, templateName
+   display_ScriptTemplate templateName
+end menu_DisplayTemplate
 
 on menu_DisplayRigControllers
    if project_IsActive("lcw_RevIgniter") is false then
@@ -57,16 +72,16 @@ on menu_DisplayRigControllers
    ide_SetScriptEditorTitles "RevIgniter"
 end menu_DisplayRigControllers
 
-on menu_DisplayScript sObject
-   display_Script sObject
-end menu_DisplayScript
-
 on _
 end _
 
-on submenu_Git
-   return "Global | GIT | Menu"
-end submenu_Git
+on menu_ScriptTools sObject
+   display_Script sObject
+end menu_ScriptTools
+
+on menu_DisplayGitStatus sObject
+   display_GitStatus sObject
+end menu_DisplayGitStatus
 
 on menu_ViewTools sObject
    display_ViewIndex sObject   

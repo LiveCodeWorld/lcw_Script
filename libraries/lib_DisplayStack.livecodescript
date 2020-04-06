@@ -67,6 +67,8 @@ command display_Script sObject
    -- display_DotArray graphData, pTitle
    
    put the name of sObject into someTitle
+   put someTitle & comma & "Script" into displayTitle
+   --
    -- put the script_OverlayData of sObject into scriptArray
    -- put the object_ScriptArray of sObject into scriptArray
    put the script_SuiteArray of sObject into scriptArray
@@ -76,7 +78,7 @@ command display_Script sObject
    put "" into inspectCommand
    put "" into mDoubleUpCommand
    --
-   display_Array scriptArray, someTitle, mTitle, mLineTitle, inspectCommand, mDoubleUpCommand
+   display_Array scriptArray, displayTitle, mTitle, mLineTitle, inspectCommand, mDoubleUpCommand
    put the result into treeView
    set the displayed_Object of treeView to sObject
    return treeView
@@ -88,7 +90,7 @@ end display_Script
 command display_ScriptArray scriptObject
    put the script_HkeyArray of scriptObject into hKeyArray
    --
-   graph_ObjectHkeyArray hkeyArray, scriptObject
+   graph_CreateScriptObjectHkeyArray hkeyArray, scriptObject
    put the result into imageFile
    display_HandlerSVG imageFile
    --
@@ -139,14 +141,15 @@ command display_ServerStacks shortStackFiles, pDisplayView
    return pDisplayView
 end display_ServerStacks
 
-command display_Stacks stackNames, pIndexView, pStackTitle
-   if pStackTitle is empty then put "Stacks,Environment" into pStackTitle
+command display_Stacks stackNames, pSomeTitle, pIndexView
+   if pSomeTitle is empty then put "Found" into pSomeTitle
    
    put "mDouble_DisplayStack" into mDoubleUp
    
    if exists (pIndexView) is false then
       put empty into mUp
-      display_Index stackNames, pStackTitle, mTitle, mLineTitle, mUp, mDoubleUp
+      -- display_Index stackNames, pStackTitle, mTitle, mLineTitle, mUp, mDoubleUp
+      display_Lines stackNames, pSomeTitle, mDoubleUp, "Stacks"
       put the result into displayView
       return displayView
    else

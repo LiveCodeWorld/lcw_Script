@@ -9,14 +9,14 @@ version: 0.5
 
 --> Menu | Props
 -
-getprop editBehavior_Params
+getprop hack_Params
    return "Compile,Menu,Script,Handler,Search"
-end editBehavior_Params
+end hack_Params
 
 
 --> Global | Script | Menu
 -
-on menu_EditBehavior seGroup, whichBehavior
+on menu_Hack seGroup, whichBehavior
    switch whichBehavior
       case "Compile"
          put scriptEditor_CompileButtonBehavior() into bObject
@@ -35,4 +35,4 @@ on menu_EditBehavior seGroup, whichBehavior
          break
    end switch
    edit the script of bObject
-end menu_EditBehavior
+end menu_Hack

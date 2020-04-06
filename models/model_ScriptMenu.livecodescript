@@ -15,17 +15,101 @@ Views are linked to menu_Controllers via the menu_Title and the menu_Controller 
 This combination of mTitle and mController uniquely identifies the menu model for that menu and it's associated script.
 */
 
---> Script | MenuTitles
+--> Menu | Name
+-
+/*
+The menu_Name is the name value of the script metadata of the controller
+It "should"" be the saem as the stack name
+*/
+
+getprop menu_Name
+   put the long id of the target into tObject
+   --
+   put the script_MetaData of tObject into scriptMetaData
+   put scriptMetaData ["type"] into scriptType
+   if scriptType is not "controller" then return empty
+   put scriptMetaData ["name"] into mName
+   return mName
+end menu_Name
+
+setprop menu_Name mName
+   put the long id of the target into tObject
+   --
+   put the script_MetaData of tObject into scriptMetaData
+   
+   put scriptMetaData ["type"] into scriptType
+   if scriptType is not "controller" then return empty
+   put scriptMetaData ["name"] into oldName
+   if oldName = mName then return mName -- no need to reset
+   
+   put mName into scriptMetaData ["name"]
+   --
+   set the script_MetaData of tObject to scriptMetaData
+   --
+   return scriptMetaData
+end menu_Name
+
+
+--> Working on
 -
 getprop script_MenuTitles
-   -- not used except "Global | Menu | Table | Menu" ?
+   put the long id of the target into tObject
    
-   put the long id of the target into targetObject
-   put the script of targetObject into someScript
-   put script_ExtractMenuSuiteTitles (someScript) into mTitles
-   return mTitles
+   -- put the script_MenuTitleTableArray of tObject into mTitleTableArray (not in order)
+   -- put menu_ListCustomPropertyTitles (tObject) into mTitles -- not using custom props
+   put the script of tObject into someScript
+   put script_ExtractMenuSuiteTitles (someScript) into scriptMenuTitles
+   --
+   return scriptMenuTitles
 end script_MenuTitles
 
+getprop script_GlobalMenuTitles
+   put the script_MenuTitles of the target into mTitles
+   filter mTitles with "Global |*"
+   return mTitles
+end script_GlobalMenuTitles
+   
+getprop script_GlobalTitles [suiteType]
+   put the script of the target into someScript
+   put script_ExtractGlobalTitles (someScript, suiteType) into globalMenuTitles
+   return globalMenuTitles
+end script_GlobalTitles
+
+getprop script_MenuTitleTableArray
+   -- this is what constructs the mTitleTableArray from a script
+   local mTitleTableArray
+   
+   put the long id of the target into mController
+   put the script of mController into someScript
+   put the revAvailableHandlers of mController into hTable
+   
+   -- put script_OrderedMenuTitles (someScript) into mTitles
+   put someScript into mTitleLines
+   filter mTitleLines with "--> * Menu"
+   
+   menu_ClearRecursionCheck
+   repeat for each line mTitleLine in mTitleLines
+      put word 2 to -1 of mTitleLine into mTitle
+      put menu_ExtractTableFromScript (mTitle, someScript, hTable, mController) into mTable
+      put mTable into mTitleTableArray [mTitle]
+   end repeat
+   return mTitleTableArray
+end script_MenuTitleTableArray
+
+getprop menu_DataArray
+   -- the problem with this is if the target has been cloned or copied
+   -- the menu_Controller will have changed
+   put the customproperties ["menu_Table"] of the target into mTitleTableArray
+   return mTitleTableArray
+end menu_DataArray
+
+setprop menu_DataArray mTitleTableArray
+   set the customproperties ["menu_Table"] of the target to mTitleTableArray
+end menu_DataArray
+
+
+--> Script | MenuTitles
+-
 getprop menu_GlobalTitle
    put the script_GlobalTitles ["Menu"] of the target into globalMenuTitles
    return globalMenuTitles
@@ -37,13 +121,6 @@ setprop menu_GlobalTitle globalMenuTitles
       menu_SetGlobalController globalMenuTitle, scriptObject
    end repeat
 end menu_GlobalTitle
-
-getprop menu_TableTitles
-   -- direct property of mController
-   put the long id of the target into mController
-   put menu_GetTableTitles (mController) into tableTitles
-   return tableTitles
-end menu_TableTitles
 
 setprop menu_Table [pMenuTitle] mTable
    if pMenuTitle is empty then put the menu_Title of the target into pMenuTitle

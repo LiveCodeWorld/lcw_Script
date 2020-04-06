@@ -4,10 +4,10 @@
 license: GPLv3
 name: Global_Script_Help_Menu
 type: controller
-version: 0.1
+version: 0.2
 
 
---> Global | Script | Help | Menu | Props
+--> Menu | Init
 -
 local LocalArray
 
@@ -22,26 +22,12 @@ on menu_Init
    end if
 end menu_Init
 
+getprop menu_Target [tObject]
+   -- put scriptEditor_GetProjectNameTarget (tObject) into projectName
+   put scriptEditor_Object() into sObject
+   return sObject
+end menu_Target
 
---> Global | Script | Help | Menu
--
-on menu_Help sObject
-   help_Launch sObject
-end menu_Help
-
-on menu_CreateHelp sObject
-   lcw_CreateObjectHelp sObject
-   help_Launch sObject
-end menu_CreateHelp
-
-on menu_UpdateHelp sObject
-   lcw_UpdateObjectHelp sObject
-   help_Launch sObject
-end menu_UpdateHelp
-
-
---> Global | Script | Help | Menu | Disabled
--
 getprop disabed_UpdateHelp
    switch
       case LocalArray ["helpURL"] is empty
@@ -71,3 +57,20 @@ getprop disabled_CreateHelp
          return false
    end switch
 end disabled_CreateHelp
+
+
+--> Global | Script | Help | Menu
+-
+on menu_Help sObject
+   help_Launch sObject
+end menu_Help
+
+on menu_CreateHelp sObject
+   lcw_CreateObjectHelp sObject
+   help_Launch sObject
+end menu_CreateHelp
+
+on menu_UpdateHelp sObject
+   lcw_UpdateObjectHelp sObject
+   help_Launch sObject
+end menu_UpdateHelp
