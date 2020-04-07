@@ -11,7 +11,7 @@ version: 0.1
 -
 on mDouble_EditHkey indexView, shortHkey
    put the displayed_Object of indexView into hObject
-   put hKeyLine_Construct (shortHkey, hObject) into hKeyLine
+   put hKeyLine_AddObject (shortHkey, hObject) into hKeyLine
    hkey_Edit hKeyLine
 end mDouble_EditHkey
 

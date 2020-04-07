@@ -19,6 +19,35 @@ See also lib_FindHkey
 */
 
 
+--> Working on
+-
+function hkeyLine_FindHandlerInObjects hName, objectIndex
+   repeat for each line someObject in objectIndex
+      if exists (someObject) is false then
+         next repeat
+      end if
+      --
+      put the revavailableHandlers of someObject into hTable
+      --
+      put revRuggedID (someObject) into hObject
+      repeat for each line hTableLine in hTable
+         if word 2 of hTableLine = hName then
+            put hKeyLine_AddObject (hTableLine, hObject) into hkeyLine
+            put hkeyLine & CR after hkeyLines
+         end if
+      end repeat
+   end repeat
+   delete char - 1 of hkeyLines
+   return hkeyLines
+end hkeyLine_FindHandlerInObjects
+
+command hkey_Normalize @hKey
+   put hkeyLine_FromHkey (hKey) into hKey
+   put word 1 to 2 of hKey into shortHkey
+   return shortHkey
+end hkey_Normalize
+
+
 --> Props
 -
 getprop hkey_Line [hKey]
@@ -46,6 +75,26 @@ end hkey_Lines
 
 --> Working on
 -
+function hKeyLine_Construct hName, hType, hObject
+   replace "c" with "M" in hType
+   put toUpper (hType) && hName into shortHkeyLine
+   if hObject is empty then return shortHkeyLine
+   
+   put hKeyLine_AddObject (shortHkeyLine, hObject) into hkeyLine
+   return hkeyLine
+end hKeyLine_Construct
+
+command hkeyLine_Deconstruct hKeyLine, @hName, @hType, @hObject
+   put toUpper (word 1 of hKeyLine) into hType
+   put word 2 of hKeyLine into hName
+   put word 4 to -1 of hKeyLine into hObject
+   return hType && hName
+end hkeyLine_Deconstruct
+
+function hKeyLine_AddObject hkeyLine, hObject
+   put word 1 to 2 of hkeyLine && "of" && hObject into hKeyLine
+   return hKeyLine
+end hKeyLine_AddObject
 
 
 --> HkeyLine | Normalize
@@ -63,37 +112,10 @@ function hkeyLine_ScriptLineToType scriptLine
    end switch
 end hkeyLine_ScriptLineToType
 
-private function _ScriptLineToType onWord
-   switch onWord
-      case "after"
-         return "A"
-      case "before"
-         return "N"
-         break
-      case "function"
-         return "F"
-      case "on"
-      case "command"
-         return "M"
-      case "getprop"
-         return "G"
-      case "setprop"
-         return "S"
-      default
-         return empty
-   end switch
-end _ScriptLineToType
-
 command hkeyLine_Normalize @hKey
    breakpoint
    hkey_Normalize hKey
 end hkeyLine_Normalize
-
-command hkey_Normalize @hKey
-   put hkeyLine_FromHkey (hKey) into hKey
-   put word 1 to 2 of hKey into shortHkey
-   return shortHkey
-end hkey_Normalize
 
 function hkeyLine_ConstructStart hKey
    hkey_Deconstruct hKey, hName, hType, hObject, hNum
@@ -137,14 +159,14 @@ function hkey_Construct hName, hType, hObject
    else
       put "Missing" into hObject
    end if
-   put hKeyLine_FromTripple (hName, hType, hObject) into hKeyLine
+   put hKeyLine_Construct (hName, hType, hObject) into hKeyLine
    return hKeyLine
 end hkey_Construct
 
 function hkey_FromShort shortHkeys, hObject
    repeat for each line shortHkey in shortHkeys
       hkey_Deconstruct shortHkey, hName, hType, xObject, xNum
-      put hKeyLine_FromTripple (hName, hType, hObject) into hkeyLine
+      put hKeyLine_Construct (hName, hType, hObject) into hkeyLine
       put hkeyLine & CR after hkeyLines
    end repeat
    delete char -1 of hkeyLines
@@ -168,7 +190,7 @@ command hkey_Deconstruct hKey, @hName, @hType, @hObject, @hNum
       if hNum is empty then put 1 into hNum
    end if
    
-   put hKeyLine_FromTripple (hName, hType, hObject) into hkeyLine
+   put hKeyLine_Construct (hName, hType, hObject) into hkeyLine
    return hkeyLine
 end hkey_Deconstruct
 
@@ -198,7 +220,7 @@ end hkeyLine_GetHandler
 -
 function hkeyLine_FromHkey hKey
    hkey_Deconstruct hKey, hName, hType, hObject, hNum
-   put hKeyLine_FromTripple (hName, hType, hObject) into hkeyLine
+   put hKeyLine_Construct (hName, hType, hObject) into hkeyLine
    return hkeyLine
 end hkeyLine_FromHkey
 
@@ -219,23 +241,26 @@ command hkeyLine_DeconstructStart handlerLine, @hName, @hType, @privateBit
    put handler_GetType (handlerLine) into hType
 end hkeyLine_DeconstructStart
 
-function hKeyLine_Construct hkeyLine, hObject
-   put word 1 to 2 of hkeyLine && "of" && hObject into hKeyLine
-   return hKeyLine
-end hKeyLine_Construct
 
-command hkeyLine_Deconstruct hKeyLine, @hName, @hType, @hObject
-   put toUpper (word 1 of hKeyLine) into hType
-   put word 2 of hKeyLine into hName
-   put word 4 to -1 of hKeyLine into hObject
-   return hType && hName
-end hkeyLine_Deconstruct
-
-function hKeyLine_FromTripple hName, hType, hObject
-   replace "c" with "M" in hType
-   put toUpper (hType) && hName into shortHkeyLine
-   if hObject is empty then return shortHkeyLine
-   
-   put hKeyLine_Construct (shortHkeyLine, hObject) into hkeyLine
-   return hkeyLine
-end hKeyLine_FromTripple
+--> Private
+-
+private function _ScriptLineToType onWord
+   switch onWord
+      case "after"
+         return "A"
+      case "before"
+         return "N"
+         break
+      case "function"
+         return "F"
+      case "on"
+      case "command"
+         return "M"
+      case "getprop"
+         return "G"
+      case "setprop"
+         return "S"
+      default
+         return empty
+   end switch
+end _ScriptLineToType

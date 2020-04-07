@@ -19,7 +19,7 @@ getprop action_Key [aItems]
    put item 2 of aItems into aIcon
    --
    put revRuggedID (tObject) into hObject
-   put hkeyLine_FromTripple (hName, "M", hObject) into hKey
+   put hKeyLine_Construct (hName, "M", hObject) into hKey
    --
    if aName is empty then
       return hKey
@@ -52,7 +52,7 @@ getprop handler_Key [hKey]
    put revRuggedID (tObject) into hObject
    --
    hkey_Deconstruct hKey, hName, hType, xObject, xNum
-   put hkeyLine_FromTripple (hName, hType, hObject) into hKey
+   put hKeyLine_Construct (hName, hType, hObject) into hKey
    --
    return hKey
 end handler_Key

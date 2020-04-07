@@ -9,6 +9,8 @@ version: 0.3
 /*
 This library interfaces with the Livecode Script Editor to allow handlers to find out what tabs are active and being displayed.
 It also allows you to create new panes for you custom interfaces.
+
+See stack "model_IDE"
 */
 
 

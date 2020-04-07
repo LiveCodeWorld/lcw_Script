@@ -4,14 +4,20 @@
 license: GPLv3
 name: Global_Hkey_Help_Menu
 type: menu
-version: 0.1
+target: hKey
+version: 0.2
 
 
---> Global | Hkey | Help | Menu | Props
+--> Menu | Init
 -
 local LocalArray
 
-on menu_Init tObject, hKey
+on menu_Init tObject
+   -- assumes we are interacting with Script Editor list field
+   
+   put scriptEditor_GetHkey() into hKey
+   put hKey into LocalArray ["hKey"]
+   --
    switch
       case hkey_IsMenuHandler (hKey)
          put true into LocalArray ["isMenu"]
@@ -29,6 +35,11 @@ on menu_Init tObject, hKey
          put false into LocalArray ["isTransport"]
    end switch
 end menu_Init
+
+getprop menu_Target [tObject]
+   -- put scriptEditor_GetHkey() into hKey
+   return LocalArray ["hKey"]
+end menu_Target
 
 getprop disabled_CreateMenuPage [hKey]
    put hkey_GetMenuTitle (hKey) into gMenuTitle
@@ -151,6 +162,10 @@ end menu_UpdateMetadata
 on _
 end _
 
+on menu_EditMenu
+   menu_Edit
+end menu_EditMenu
+
 on submenu_HkeyHelpDev
    return "Dev | Menu"
 end submenu_HkeyHelpDev
@@ -215,6 +230,13 @@ on menu_UpdateSubdomain hKey
    put the stack_Name of hObject into stackName
    help_LaunchMenuSubdomain stackName
 end menu_UpdateSubdomain
+
+on _
+end _
+
+on menu_EditMenu
+   menu_Edit
+end menu_EditMenu
 
 
 --> Private

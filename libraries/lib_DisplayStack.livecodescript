@@ -40,7 +40,7 @@ getprop stack_PlaceArray
    
    repeat for each line hTableLine in hTable
       put word 1 to 2 of hTableLine into shortHkey
-      put hKeyLine_Construct (shortHkey, rObject) into pHkey
+      put hKeyLine_AddObject (shortHkey, rObject) into pHkey
       put handler_FetchCalls (shortHkey, dataFolder) into shortCalls
       put shortCalls into pDepArray ["Handlers"][pHkey]
       
@@ -52,7 +52,7 @@ getprop stack_PlaceArray
          else
             hkey_Deconstruct externalHkey, cName, cType, cObject, cNum
             put the project_Name of cObject into cProjectName
-            put hKeyLine_Construct (shortCall, cObject) into cHkey
+            put hKeyLine_AddObject (shortCall, cObject) into cHkey
             put empty into pDepArray ["Calls"][cProjectName][cObject][cHkey][pHkey]
          end if
       end repeat
@@ -235,7 +235,7 @@ function walk_TargetHandlers targetObject, pExternalObjects, pUseExportedCalls
    repeat for each line hLine in hTable
       set the cursor to busy
       put word 1 to 2 of hLine into shortHkey
-      put hKeyLine_Construct (shortHkey, rObject) into hKeyLine
+      put hKeyLine_AddObject (shortHkey, rObject) into hKeyLine
       --
       if pUseExportedCalls is true then
          put hkey_FetchCalls (hKeyLine) into shortCallHkeyLines
@@ -256,14 +256,14 @@ private command walk_FoundShortHkeyLine shortCallHkeyLine, parentHKeyLine, pExte
    put hkey_Find (shortCallHkeyLine, pObject, pExternalObjects) into foundCall
    --
    if foundCall is empty then 
-      put hKeyLine_Construct (shortCallHkeyLine, "Missing") into missingCall
+      put hKeyLine_AddObject (shortCallHkeyLine, "Missing") into missingCall
       put true into hKeyLinkArray [parentHKeyLine][missingCall]
       return empty
    end if
    --
    hkeyLine_Deconstruct foundCall, fName, fType, fObject
    if exists (fObject) is false then
-      put hKeyLine_Construct (shortCallHkeyLine, "Missing") into missingCall
+      put hKeyLine_AddObject (shortCallHkeyLine, "Missing") into missingCall
       put true into hKeyLinkArray [parentHKeyLine][missingCall]
       return empty
    end if

@@ -52,6 +52,31 @@ end menu_Name
 
 --> Working on
 -
+getprop script_MenuTitleAbove [lineNum]
+   put the script of the target into someScript
+   --
+   repeat with lineNum = lineNum down to 1
+      put line lineNum of someScript into scriptLine
+      put script_ExtractGlobalMenu (scriptLine) into gMenuTitle
+      if gMenuTitle is not empty then
+         return gMenuTitle
+      end if
+   end repeat
+   return empty
+end script_MenuTitleAbove
+
+function script_ExtractGlobalMenu scriptLine
+   put "^-->\s*(Global\s*\|\s*.*Menu)" into someReg
+   get matchChunk (scriptLine, someReg, startChar, endChar)
+   --
+   if it is true then
+      put char startChar to endChar of scriptLine into gMenuTitle
+      return gMenuTitle
+   else
+      return empty
+   end if
+end script_ExtractGlobalMenu
+
 getprop script_MenuTitles
    put the long id of the target into tObject
    

@@ -9,49 +9,75 @@ version: 0.1
 
 --> Working on
 -
-command hkey_SetMenuItemHelpInfo hKey, @gMenuTitle, @hkeyPageTitle, @menuSubDomain, @hkeySlug
+command help_SetHkeyInfo hKey, @wikiDomain, @pageSlug, @pageTitle   
+   switch
+      case hkey_IsMenuHandler (hKey)
+         _SetMenuItemHelpInfo hKey, gMenuTitle, pageTitle, wikiDomain, pageSlug
+         break
+      case hkey_IsTransportHandler (hKey)
+         put "transport.fedwiki.org" into wikiDomain
+         hkey_Deconstruct hKey, hName, hType, hObject, hNum
+         put the stack_Name of hObject into stackName
+         put help_ConstructTransportTitle (stackName) into pageTitle 
+         break
+      default
+         -- not a special handler so add to global library
+         put "handler.livecode.world" into wikiDomain
+         put help_ConstructHandlerTitle (hKey) into pageTitle
+         put fedwiki_ConstructSlug (pageTitle) into pageSlug
+   end switch
+end help_SetHkeyInfo
+
+private command _SetMenuItemHelpInfo hKey, @gMenuTitle, @hkeyPageTitle, @menuSubDomain, @hkeySlug
    hkey_Deconstruct hKey, hName, hType, hObject, hNum
+   --
+   -- put hkey_GetMenuTitle (hKey) into gMenuTitle
+   put line 1 of the script_GlobalMenuTitles of hObject into gMenuTitle
+   put the script_Type of hObject into sType
+   --
+   if sType is not among the items of "menu,controller" then
+      -- it's a bit old and not yet organised
+      display_DebugHistory
+      --
+      breakpoint
+      lcw_AnswerWarning "Menu is not prepared for indexing!"
+      return empty
+   end if
+   
+   --
    put menu_CommandToText (hName) into hkeyPageTitle
    put fedwiki_ConstructSlug (hkeyPageTitle) into hkeySlug
    --
-   put hkey_GetMenuTitle (hKey) into gMenuTitle
    set the itemdelimiter to "|"
    if word 1 to -1 of item 1 of gMenuTitle = "Global" then
       put help_ConstructMenuSubDomain (gMenuTitle) into menuSubDomain
       return hObject
    else
       -- could be a local menu such as "Dev | Menu" of a global menu
-      get the script_Type of hObject
-      if it = "menu" then
-         put the script_metadata ["name"] of hObject into gMenuTitle
-         replace "_" with " | " in gMenuTitle
-         --
-         put the script_MenuTitles of hObject into mTitles
-         filter mTitles with "Global | *"
-         --
-         set the wholematches to true
-         if gMenuTitle is among the lines of mTitles then
-            put help_ConstructMenuSubDomain (gMenuTitle) into menuSubDomain
-            return hObject
-         else
-            breakpoint
-            lcw_AnswerWarning merge ("[[gMenuTitle]] is not present. Menu is not prepared for indexing!")
-            return empty
-         end if
+      --
+      put the script_metadata ["name"] of hObject into gMenuTitle
+      replace "_" with " | " in gMenuTitle
+      --
+      put the script_MenuTitles of hObject into mTitles
+      filter mTitles with "Global | *"
+      --
+      set the wholematches to true
+      if gMenuTitle is among the lines of mTitles then
+         put help_ConstructMenuSubDomain (gMenuTitle) into menuSubDomain
+         return hObject
       else
-         -- it's a bit old and not yet organised
          breakpoint
-         lcw_AnswerWarning "Menu is not prepared for indexing!"
+         lcw_AnswerWarning merge ("[[gMenuTitle]] is not present. Menu is not prepared for indexing!")
          return empty
       end if
    end if
-end hkey_SetMenuItemHelpInfo
+end _SetMenuItemHelpInfo
 
 
 --> Help | Menu | Check
 -
 command help_CheckUpdateMenuItem hKey
-   hkey_SetMenuItemHelpInfo hKey, gMenuTitle, hkeyPageTitle, menuSubDomain, hkeySlug
+   _SetMenuItemHelpInfo hKey, gMenuTitle, hkeyPageTitle, menuSubDomain, hkeySlug
    
    -- check menu.livecode.world
    if help_CheckMenu (gMenuTitle) is true then
@@ -81,7 +107,7 @@ function help_CheckMenu gMenuTitle
 end help_CheckMenu
 
 function help_CheckMenuSubdomain hKey
-   hkey_SetMenuItemHelpInfo hKey, gMenuTitle, hkeyPageTitle, menuSubDomain, hkeySlug
+   _SetMenuItemHelpInfo hKey, gMenuTitle, hkeyPageTitle, menuSubDomain, hkeySlug
    put fedwiki_IsWiki (menuSubDomain) into subdomainExists
    return subdomainExists
 end help_CheckMenuSubdomain
@@ -90,7 +116,7 @@ end help_CheckMenuSubdomain
 --> Help | Menu | Item
 -
 command help_CreateMenuItem hKey, pScriptHelp
-   hkey_SetMenuItemHelpInfo hKey, gMenuTitle, hkeyPageTitle, menuSubDomain, hkeySlug
+   _SetMenuItemHelpInfo hKey, gMenuTitle, hkeyPageTitle, menuSubDomain, hkeySlug
    --
    if word 1 of gMenuTitle is not "Global" then return empty
    
@@ -103,7 +129,7 @@ command help_CreateMenuItem hKey, pScriptHelp
 end help_CreateMenuItem
 
 command help_UpdateMenuItem hKey
-   hkey_SetMenuItemHelpInfo hKey, gMenuTitle, hkeyPageTitle, menuSubDomain, hkeySlug
+   _SetMenuItemHelpInfo hKey, gMenuTitle, hkeyPageTitle, menuSubDomain, hkeySlug
    put pageArray_Fetch (menuSubDomain, hkeySlug) into hkeyPageArray
    if hkeyPageArray is empty then return empty
    --
@@ -118,7 +144,7 @@ end help_UpdateMenuItem
 --> Help | Menu | Subdomain | Create
 -
 command help_CreateMenuSubdomain hKey
-   hkey_SetMenuItemHelpInfo hKey, gMenuTitle, hkeyPageTitle, menuSubDomain, hkeySlug
+   _SetMenuItemHelpInfo hKey, gMenuTitle, hkeyPageTitle, menuSubDomain, hkeySlug
    put the result into mController
    --
    put fedwiki_IsWiki (menuSubDomain) into subDomainExists
@@ -152,7 +178,7 @@ end help_CreateMenuSubdomain
 
 command help_UpdateMenuSubdomain hKey, pHow
    -- no checks at the moment
-   hkey_SetMenuItemHelpInfo hKey, gMenuTitle, hkeyPageTitle, menuSubDomain, hkeySlug
+   _SetMenuItemHelpInfo hKey, gMenuTitle, hkeyPageTitle, menuSubDomain, hkeySlug
    put the result into mController
    --
    put fedwiki_IsWiki (menuSubDomain) into subDomainExists
@@ -290,7 +316,7 @@ function help_FetchMenuHelpArray gMenuTitle
 end help_FetchMenuHelpArray
 
 function lcw_FetchMenuItemHelpArray hKey, pFetchWelcome
-   hkey_SetMenuItemHelpInfo hKey, gMenuTitle, hkeyPageTitle, menuSubDomain, hkeySlug
+   _SetMenuItemHelpInfo hKey, gMenuTitle, hkeyPageTitle, menuSubDomain, hkeySlug
    if pFetchWelcome is true then
       -- wiki farms return json for welcome visitors wehn site does not exist!
       if fedwiki_IsWiki (menuSubDomain) is false then

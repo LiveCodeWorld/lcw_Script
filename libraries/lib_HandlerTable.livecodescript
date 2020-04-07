@@ -40,7 +40,7 @@ getprop handler_From [hKeyOrNumber]
    else
       put word 5 to -1 of line 1 of hTable into scriptObject
       --
-      put hKeyLine_Construct (hKeyOrNumber, scriptObject) into hKey
+      put hKeyLine_AddObject (hKeyOrNumber, scriptObject) into hKey
       htable_ExactLineOffsets hKey, hTable, startLineNum, endLineNum
       if the result is false then return empty
       
@@ -109,7 +109,7 @@ function hTable_GetHkeys hTable, hObject
    repeat for each line someLine in hTable
       put word 1 of someLine into hType
       put word 2 of someLine into hName
-      put hKeyLine_FromTripple (hName, hType, hObject) into hkeyLine
+      put hKeyLine_Construct (hName, hType, hObject) into hkeyLine
       put hkeyLine & CR after hkeyLines
    end repeat
    delete char -1 of hkeyLines
@@ -148,7 +148,7 @@ function hTable_GetFlexible searchHkeyLine, hTable, tObject, pMatchPrivate
    
    put word 1 of searchHkeyLine into hType
    put word 2 of searchHkeyLine into hName
-   put hKeyLine_FromTripple (hName, hType, tObject) into foundHkey
+   put hKeyLine_Construct (hName, hType, tObject) into foundHkey
    return foundHkey
 end hTable_GetFlexible
 
@@ -199,7 +199,7 @@ function htable_GetExact searchHkeyLine, hTable, tObject
    
    put word 1 of searchHkeyLine into hType
    put word 2 of searchHkeyLine into hName
-   put hKeyLine_FromTripple (hName, hType, tObject) into foundHkey
+   put hKeyLine_Construct (hName, hType, tObject) into foundHkey
    return foundHkey
 end htable_GetExact
 
@@ -230,7 +230,7 @@ function htable_GetEither searchHkeyLine, hTable, tObject
    
    put word 1 of searchHkeyLine into hType
    put word 2 of searchHkeyLine into hName
-   put hKeyLine_FromTripple (hName, hType, tObject) into foundHkey
+   put hKeyLine_Construct (hName, hType, tObject) into foundHkey
    return foundHkey
 end htable_GetEither
 

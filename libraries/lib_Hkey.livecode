@@ -27,25 +27,6 @@ function hkey_IsMenuHandler hKey
    else
       return true
    end if
-   
-   
-   hkey_Deconstruct hKey, hName, hType, hObject, hNum
-   -- put the script_Type of hObject into scriptType -- = "menu" ?
-   
-   set the itemdelimiter to "_"
-   if item 1 of hName = "menu" then
-      -- we should check if it an actual menu or just a handler somewhere
-      put the stack_Name of hObject into stackName
-      put project_ListUsedStackNames ("lcw_Menus") into libAndModelNames
-      set the wholematches to true
-      if stackName is among the lines of libAndModelNames then
-         return false
-      else
-         return true
-      end if
-   else
-      return false
-   end if
 end hkey_IsMenuHandler
 
 function hkey_GetMenuTitle hKey
@@ -73,7 +54,6 @@ function hkey_GetSuiteTitle hKey
    delete char 1 to 4 of suiteTitle
    return word 1 to -1 of suiteTitle
 end hkey_GetSuiteTitle
-
 
 
 --> Hkey | Check

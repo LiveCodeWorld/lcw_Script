@@ -50,7 +50,7 @@ getprop exported_HandlerHkeyArray [shortHkey]
    put the long id of the target into tObject
    hkey_Deconstruct shortHkey, hName, hType, hObject, hNum
    put revRuggedID (tObject) into hObject
-   put hKeyLine_FromTripple (hName, hType, hObject) into hKeyLine
+   put hKeyLine_Construct (hName, hType, hObject) into hKeyLine
    put hkeyLine_WalkExportedHkeyArray (hKeyLine) into hKeyArray
    return hKeyArray
 end exported_HandlerHkeyArray
@@ -65,7 +65,7 @@ on hkey_Rename hkey
          return empty
       case hName begins with "rig"
          put "revIgniter" into hObject -- could be "stack 'revIgniter'"?
-         put hKeyLine_FromTripple (hName, hType, hObject) into hkey
+         put hKeyLine_Construct (hName, hType, hObject) into hkey
          return hkey
       default
          return hKey
@@ -260,12 +260,12 @@ private command hkeyLine_WalkExportedHkeyArray shortCallHkeyLine, parentHKeyLine
    put hkey_GetPlace (shortCallHkeyLine, hkeyPlaceArray) into cObject -- find it
    
    if exists (cObject) is false then 
-      put hKeyLine_Construct (shortCallHkeyLine, "Missing") into missingCall
+      put hKeyLine_AddObject (shortCallHkeyLine, "Missing") into missingCall
       put true into hKeyLinkArray [parentHKeyLine][missingCall]
       return empty
    end if
    
-   put hKeyLine_Construct (shortCallHkeyLine, cObject) into foundCall
+   put hKeyLine_AddObject (shortCallHkeyLine, cObject) into foundCall
    if hKeyLinkArray [parentHKeyLine][foundCall] is true then
       return empty -- already indexed (don't recurse)
    end if
@@ -324,7 +324,7 @@ on mouse_EditHkey treeView, hTableLine
          put hTableLine into lineNums
          put the title_Text of treeView into hKeyLine
          -- put the displayed_Title of treeView into hTableLine
-         -- put hKeyLine_Construct (shortHkeyLine, dObject) into hKeyLine
+         -- put hKeyLine_AddObject (shortHkeyLine, dObject) into hKeyLine
          hkey_Edit hKeyLine
    end switch
 end mouse_EditHkey

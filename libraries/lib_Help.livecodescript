@@ -102,25 +102,6 @@ function help_FetchNewPageArray pageTitle, scriptType, curlyData, pScriptHelp
    return pageArray
 end help_FetchNewPageArray
 
-command help_SetHkeyInfo hKey, @wikiDomain, @pageSlug, @pageTitle   
-   switch
-      case hkey_IsMenuHandler (hKey)
-         hkey_SetMenuItemHelpInfo hKey, gMenuTitle, pageTitle, wikiDomain, pageSlug
-         break
-      case hkey_IsTransportHandler (hKey)
-         put "transport.fedwiki.org" into wikiDomain
-         hkey_Deconstruct hKey, hName, hType, hObject, hNum
-         put the stack_Name of hObject into stackName
-         put help_ConstructTransportTitle (stackName) into pageTitle 
-         break
-      default
-         -- not a special handler so add to global library
-         put "handler.livecode.world" into wikiDomain
-         put help_ConstructHandlerTitle (hKey) into pageTitle
-         put fedwiki_ConstructSlug (pageTitle) into pageSlug
-   end switch
-end help_SetHkeyInfo
-
 
 --> LCW | Handler | Help
 -

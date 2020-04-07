@@ -172,95 +172,16 @@ on submenu_MenuTools
 end submenu_MenuTools
 
 on submenu_Go
-   return "ScriptEditor | Go | Menu"
+   return "Global | ScriptEditor | Go | Menu"
 end submenu_Go
 
 on submenu_Tabs
-   return "ScriptEditor | Tabs | Menu"
+   return "Global | ScriptEditor | Tabs | Menu"
 end submenu_Tabs
 
 on submenu_MyMenu
-   -- here we insert the user menu
-   -- should be started on startUp
    return "Global | ScriptEditor | Recent | Custom | Menu"
 end submenu_MyMenu
-
-
---> ScriptEditor | Go | Menu
--
-on menu_ObjectProperties sObject
-   revIDEInspectObjects sObject
-   -- object_Inspect sObject
-end menu_ObjectProperties
-
-on menu_FindLoadedStack sObject
-   -- put the stacksinuse into stackNames
-   put revLoadedStacks ("all") into stackNames
-   --
-   put "*" & the short name of sObject & "*" into someFilter
-   put lcw_Ask ("Filter stacksinuse with...", someFilter) into someFilter
-   --
-   filter stackNames with someFilter
-   put empty into pIndexView
-   display_Stacks stackNames, "Found Stacks"
-end menu_FindLoadedStack
-
-on menu_GoToStack sObject
-   object_GoTo sObject
-end menu_GoToStack
-
-on menu_OpenInFinder sObject
-   put the stack_Name of scriptObject into stackName
-   stack_RevealInFinder stackName
-end menu_OpenInFinder
-
-on _
-end _
-
-on menu_Terminal sObject
-   put the stack_Folder of sObject into stackFolder
-   launch_Terminal stackFolder
-end menu_Terminal
-
-on menu_GitStatus sObject
-   put the stack_Folder of scriptObject into stackFolder
-   display_GitFolderStatus stackFolder
-end menu_GitStatus
-
-
---> ScriptEditor | Tabs | Menu
--
-on menu_SaveScriptTabs scriptObject
-   put empty into pPrefKey
-   --
-   put scriptEditor_ListEditingObjects() into historyObjects
-   pref_SaveValue "historyObjects", historyObjects, pPrefKey
-   
-   put scriptEditor_ListTabScriptObjects() into tabScriptObjects
-   pref_SaveValue "tabScriptObjects", tabScriptObjects, pPrefKey
-   
-   put line 1 of tabScriptObjects into scriptObject
-   save scriptObject
-   repeat with lineNum = 2 to the number of lines of tabScriptObjects
-      put line lineNum of tabScriptObjects into scriptObject
-      save scriptObject
-      scriptEditor_CloseTab scriptObject
-   end repeat
-end menu_SaveScriptTabs
-
-on menu_RestoreScriptTabs
-   put empty into pPrefKey
-   --
-   put pref_FetchValue ("tabScriptObjects", pPrefKey)into tabScriptObjects
-   repeat for each line scriptObject in tabScriptObjects
-      -- scriptEditor_CreateNewTab scriptObject
-      edit the script of scriptObject
-   end repeat
-end menu_RestoreScriptTabs
-
-on menu_GatherStacks
-   screen_GatherStacks
-end menu_GatherStacks
 
 
 --> Deps
