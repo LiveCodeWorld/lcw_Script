@@ -54,13 +54,13 @@ end hkey_Lines
 
 getprop hkey_LineNums [shortHkey]
    put the long id of the target into hObject
-   _HkeyOffsets hObject, shortHkey, sLineNum, eLineNum
+   hkeyLine_Offsets hObject, shortHkey, sLineNum, eLineNum
    if the result is empty then return empty
    --
    return sLineNum,eLineNum
 end hkey_LineNums
 
-private command _HkeyOffsets hObject, shortHkey, @sLineNum, @eLineNum
+command hkeyLine_Offsets hObject, shortHkey, @sLineNum, @eLineNum
    put the hkey_Line [shortHkey] of hObject into hTableLine
    if hTableLine is empty then return empty
    --
@@ -68,7 +68,7 @@ private command _HkeyOffsets hObject, shortHkey, @sLineNum, @eLineNum
    put word 3 of hTableLine + 1 into sLineNum
    put word 4 of hTableLine + 1 into eLineNum
    return hName
-end _HkeyOffsets
+end hkeyLine_Offsets
 
 
 --> hKeyLine
