@@ -26,6 +26,20 @@ getprop short_Hkeys [hFilter]
    return shortHkeys
 end short_Hkeys
 
+getprop hkey_Either [shortHkey]
+   -- returns public or private hkey in tObject
+   put the revAvailableHandlers of the target into hTable
+   put hTable_GetEither (shortHkey, hTable) into foundHkey
+   return foundHkey
+end hkey_Either
+
+getprop hkey_Exact [shortHkey]
+   -- this finds exactly what you specifiy in shortHkey
+   put the revAvailableHandlers of the target into hTable
+   put htable_GetExact (shortHkey, hTable) into foundHkey
+   return foundHkey
+end hkey_Exact
+
 getprop handler_Names [hFilter]
    put the revAvailableHandlers of the target into hTable
    put hTable_ListHanderNames (hTable, hFilter) into hNames
@@ -140,63 +154,16 @@ function hTable_GetHandlerNames hTable, pNotPrivate
 end hTable_GetHandlerNames
 
 
---> hTable | Flexible
--
-function hTable_GetFlexible searchHkeyLine, hTable, tObject, pMatchPrivate
-   hTable_FlexibleLineOffsets searchHkeyLine, hTable, startLineNum, endLineNum, pMatchPrivate
-   if the result is false then return empty
-   
-   put word 1 of searchHkeyLine into hType
-   put word 2 of searchHkeyLine into hName
-   put hKeyLine_Construct (hName, hType, tObject) into foundHkey
-   return foundHkey
-end hTable_GetFlexible
-
-command hTable_FlexibleLineOffsets shortHkey, hTable, @startLineNum, @endLineNum, pMatchPrivate
-   hkey_Normalize shortHkey
-   
-   -- this should get offsets for a call as a script would
-   -- so it ignores the difference betweeen "on" and "command"
-   --
-   if hTable is empty then
-      put 0 into startLineNum
-      put 0 into endLineNum
-      return false
-   end if
-   --
-   put word 1 of shortHkey into hType
-   put word 2 of shortHkey into hName
-   --
-   repeat for each line hLine in hTable      
-      put word 2 of hLine into hTableName
-      if hTableName is not hName then next repeat
-      --
-      put word 1 of hLine into hTableType
-      switch
-         case hTableType = hType
-            -- matches same type
-         case pMatchPrivate is true and char -1 of hTableType = hType
-            --if private matches private same type
-            put word 3 of hLine into startLineNum
-            put word 4 of hLine into endLineNum
-            return true
-      end switch
-   end repeat
-   put 0 into startLineNum
-   put 0 into endLineNum
-   return false
-end hTable_FlexibleLineOffsets
-
-
 --> hTable | Public or Private
 -
-function htable_GetExact searchHkeyLine, hTable, tObject
+function htable_GetExact searchHkeyLine, hTable
    -- searches hTable for the hType and hName in searchHkeyLine (searchHkeyLine = "PF _GetSomething .....")
    -- as fast as possible
    
    htable_ExactLineOffsets searchHkeyLine, hTable, startLineNum, endLineNum
    if the result is false then return empty
    
+   put word 5 to -1 of line 1 of hTable into tObject
    put word 1 of searchHkeyLine into hType
    put word 2 of searchHkeyLine into hName
    put hKeyLine_Construct (hName, hType, tObject) into foundHkey
@@ -204,7 +171,7 @@ function htable_GetExact searchHkeyLine, hTable, tObject
 end htable_GetExact
 
 command htable_ExactLineOffsets searchHkeyLine, hTable, @startLineNum, @endLineNum
-   hkey_Normalize searchHkeyLine
+   -- hkey_Normalize searchHkeyLine
    -- searches hTable for the hType and hName in searchHkeyLine (as fast as possible)
    put word 1 to 2 of searchHkeyLine into shortHkeyLine
    repeat for each line hLine in hTable
@@ -222,16 +189,22 @@ end htable_ExactLineOffsets
 
 --> hTable | Public or Private
 -
-function htable_GetEither searchHkeyLine, hTable, tObject
-   -- searches hTable for the hType and hName in searchHkeyLine
-   -- as fast as possible
-   htable_EitherLineOffsets searchHkeyLine, hTable, startLineNum, endLineNum
-   if the result is false then return empty
+function htable_GetEither searchHkeyLine, hTable
+   -- matches either private of public handlers
+   -- returns just the foundHkey (we dont need line numbers)
+   put char -1 of word 1 of searchHkeyLine into publicSearchType
+   put word 2 of searchHkeyLine into searchName
    
-   put word 1 of searchHkeyLine into hType
-   put word 2 of searchHkeyLine into hName
-   put hKeyLine_Construct (hName, hType, tObject) into foundHkey
-   return foundHkey
+   repeat for each line hLine in hTable
+      put word 2 of hLine into foundName
+      put word 1 of hLine into foundPublicType
+      if (foundName = searchName) AND (char -1 of foundPublicType = publicSearchType) then
+         put word 5 to -1 of line 1 of hTable into hObject
+         put hKeyLine_Construct (foundName, foundPublicType, hObject) into foundHkey
+         return foundHkey
+      end if
+   end repeat
+   return empty
 end htable_GetEither
 
 command htable_EitherLineOffsets searchHkeyLine, hTable, @startLineNum, @endLineNum
@@ -254,3 +227,51 @@ command htable_EitherLineOffsets searchHkeyLine, hTable, @startLineNum, @endLine
    put 0 into endLineNum
    return false
 end htable_EitherLineOffsets
+
+
+--> hTable | Flexible
+-
+function hTable_GetFlexible searchHkeyLine, hTable, tObject, pMatchPrivate
+   hTable_FlexibleLineOffsets searchHkeyLine, hTable, startLineNum, endLineNum, pMatchPrivate
+   if the result is false then return empty
+   
+   put word 1 of searchHkeyLine into hType
+   put word 2 of searchHkeyLine into hName
+   put hKeyLine_Construct (hName, hType, tObject) into foundHkey
+   return foundHkey
+end hTable_GetFlexible
+
+command hTable_FlexibleLineOffsets shortHkey, hTable, @startLineNum, @endLineNum, pMatchPrivate
+   -- same as GetEither? Not needed?
+   -- this should get offsets for a call as a script would
+   -- so it ignores the difference betweeen "on" and "command"
+   hkey_Normalize shortHkey
+   --
+   if hTable is empty then
+      put 0 into startLineNum
+      put 0 into endLineNum
+      return false
+   end if
+   --
+   put word 1 of shortHkey into hType
+   put word 2 of shortHkey into hName
+   --
+   repeat for each line hLine in hTable      
+      put word 2 of hLine into hTableName
+      if hTableName is not hName then next repeat
+      --
+      put word 1 of hLine into hTableType
+      switch
+         case hTableType = hType
+            -- matches same type
+         case pMatchPrivate is true and char -1 of hTableType = hType
+            -- if private matches private same type
+            put word 3 of hLine into startLineNum
+            put word 4 of hLine into endLineNum
+            return true
+      end switch
+   end repeat
+   put 0 into startLineNum
+   put 0 into endLineNum
+   return false
+end hTable_FlexibleLineOffsets

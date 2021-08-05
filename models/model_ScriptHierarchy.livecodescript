@@ -15,29 +15,97 @@ So we can calculate a good guess. Even a bit of a hack is useful in terms of fin
 
 --> Working on
 -
+getprop object_Hierarchy [pWhichBehaviors]
+   -- this old handler return things the wrong way round
+   -- see also "script_Hierarchy" 
+   put the long id of the target into someObject
+   if pWhichBehaviors is empty then put "no library deps" into pWhichBehaviors
+   
+   put revRuggedId (someObject) into objectHierarchy
+   put the behavior of someObject into objectBehavior
+   object_MaybeAddBehavior objectHierarchy, objectBehavior, pWhichBehaviors
+   
+   put someObject into objectOwner
+   put empty into skipThisBackgroundID
+   repeat
+      switch word 1 of objectOwner
+         case "stack"
+            -- previously added a stack, check if it was a substack
+            put objectOwner into stackObject
+            put the owner of stackObject into mainStackObject
+            if exists(mainStackObject) then
+               put mainStackObject & CR before objectHierarchy
+               put the behavior of mainStackObject into objectBehavior
+               object_MaybeAddBehavior objectHierarchy, objectBehavior, pWhichBehaviors
+            end if
+            return objectHierarchy
+            break
+         case "card"
+            -- previously added a card, so check for backgrounds
+            
+            put objectOwner into cardObject
+            put the backgroundIDs of cardObject into bgIDs
+            -- need to add in reverse to mirror message path
+            repeat with bgNum = the number of lines of bgIDs down to 1
+               put line bgNum of bgIDs into someID
+               if someID = skipThisBackgroundID then next repeat
+               put the long ID of bg ID someID of cardObject into backgroundObject
+               put revRuggedId (backgroundObject) & CR before objectHierarchy
+               put the behavior of backgroundObject into objectBehavior
+               object_MaybeAddBehavior objectHierarchy, objectBehavior, pWhichBehaviors
+            end repeat
+            
+            delete word 1 to 4 of objectOwner
+            
+            -- above a card must be a stack
+            put name of objectOwner into stackObject
+            put stackObject & CR before objectHierarchy
+            put the behavior of stackObject into objectBehavior
+            object_MaybeAddBehavior objectHierarchy, objectBehavior, pWhichBehaviors
+            break
+         case "group"
+            -- previously added a group, check to see if was a bg
+            if the backgroundbehavior of objectOwner is true then
+               -- will need to skip it's own "card" background
+               put the short ID of objectOwner into skipThisBackgroundID
+            end if
+            delete word 1 to 4 of objectOwner
+            if exists (objectOwner) is false then return objectHierarchy
+            put revRuggedId (objectOwner) & CR before objectHierarchy
+            put the behavior of objectOwner into objectBehavior
+            object_MaybeAddBehavior objectHierarchy, objectBehavior, pWhichBehaviors
+            break
+         default
+            -- previously added a normal control
+            delete word 1 to 4 of objectOwner
+            if exists (objectOwner) is false then return objectHierarchy
+            put revRuggedId (objectOwner) & CR before objectHierarchy
+            put the behavior of objectOwner into objectBehavior
+            object_MaybeAddBehavior objectHierarchy, objectBehavior, pWhichBehaviors
+      end switch
+   end repeat
+   return "error" -- should never get here!
+end object_Hierarchy
+
+command object_MaybeAddBehavior @objectHierarchy, objectBehavior, pWhichBehaviors
+   if exists (objectBehavior) then
+      switch
+         case pWhichBehaviors is "no deps"
+            -- don't add
+            break
+         case pWhichBehaviors is "no library deps" and the uRIP ["type"] of objectBehavior is not "behavior/library"
+            put revRuggedId (objectBehavior) & CR before objectHierarchy
+            break
+         default -- case "all"
+            put revRuggedId (objectBehavior) & CR before objectHierarchy
+            break
+      end switch
+   end if
+end object_MaybeAddBehavior
+
 
 --> Script| Hierarchy
 -
-getprop hkey_ScriptHierarchy [externalObjects]
-   -- Quick hack
-   -- Good for straigh libraries and the object itself
-   -- does not do behaviors of libs, or front and back scripts
-   
-   if externalObjects is empty then
-      put stack_PathsToObjects (the stacksinUse) into externalObjects
-   end if
-   put the long id of the target into targetObject
-   put the behavior_Objects of the target into bObjects
-   
-   -- let's just do used stacks for now
-   put targetObject into scriptHierarchy
-   if bObjects is not empty then put CR & bObjects after scriptHierarchy
-   if externalObjects is not empty then put CR & externalObjects after scriptHierarchy
-   --
-   -- put word 1 to -1 of scriptHierarchy into scriptHierarchy
-   return scriptHierarchy
-end hkey_ScriptHierarchy
-
 getprop script_Hierarchy [pProjectName]
    -- surpisingly complex dependencies if we include pProjectName
    put the long id of the target into targetObject
@@ -45,6 +113,25 @@ getprop script_Hierarchy [pProjectName]
    hkey_AddDevelopmentHierarchy scriptHierarchy, pProjectName
    return scriptHierarchy
 end script_Hierarchy
+
+getprop hkey_ScriptHierarchy [externalObjects]
+   -- Good for straight libraries and the object itself
+   -- Does not do behaviors of libs, or front and back scripts
+   
+   put the long id of the target into tObject
+   put revRuggedID (tObject) into tObject
+   if externalObjects is empty then
+      put env_ScriptHierarchy (true) into externalObjects
+      line_Delete tObject, externalObjects
+   end if
+   put the behavior_Objects of tObject into bObjects
+   
+   put tObject into scriptHierarchy
+   if bObjects is not empty then put CR & bObjects after scriptHierarchy
+   if externalObjects is not empty then put CR & externalObjects after scriptHierarchy
+   --
+   return scriptHierarchy
+end hkey_ScriptHierarchy
 
 getprop object_Hierarchy
    put the long id of the target into targetObject
@@ -71,19 +158,6 @@ end object_Hierarchy
 
 --> Script| Hierarchy | Development
 -
-function env_ScriptHierarchy
-   put stack_PathsToObjects (the stacksinUse) into usedStacks
-   put env_ListFrontScripts() into frontObjects
-   put env_ListBackScripts() into backObjects
-   --
-   object_AddBehaviors usedStacks
-   object_AddBehaviors frontObjects
-   object_AddBehaviors backObjects
-   script_AddLibrariesToHierarchy scriptHierarchy, frontObjects, usedStacks, backObjects
-   --
-   return scriptHierarchy
-end env_ScriptHierarchy
-
 command hkey_AddDevelopmentHierarchy @scriptHierarchy, pProjectName
    local frontObjects, usedStacks, backObjects
    
@@ -135,7 +209,7 @@ function stack_PathsToObjects stackNameOrPaths
       put the name of stack stackName & CR after stackObjects
    end repeat
    delete char -1 of stackObjects
-   return stackObjects
+   return word 1 to -1 of stackObjects
 end stack_PathsToObjects
 
 command ide_FilterOutStacks @longIDs
@@ -151,20 +225,6 @@ command ide_FilterOutStacks @longIDs
    delete char -1 of filteredObjects
    put filteredObjects into longIDs
 end ide_FilterOutStacks
-
-function env_ListFrontScripts
-   -- /Applications/LiveCode Community 8.1.0 (dp 3).app/Contents/Tools/Toolset/libraries/revshortcutslibrary.livecodescript
-   put the frontscripts into longIDs
-   ide_FilterOutStacks longIDs
-   return longIDs
-end env_ListFrontScripts
-
-function env_ListBackScripts
-   -- /Applications/LiveCode Community 8.1.0 (dp 3).app/Contents/Tools/Toolset/libraries/revshortcutslibrary.livecodescript
-   put the backscripts into longIDs
-   ide_FilterOutStacks longIDs
-   return longIDs
-end env_ListBackScripts
 
 function rev_AppToolsFolder
    put rev_AppContentsFolder() & "Tools/" into revToolsLibraryFolder

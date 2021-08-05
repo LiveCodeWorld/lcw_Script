@@ -1,22 +1,30 @@
-﻿script "Global_ScriptEditor_Header_Menu"
+﻿script "Global | ScriptEditor | Header | Menu"
 --> MetaData
 -
 license: GPLv3
-name: Global_ScriptEditor_Header_Menu
+name: Global | ScriptEditor | Header | Menu
 type: controller
 version: 0.6
 
-/*
-This menu is desinged to act as a constant header with a common set of tools,
-while you switch menu tool environments.
-*/
+/*This menu is desinged to act as a constant header with a common set of tools,
+while you switch menu tool environments.*/
 
 
 --> Menu | Props
 -
 local LocalArray
 
-on menu_Init
+on menu_Init tObject
+   pass menu_Init
+end menu_Init
+
+getprop menu_Target [tObject]
+   _Init
+   put LocalArray ["sObject"] into sObject
+   return sObject
+end menu_Target
+
+private command _Init
    put stack_ListEditedNames() into editedStackNames
    repeat for each line stackName in editedStackNames
       switch
@@ -37,25 +45,30 @@ on menu_Init
    --
    put scriptEditor_Object() into sObject
    put sObject into LocalArray ["sObject"]
-end menu_Init
+   --
+   put the script_IsDifferent of sObject is true into LocalArray ["scriptIsDifferent"]
+end _Init
 
-getprop menu_Target [tObject]
-   put LocalArray ["sObject"] into sObject
-   return sObject
-end menu_Target
+getprop disabled_DisplayLocalChanges [sObject]
+   if LocalArray ["scriptIsDifferent"] then
+      return false
+   else
+      return "delete"
+   end if
+end disabled_DisplayLocalChanges
 
 getprop editIdeMenu_Params
    return ide_ListMenuElements()
 end editIdeMenu_Params
 
-getprop setMenu_Param
+getprop setMenuGroup_Param
    return ide_ShortTitle ("Recent")
-end setMenu_Param
+end setMenuGroup_Param
 
-getprop setMenu_Params
+getprop setMenuGroup_Params
    put ide_ListShortMenuTitles ("Recent") into shortNames
    return shortNames
-end setMenu_Params
+end setMenuGroup_Params
 
 getprop recentScripts_Params
    put LocalArray ["recentObjects"] into recentObjects
@@ -99,15 +112,12 @@ getprop disabled_SaveRecentStacks
    end if
 end disabled_SaveRecentStacks
 
-getprop disabled_SaveEdited
-   put LocalArray ["editedStackNames"] into editedStackNames
-   if editedStackNames is empty then
-      -- return true
-      return "delete"
-   else
-      return false
-   end if
-end disabled_SaveEdited
+getprop disabled_Create [scriptObject]
+   get the script_Type of scriptObject
+   put the project_Name of scriptObject into projectName
+   put projectName is empty into isNotProject
+   return isNotProject
+end disabled_Create
 
 getprop disabled_MenuTools [scriptObject]
    get the script_Type of scriptObject
@@ -118,74 +128,16 @@ getprop disabled_MenuTools [scriptObject]
    end if
 end disabled_MenuTools
 
-getprop disabled_DisplayLocalChanges [scriptObject]
-   if the script_IsDifferent of scriptObject is true then
-      return false
-   else
+getprop disabled_SaveEdited
+   put LocalArray ["editedStackNames"] into editedStackNames
+   if editedStackNames is empty then
       -- return true
       return "delete"
-   end if
-end disabled_DisplayLocalChanges
-
-
---> Global | ScriptEditor | Header | Menu
--
-on menu_DisplayLocalChanges scriptObject
-   put the script of scriptObject into nowScript
-   put the exported_Script of scriptObject into exportedScript
-   terminal_Diff exportedScript, nowScript, "the exported_Script of mTarget", "the script of mTarget"
-end menu_DisplayLocalChanges
-
-on menu_RecentScripts scriptObject, recentObject
-   put LocalArray ["friendlyArray"][recentObject] into someObject
-   if exists (someObject) then
-      edit the script of someObject
    else
-      breakpoint
+      return false
    end if
-end menu_RecentScripts
+end disabled_SaveEdited
 
-on menu_SaveEdited
-   stack_SaveEdited "all"
-end menu_SaveEdited
-
-on _
-end _
-
-on submenu_Help
-   return "Global | Script | Help | Menu"
-end submenu_Help
-
-on menu_SetMenu sObject, mTitle
-   ide_SetMenuTitle "Recent", mTitle
-end menu_SetMenu
-
-on menu_EditIdeMenu sObject, mElement
-   ide_EditMenu mElement
-end menu_EditIdeMenu
-
-on _
-end _
-
-on submenu_MenuTools
-   return "Global | MenuTools | Menu"
-end submenu_MenuTools
-
-on submenu_Go
-   return "Global | ScriptEditor | Go | Menu"
-end submenu_Go
-
-on submenu_Tabs
-   return "Global | ScriptEditor | Tabs | Menu"
-end submenu_Tabs
-
-on submenu_MyMenu
-   return "Global | ScriptEditor | Recent | Custom | Menu"
-end submenu_MyMenu
-
-
---> Deps
--
 command objects_MakeFriendly someObjects, @orderedFriendlyObjects, @friendlyArray
    repeat for each line someObject in someObjects
       put the long id of someObject into longIDObject
@@ -208,3 +160,74 @@ function object_MakeFriendly scriptObject
    end if
    return tFriendlyName
 end object_MakeFriendly
+
+
+--> Global | ScriptEditor | Header | Menu
+-
+on menu_DisplayLocalChanges scriptObject
+   put the script of scriptObject into nowScript
+   put the exported_Script of scriptObject into exportedScript
+   terminal_Diff exportedScript, nowScript, "the exported_Script of mTarget", "the script of mTarget"
+end menu_DisplayLocalChanges
+
+on menu_RecentScripts scriptObject, recentObject
+   put LocalArray ["friendlyArray"][recentObject] into someObject
+   if exists (someObject) then
+      edit the script of someObject
+   else
+      breakpoint
+   end if
+end menu_RecentScripts
+
+on submenu_Help
+   return "Global | Script | Help | Menu"
+end submenu_Help
+
+on submenu_Git
+   return "Global | GIT | Simple | Object | Menu"
+end submenu_Git
+
+on menu_SaveEdited
+   stack_SaveEdited "all"
+end menu_SaveEdited
+
+on _
+end _
+
+on submenu_Display
+   return "Global | Project | Display | Menu"
+end submenu_Display
+
+on submenu_Create
+   return "Global | Project | Create | Menu"
+end submenu_Create
+
+on submenu_MenuTools
+   return "Global | MenuTools | Menu"
+end submenu_MenuTools
+
+on _
+end _
+
+on submenu_Go
+   return "Global | ScriptEditor | Go | Menu"
+end submenu_Go
+
+on submenu_Tabs
+   return "Global | ScriptEditor | Tabs | Menu"
+end submenu_Tabs
+
+on submenu_MyMenu
+   return "Global | ScriptEditor | Recent | Custom | Menu"
+end submenu_MyMenu
+
+on _
+end _
+
+on menu_SetMenuGroup sObject, shortTitle
+   ide_SetScriptEditorTitles shortTitle
+end menu_SetMenuGroup
+
+on menu_EditIdeMenu sObject, mElement
+   ide_EditMenu mElement
+end menu_EditIdeMenu

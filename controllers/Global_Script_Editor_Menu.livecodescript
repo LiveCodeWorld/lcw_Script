@@ -18,6 +18,22 @@ local BehaviorObjectMenu, ObjectDictionary, ViewNames
 
 --> Menu | Props
 -
+getprop hierarchyObject_Params [mTarget]
+   return BehaviorObjectMenu
+end hierarchyObject_Params
+
+getprop cardView_Params [mTarget]
+   return ViewNames
+end cardView_Params
+
+getprop findLibraryHandler_Params
+   return "text,hkey"
+end findLibraryHandler_Params
+
+getprop findProjectHandler_Params
+   return "text,hkey"
+end findProjectHandler_Params
+
 getprop menu_Title [pMenuButton]
    put "This is not being called"
    if the shiftKey is "Down" then
@@ -46,6 +62,71 @@ getprop menu_Target [mTitlePath]
    return scriptObject
 end menu_Target
 
+private function _getSelectedText findWhat
+   switch findWhat
+      case "text"
+         put LocalArray ["textSelected"] into textToFind
+         break
+      case "hkey"
+         put LocalArray ["selectedHkey"] into textToFind
+         break
+   end switch
+   
+   if textToFind is empty then
+      put lcw_Ask ("Enter some text to do a spotlight search for...") into textToFind
+   end if
+   return textToFind
+end _getSelectedText
+
+getprop disabled_DisplayGlobalMenu
+   put "/Users/BabyBlue/Documents/My Revolution Enterprise/Plugins/opn_Plugins/opn_Libraries/libOPN_Menus.rev" into longStackFile
+   return exists (stack longStackFile) is false
+end disabled_DisplayGlobalMenu
+
+getprop disabled_HierarchyObject [mTarget]
+   local longObjects, shortObjects, shortNames
+   put the object_BehaviorHierarchyArray of mTarget into hierarchyArray
+   
+   put hierarchyArray ["longObjects"] into longObjects 
+   put hierarchyArray ["menu"] into BehaviorObjectMenu
+   put hierarchyArray ["dictionary"] into ObjectDictionary
+   
+   if longObjects is empty then
+      return "delete"
+   else
+      return false
+   end if
+end disabled_HierarchyObject
+
+getprop disabled_CardView [mTarget]
+   put the card_Object of mTarget into cardObject
+   if exists(cardObject) is false then return "delete"
+   put the view_NameArray of cardObject into nameArray
+   put keys(nameArray) into ViewNames
+   if ViewNames is empty then
+      return "delete"
+   else
+      return false
+   end if
+end disabled_CardView
+
+getprop disabled_FindInHierarchy [mTarget]
+   -- put the long id of the clickfield into scriptField
+   put rev_ScriptEditorField() into scriptField
+   if exists(scriptField) is false then return empty
+   put the selectedtext of scriptField into someToken
+   if someToken is empty then return "delete"
+   
+   if ide_IsDictionaryTerm(someToken) is true then
+      -- return "true"
+      return "delete"
+   else
+      put hkey_GetSelected (scriptField) into hKey
+      set the search_Hkey of me to hKey
+      return false
+   end if
+end disabled_FindInHierarchy
+
 
 --> Global | Script | Editor | Menu
 -
@@ -63,12 +144,11 @@ on menu_FindLibraryHandler mTarget, findWhat
       exit to top
    end if
    
-   put merge ("Files with hKey '[[textToFind]]") into someTitle
-   display_Array pathArray, someTitle, titleMenu, lineMenu, "launchFile", "launchFile"
-   put the result into treeWidget
-   
-   set the search_Folder of treeWidget to findInsideFolder
-   set the search_Text of treeWidget to textToFind
+   display_Array pathArray, textToFind, "Files with hKey"
+   put the result into displayView
+   set the mouse_DoubleUp of displayView to "launchFile"
+   set the search_Folder of displayView to findInsideFolder
+   set the search_Text of displayView to textToFind
 end menu_FindLibraryHandler
 
 on menu_FindProjectHandler mTarget, findWhat
@@ -236,90 +316,7 @@ on submenu_Dev
 end submenu_Dev
 
 
---> Global | Script | Editor | Props
--
-getprop some_Things [mTarget]
-   return BehaviorObjectMenu
-end some_Things
-
-getprop view_Things [mTarget]
-   return ViewNames
-end view_Things
-
-getprop find_Whats
-   return "text,hkey"
-end find_Whats
-
-private function _getSelectedText findWhat
-   switch findWhat
-      case "text"
-         put LocalArray ["textSelected"] into textToFind
-         break
-      case "hkey"
-         put LocalArray ["selectedHkey"] into textToFind
-         break
-   end switch
-   
-   if textToFind is empty then
-      put lcw_Ask ("Enter some text to do a spotlight search for...") into textToFind
-   end if
-   return textToFind
-end _getSelectedText
-
-
---> Global | Script | Editor | Disabled
--
-getprop disabled_DisplayGlobalMenu
-   put "/Users/BabyBlue/Documents/My Revolution Enterprise/Plugins/opn_Plugins/opn_Libraries/libOPN_Menus.rev" into longStackFile
-   return exists (stack longStackFile) is false
-end disabled_DisplayGlobalMenu
-
-getprop disabled_HierarchyObject [mTarget]
-   local longObjects, shortObjects, shortNames
-   put the object_BehaviorHierarchyArray of mTarget into hierarchyArray
-   
-   put hierarchyArray ["longObjects"] into longObjects 
-   put hierarchyArray ["menu"] into BehaviorObjectMenu
-   put hierarchyArray ["dictionary"] into ObjectDictionary
-   
-   if longObjects is empty then
-      return "delete"
-   else
-      return false
-   end if
-end disabled_HierarchyObject
-
-getprop disabled_CardView [mTarget]
-   put the card_Object of mTarget into cardObject
-   if exists(cardObject) is false then return "delete"
-   put the view_NameArray of cardObject into nameArray
-   put keys(nameArray) into ViewNames
-   if ViewNames is empty then
-      return "delete"
-   else
-      return false
-   end if
-end disabled_CardView
-
-getprop disabled_FindInHierarchy [mTarget]
-   -- put the long id of the clickfield into scriptField
-   put rev_ScriptEditorField() into scriptField
-   if exists(scriptField) is false then return empty
-   put the selectedtext of scriptField into someToken
-   if someToken is empty then return "delete"
-   
-   if ide_IsDictionaryTerm(someToken) is true then
-      -- return "true"
-      return "delete"
-   else
-      put hkey_GetSelected (scriptField) into hKey
-      set the search_Hkey of me to hKey
-      return false
-   end if
-end disabled_FindInHierarchy
-
-
---> Deps | Display
+--> Deps
 -
 command launchFile treeWidget, shortPath
    -- for "display_Array" in "menu_FindLibraryHandler" and "menu_FindProjectHandler"
@@ -334,9 +331,6 @@ command launchFile treeWidget, shortPath
    put hkey_FromShortFolder (shortHandlerFolder)
 end launchFile
 
-
---> Deps
--
 command field_SetSelected scriptField, @textSelected, @someLine, @lineNum, @someScript, @startChar, @endChar
    put the selectedText into textSelected   
    put the selectedchunk into chunkSelected
@@ -544,12 +538,10 @@ on menu_DisplayScriptAnalysis scriptObject
    if breakdownArray ["duplicateArray"] is empty then delete variable breakdownArray ["duplicateArray"]
    delete variable breakdownArray ["scriptArray"]
    
-   put "Script analysis for" && the name of scriptObject into someTitle
-   display_Array breakdownArray, someTitle, "Global | Script | Duplicates | Menu", "Global | Script | Duplicates | Line | Menu"
-   put the result into treeView
-   
-   put the object_Hkey ["M display_DuplicateKey"] of me into hKey
-   set the event_Trigger ["mouseDoubleUp"] of the tree_Field of treeView to hKey
+   put the name of scriptObject into someTitle
+   display_Array breakdownArray, someTitle, "Script analysis for"
+   put the result into displayView
+   display_SetInteractions displayView, "Script | Duplicates", "display_DuplicateKey"
 end menu_DisplayScriptAnalysis
 
 on menu_DuplicatesInScript scriptObject
@@ -568,8 +560,9 @@ on menu_DuplicatesInScript scriptObject
       script_FetchFromHkeys uniqueKeys, depScript, missingHkeys
       put script_ConstructSuite ("Deps", depScript) into depSuite
       
-      display_Array duplicateArray, "Duplicate Handlers", "Global | Script | Duplicates | Menu", "Global | Script | Duplicates | Line | Menu"
-      
+      display_Array duplicateArray, "Duplicate Handlers"
+      display_SetInteractions the result, "Script | Duplicates", ""
+      --    
       put "Dep suite for" && the mobile_Name of scriptObject into someTitle
       display_Text depSuite, someTitle
    end if

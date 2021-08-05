@@ -92,7 +92,7 @@ end menu_DisplayMainstackHarray
 
 on menu_DisplayMainstackHkeyArray scriptObject
    put the mainstack_HkeyArray of scriptObject into mainStackHkeyArray   
-   display_HkeyArray mainStackHkeyArray, "the mainstack_HkeyArray of scriptObject"
+   display_ScriptHkeyArray mainStackHkeyArray, "the mainstack_HkeyArray of scriptObject"
 end menu_DisplayMainstackHkeyArray
 
 on menu_DisplayMainstackWalkArray scriptObject

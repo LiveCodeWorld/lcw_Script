@@ -1,8 +1,8 @@
-﻿script "Global_ScriptEditor_Hkey_Menu"
+﻿script "Global | ScriptEditor | Hkey | Menu"
 --> MetaData
 -
 license: GPLv3
-name: Global_ScriptEditor_Hkey_Menu
+name: Global | ScriptEditor | Hkey | Menu
 type: controller
 version: 0.7
 
@@ -10,100 +10,6 @@ version: 0.7
 --> Variables
 -
 local LocalArray
-
-
---> Global | ScriptEditor | Hkey | Menu
--
-on insert_SendHkey
-   return "Global | Hkey | Send | Menu"
-end insert_SendHkey
-
-on _
-end _
-
-on insert_HelpMenu
-   return "Global | Hkey | Help | Menu"
-end insert_HelpMenu
-
-on _
-end _
-
-on menu_DisplayHkeySvg hKey
-   put hkey_SvgFile (hKey) into svgFile
-   if scriptEditor_PaneExists ("Deps") then
-      display_ScriptEditorSvg svgFile
-   end if
-   
-   put hkey into stackLabel
-   display_SVG svgFile, stackLabel
-end menu_DisplayHkeySvg
-
-on _
-end _
-
-on submenu_HandlerFiles
-   return "Global | Handler | Calls | Menu"
-end submenu_HandlerFiles
-
-on submenu_HandlerLibrary
-   return "Global | Handler | Library | Menu"
-end submenu_HandlerLibrary
-
-on submenu_HandlerCalls
-   return "Global | Handler | Calls | Menu"
-end submenu_HandlerCalls
-
-on submenu_HandlerWalk
-   return "Global | Hkey | Walk | Menu"
-end submenu_HandlerWalk
-
-on submenu_HandlerTest
-   return "Global | Handler | Menu"
-end submenu_HandlerTest
-
-on submenu_Panes
-   return "Global | ScriptEditor | Panes | Menu"
-end submenu_Panes
-
-on _
-end _
-
-on submenu_Dev
-   return "Dev | Menu"
-end submenu_Dev
-
-
---> Global | ScriptEditor | Hkey | Menu | Props
--
-
-
---> Global | ScriptEditor | Hkey | Menu | Disabled
--
-getprop disabled_DisplayHkeySvg [hKey]
-   put hkey_SvgFile (hKey) into svgFile
-   if there is a file svgFile then
-      return false
-   else
-      return true
-   end if
-end disabled_DisplayHkeySvg
-
-
---> Dev | Menu
--
-on menu_FindHandlerWithSpotlight hkeyLine
-   display_SpotlightHandler hkeyLine
-end menu_FindHandlerWithSpotlight
-
-on menu_UpdateSpotlightFolder
-   answer folder "Choose a folder to re-index..."
-   if it is empty then exit to top
-   put it into inFolder
-   
-   spotlight_ForceUpdate inFolder
-   put the result
-end menu_UpdateSpotlightFolder
-
 
 --> Menu | Props
 -
@@ -127,19 +33,66 @@ on menu_Init targetObject, mPath, mTitlePath
    put startLineNum into LocalArray ["startLineNum"]
    put endLineNum into LocalArray ["endLineNum"]
    put line startLineNum to endLineNum of the script of hObject into LocalArray ["someHandler"]
-   
-   -- put library_HandlerFile (hKey, empty, true) into LocalArray ["hkeyFolder"]
-   
-   /*
-   put hArray_ListHkeyObjects (hKey) into otherObjects
-   line_Delete hObject, otherObjects
-   put word 1 to -1 of otherObjects into LocalArray ["other objects"]
-   */
 end menu_Init
 
 getprop menu_Target [mTitlePath]
    return LocalArray ["hKey"]
 end menu_Target
+
+getprop disabled_DisplayHkeySvg [hKey]
+   put hkey_SvgFile (hKey) into svgFile
+   if there is a file svgFile then
+      return false
+   else
+      return true
+   end if
+end disabled_DisplayHkeySvg
+
+
+--> Global | ScriptEditor | Hkey | Menu
+-
+on submenu_HandlerLibrary
+   return "Global | Handler | Library | Menu"
+end submenu_HandlerLibrary
+
+on submenu_HandlerTest
+   return "Global | Handler | Menu"
+end submenu_HandlerTest
+
+on submenu_HandlerCalls
+   return "Global | Handler | Calls | Menu"
+end submenu_HandlerCalls
+
+on submenu_HandlerWalk
+   return "Global | Hkey | Walk | Menu"
+end submenu_HandlerWalk
+
+on submenu_Panes
+   return "Global | ScriptEditor | Panes | Menu"
+end submenu_Panes
+
+on _
+end _
+
+on submenu_Dev
+   return "Dev | Menu"
+end submenu_Dev
+
+
+--> Dev | Menu
+-
+on _FindHandlerWithSpotlight hkeyLine
+   display_SpotlightHandler hkeyLine
+end _FindHandlerWithSpotlight
+
+on _UpdateSpotlightFolder
+   answer folder "Choose a folder to re-index..."
+   if it is empty then exit to top
+   put it into inFolder
+   
+   spotlight_ForceUpdate inFolder
+   put the result
+end _UpdateSpotlightFolder
 
 
 --> Handlers

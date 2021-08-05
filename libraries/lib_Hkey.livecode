@@ -19,6 +19,35 @@ with the "script_" extension being replaces by "hkey_"
 
 --> Working on
 -
+function script_HkeysFromAvailable handlerTable, someScript, pReturnHow
+   repeat for each line someLine in handlerTable
+      put word 1 of someLine into handlerType
+      if handlerType is not "M" then next repeat
+      
+      put word 3 of someLine into startLineNum
+      -- put word 4 of someLine into endLineNum
+      put line startLineNum of someScript into startLine
+      if word 1 of startLine is not "on" then next repeat
+      
+      put word 2 of someLine into hName
+      switch pReturnHow
+         case "hKey"
+            put hName,hType,tObject,1 & CR after hKeys
+            break
+         case "name"
+            put hName & CR after hKeys
+            break
+         default
+            put hName,hType & CR after hKeys
+      end switch
+   end repeat
+   delete char -1 of hKeys
+   return hKeys
+end script_HkeysFromAvailable
+
+
+--> Hkey | Type
+-
 function hkey_IsMenuHandler hKey
    -- not sure how best to check this
    put hkey_GetMenuTitle (hKey) into mTitle
@@ -485,19 +514,6 @@ function hkey_DontRecurse hKey, pOriginalHkey
    end switch
 end hkey_DontRecurse
 
-command hkey_RedrawDependencyGraph hKey, pGraphStyle, pImageView, pVersionName
-   local pGraphSize, pOverlayName
-   set the cursor to watch
-   
-   put hkey_GetLinkArray (hKey) into hkeyArray
-   put hkey_DotFile (hKey, pVersionName, false) into dotFile
-   put the scriptLibrary_Card of me into graphController  
-   linkArray_RedrawOverlayMap hkeyArray, dotFile, graphController, graphController, pImageView, pGraphStyle, pGraphSize, hKey
-   put the result into pImageView
-   set the  overlay_Of of pImageView to hKey
-   return pImageView
-end hkey_RedrawDependencyGraph
-
 
 --> Script
 -
@@ -603,32 +619,6 @@ command hkey_EditFoundHandler hkey
    -- lcw_Notify revHandlerTreeLineNum, true
    return true
 end hkey_EditFoundHandler
-
-function script_HkeysFromAvailable handlerTable, someScript, pReturnHow
-   repeat for each line someLine in handlerTable
-      put word 1 of someLine into handlerType
-      if handlerType is not "M" then next repeat
-      
-      put word 3 of someLine into startLineNum
-      -- put word 4 of someLine into endLineNum
-      put line startLineNum of someScript into startLine
-      if word 1 of startLine is not "on" then next repeat
-      
-      put word 2 of someLine into hName
-      switch pReturnHow
-         case "hKey"
-            put hName,hType,tObject,1 & CR after hKeys
-            break
-         case "name"
-            put hName & CR after hKeys
-            break
-         default
-            put hName,hType & CR after hKeys
-      end switch
-   end repeat
-   delete char -1 of hKeys
-   return hKeys
-end script_HkeysFromAvailable
 
 command script_HandlerTableOffsets shortHkey, handlerTable, @startLineNum, @endLineNum, @handlerNum
    -- old

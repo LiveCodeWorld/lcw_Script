@@ -21,16 +21,27 @@ These handlers extract handlers from an objects script.
 For handlers that work on exported handlers see "model_HandlerLibrary"
 */
 
+getprop script_HandlerExists [shortHKey]
+   if shortHKey is empty then return empty
+   put the revAvailableHandlers of the target into hTable
+   --
+   put space after word 1 to -1 of shortHKey
+   if lineOffset (shortHKey, hTable) = 0 then
+      return false
+   else
+      return true
+   end if
+end script_HandlerExists
+
 getprop script_Handler [shortHKey]
    if shortHKey is empty then return empty
-   hkey_Normalize shortHKey
+   -- hkey_Normalize shortHKey
    
    put the long id of the target into hObject
    put the revAvailableHandlers of hObject into hTable
    put the script of hObject into someScript
-   
-   put hkeyLine_GetHandlers (shortHKey, hTable, someScript) into someHandlers
-   return someHandlers
+   put hkeyLine_GetHandler (shortHKey, hTable, someScript) into foundHandler
+   return foundHandler
 end script_Handler
 
 setprop script_Handler [shortHKey] someHandler
@@ -110,8 +121,16 @@ getprop script_Hkeys [fetchHow]
          return the hArray_Hkeys of the target
       case "script"
          return the script_ArrayHkeys of the target
-      default -- case "revAvailableHandlers"
+      case "all"
          return the script_FirstHkeys of the target
+      default
+         try
+            put the long id of the target into tObject
+            put the revAvailableHandlers of tObject into handlerTable
+            return hTable_GetHkeys (handlerTable,  tObject) 
+         catch someError
+            return empty -- a locked stack
+         end try
    end switch
 end script_Hkeys
 

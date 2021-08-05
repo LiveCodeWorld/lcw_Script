@@ -22,26 +22,29 @@ local LocalArray
 
 --> Menu | Init
 -
-on menu_Init tObject
-   -- a hack (we keep getting this reset by Livecode)
-   ide_AddRevEditScriptStack "LCW"
-   rev_AddBehaviorHacks
-   --
-   put scriptEditor_Object() into sObject
-   put sObject into LocalArray ["sObject"]
+-- on menu_Init tObject
+-- a hack (we keep getting this reset by Livecode)
+ide_AddRevEditScriptStack "LCW"
+rev_AddBehaviorHacks
 end menu_Init
 
-getprop menu_Target [tObject]
-   put LocalArray ["sObject"] into sObject
+getprop menu_Target
+   put scriptEditor_Object() into sObject
+   put sObject into LocalArray ["sObject"]
    return sObject
 end menu_Target
+
+-- getprop menu_IsSimple
+   return false
+end menu_IsSimple
 
 
 --> Menu | Props
 -
-getprop displayTemplate_Params
-   return scaffold_ListShortFiles()
-end displayTemplate_Params
+getprop editIdeBehavior_Params
+   put project_ListBehaviorStackNames ("lcw") into stackNames
+   return stackNames
+end editIdeBehavior_Params
 
 
 --> Global | ScriptEditor | Recent | Watch | Menu
@@ -57,32 +60,14 @@ on submenu_Create sObject
    return "Global | Project | Create | Menu"
 end submenu_Create
 
-on menu_DisplayTemplate sObject, templateName
-   display_ScriptTemplate templateName
-end menu_DisplayTemplate
+on submenu_Script
+   return "Global | ScriptEditor | Script | Menu"
+end submenu_Script
 
-on menu_DisplayRigControllers
-   if project_IsActive("lcw_RevIgniter") is false then
-      lcw_Answer "Do you want to start the lcw_RevIgniter project?"
-      --
-      project_Start "lcw_Revigniter"
-   end if
-   --
-   display_RigControllerArray
-   ide_SetScriptEditorTitles "RevIgniter"
-end menu_DisplayRigControllers
+on menu_EditIdeBehavior sObject, stackName
+   edit the script of stack stackName
+end menu_EditIdeBehavior
 
-on _
-end _
-
-on menu_ScriptTools sObject
-   display_Script sObject
-end menu_ScriptTools
-
-on menu_DisplayGitStatus sObject
-   display_GitStatus sObject
-end menu_DisplayGitStatus
-
-on menu_ViewTools sObject
-   display_ViewIndex sObject   
-end menu_ViewTools
+on submenu_SetIdeBehavior
+   return "Global | ScriptEditor | Behavior | Menu"
+end submenu_SetIdeBehavior

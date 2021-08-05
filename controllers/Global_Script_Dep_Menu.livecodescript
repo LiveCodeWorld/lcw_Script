@@ -1,94 +1,159 @@
-﻿script "Global_Script_Dep_Menu"
+﻿script "Global | Script | Dep | Menu"
 --> MetaData
 -
 license: GPLv3
-name: Global_Script_Dep_Menu
+name: Global | Script | Dep | Menu
 type: controller
 version: 0.2
 
-/*
-This menu is for processing whole scripts to extract their dependencies.
-*/
+/*This menu is for processing whole scripts to extract their dependencies.*/
+
 
 --> Variables
 -
 local LocalArray
 
 
---> Working on
+--> Menu | Props
 -
-/*
-command graph_FilterProcessedArray @processedCalls, someKeyCall
-   -- same as default
-   -- traps and filters hKeyArray for "display_CreateScriptObjectGraph"
-   
-   hkey_Deconstruct someKeyCall, hName, hType, hObject, hNum
-   if hObject = "missing" then
-      switch
-         case hName is among the items of "jsonExport,jsonImport"
-            -- skip (remove from missing)
-            break
-         case char 1 to 3 of hName = "rig"
-            put "revIgniter" into item 3 of someKeyCall
-            put someKeyCall & CR after processedCalls
-            break
-         default
-            put someKeyCall & CR after processedCalls
-      end switch
-   else
-      put someKeyCall & CR after processedCalls
-   end if
-end graph_FilterProcessedArray
-
-command graph_TidyOverlayArray @overlayArray
-   -- here we tidy names specifically for Hkey graphing.
-   -- should dispatch / be able to customise
-   
-   put overlayArray ["data"]["idArray"] into idArray
-   repeat for each key someID in idArray
-      put idArray [someID] into hKey
-      -- put word 2 of hKey into hName -- there is some old hKeys hanging around
-      hkey_Deconstruct hKey, hName, hType, hObject, hNum
-      put hName into idArray [someID]
-   end repeat
-   put idArray into overlayArray ["data"]["idArray"]
-end graph_TidyOverlayArray
-
-*/
+getprop menu_Target [tObject]
+   put the display_View of tObject into displayView
+   put the displayed_Object of displayView into sObject
+   put the displayed_HkeyArray of displayView into hkeyArray
+   --
+   put hkeyArray into LocalArray ["hkeyArray"]
+   put displayView into LocalArray ["displayView"]
+   --
+   return sObject
+end menu_Target
 
 
 --> Global | Script | Dep | Menu
 -
-on menu_DisplayScript sObject
-   display_Script sObject
-end menu_DisplayScript
+on menu_HkeyArrayGraph sObject
+   local pGraphStyle, pProcessObject, projectName
+   --
+   -- display_CreateScriptObjectGraph sObject, projectName, pGraphStyle, pProcessObject, false
+   -- display_ObjectDepArray sObject
+   
+   put LocalArray ["hkeyArray"] into hkeyArray
+   graph_CreateScriptObjectHkeyArray hkeyArray, sObject, "fast undirected spring"
+   put the result into svgFile
+   --
+   display_SVG svgFile
+end menu_HkeyArrayGraph
+
+on menu_DisplayMissing sObject
+   put LocalArray ["hkeyArray"] into hkeyArray
+   --
+   display_MissingHkey hkeyArray, sObject
+end menu_DisplayMissing
+
+on menu_Refresh sObject
+   display_ScriptDeps sObject
+end menu_Refresh
 
 on _
 end _
 
-on menu_DisplayObjectGraph sObject
-   local pGraphStyle, pProcessObject, projectName
-   --
-   display_CreateScriptObjectGraph sObject, projectName, pGraphStyle, pProcessObject, false
-   --
-   display_ObjectDepArray sObject
-end menu_DisplayObjectGraph
+on submenu_Show
+   return "Global | HkeyArray | Tree | Menu"
+end submenu_Show
 
-on menu_DisplaySvg sObject
-   put the projectOverlay_SvgFile of sObject into svgFile
+on submenu_Display
+   return "Global | Project | Display | Menu"
+end submenu_Display
+
+on submenu_Create
+   return "Global | Project | Create | Menu"
+end submenu_Create
+
+on submenu_MenuTools
+   return "Global | MenuTools | Menu"
+end submenu_MenuTools
+
+on _
+end _
+
+on menu_ScriptSvgFile sObject
+   put the script_SvgFile of sObject into svgFile
+   finder_Reveal svgFile
+end menu_ScriptSvgFile
+
+on menu_MetadaDataFolder sObject
+   -- same as the metadata_Folder of sObject
+   put the metadataObject_Folder of sObject into metadataFolder
+   finder_Reveal metadataFolder
+   --
+   put the script_OverlayFolder of sObject into scriptOverlayFolder
+   put scriptOverlayFolder = metadataFolder
+end menu_MetadaDataFolder
+
+on menu_OverlayFolder sObject
+   put the overlay_Folder of sObject into objectFolder
+   finder_Reveal objectFolder
+end menu_OverlayFolder
+
+on _
+end _
+
+on menu_ListDepStacks sObject
+   put LocalArray ["displayView"] into displayView
+   -- put the title_Text of displayView into sObject
+   put the displayed_Data of displayView into depObjectData
+   delete variable depObjectData [sObject]
+   --
+   put keys (depObjectData) into depStacks
+   repeat for each line stackObject in depStacks
+      put the short name of stackObject into libName
+      put libName & ", " after libNames
+      put the project_Name of stackObject into projectName
+      put libName into projectArray [projectName]
+   end repeat
+   delete char -2 to -1 of libNames
+   sort libNames
+   put keys (projectArray) into projectNames
+   sort projectNames
+   replace CR with ", " in projectNames
+   --
+   put "libss:" && libNames into libDepLine -- dep_StackNames
+   put "projeects:" && projectNames into projectDepLine -- dep_StackNames
+   
+   put libDepLine & CR & projectDepLine
+end menu_ListDepStacks
+
+on submenu_Dev
+   return "Dev | Menu"
+end submenu_Dev
+
+
+--> Dev | Menu
+-
+on menu_CreateHkeyArrayObjectGraph sObject
+   put LocalArray ["hkeyArray"] into hkeyArray
+   --
+   graph_CreateScriptObjectHkeyArray hkeyArray, sObject -- in the metadataObject_Folder of sObject
+   
+   put the result into svgFile
+   --
+   _DisplaySvgFile svgFile
+end menu_CreateHkeyArrayObjectGraph
+
+on menu_DisplayObjectSvg sObject
+   put the script_SvgFile of sObject into svgFile
    if scriptEditor_PaneExists ("Deps") is true then
       display_ScriptEditorSvg svgFile
    else
-      display_SVG svgFile
+      _DisplaySvgFile svgFile
    end if
-end menu_DisplaySvg
+end menu_DisplayObjectSvg
 
 on _
 end _
 
 on menu_DisplayTextStackHkeyArray sObject
    put the projectOverlay_Array ["processedHkey.array"] of sObject into processedHkeyArray
-   display_HkeyArray processedHkeyArray, sObject
+   display_ScriptHkeyArray processedHkeyArray, sObject
 end menu_DisplayTextStackHkeyArray
 
 on menu_DisplayScriptHkeyArray sObject
@@ -119,13 +184,27 @@ end menu_DisplayStackDepArray
 on _
 end _
 
-on submenu_Dev
-   return "Dev | Menu"
-end submenu_Dev
+on menu_DisplayProjectSvg sObject
+   put the projectOverlay_SvgFile of sObject into svgFile
+   if scriptEditor_PaneExists ("Deps") is true then
+      display_ScriptEditorSvg svgFile
+   else
+      _DisplaySvgFile svgFile
+   end if
+end menu_DisplayProjectSvg
 
+on menu_ProjectOverlaySvgFile sObject
+   put the projectOverlay_SvgFile of sObject into svgFile
+   finder_Reveal svgFile
+end menu_ProjectOverlaySvgFile
 
---> Dev | Menu
--
+on _
+end _
+
+on menu_CreateTransporterGraphs sObject
+   transporter_CreateGraph sObject, true, true
+end menu_CreateTransporterGraphs
+
 on menu_ClusterDepGraph hObject
    -- same as menu item "menu_CheckTransportGraph"
    put the dep_StackNames of hObject into stackNames
@@ -157,26 +236,16 @@ on menu_DisplayStackDeps hObject
 end menu_DisplayStackDeps
 
 
---> Global | Script | Dep | Menu | Props
+--> Dev | Menu | Props
 -
-getprop p_Name [scriptObject]
-   put the p_Name of scriptObject into pName
-   return pName
-end p_Name
-
-getprop p_Names
-   put library_ListProjectNames() into projectNames
-   return projectNames
-end p_Names
 
 
---> Global | Script | Dep | Menu | Disabled
+--> Deps
 -
-getprop disabled_DisplayProjectSvg [scriptObject]
-   put the projectOverlay_SvgFile of scriptObject into svgFile
-   if there is a file svgFile then
-      return false
-   else
-      return true
+private command _DisplaySvgFile svgFile
+   display_SVG svgFile
+   put the result into displayView
+   if exists (displayView) is false then
+      lcw_AnswerWarning "SVG file is empty!", displayView
    end if
-end disabled_DisplayProjectSvg
+end _DisplaySvgFile

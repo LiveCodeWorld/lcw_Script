@@ -70,7 +70,7 @@ end menu_ProjectOverlayDot
 on menu_ProcessedHkeyArray scriptObject
    put the projectOverlay_Array ["processedHkey.array"] of scriptObject into hkeyArray
    --
-   display_HkeyArray hKeyArray, scriptObject
+   display_ScriptHkeyArray hKeyArray, scriptObject
 end menu_ProcessedHkeyArray
 
 on menu_ProjectOverlayData scriptObject

@@ -60,17 +60,19 @@ getprop script_SuiteArray
       put word 3 of hLine into startLineNum
       put word 4 of hLine into endLineNum
       --
+      if suiteTitles is empty then
+         put empty into scriptSuiteArray [shortHkey]
+         next repeat
+      end if
+      
       put suite_FindTitleNum (startLineNum, suiteNumberedArray) into suiteNum
       if suiteNum = 0 then
          put "No Suite" into suiteTitle
       else
-         -- put line suiteNum of uniqueTitles into suiteTitles
          put line suiteNum of uniqueTitles into uniqueSuiteTitle
       end if
       --
       put empty into scriptSuiteArray [uniqueSuiteTitle][shortHkey]
-      -- put startLineNum into scriptSuiteArray [suiteNum]["title"][suiteTitle][shortHkey]["startLineNum"]
-      -- put endLineNum into scriptSuiteArray [suiteNum]["title"][suiteTitle][shortHkey]["startLineNum"]
    end repeat
    return scriptSuiteArray
 end script_SuiteArray

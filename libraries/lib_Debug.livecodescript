@@ -34,8 +34,8 @@ end mDoubleUp_DebugHistory
 
 --> Display | Debug
 -
-command display_DebugHistory pAlsoArray
-   put "mDoubleUp_DebugHistory" into mDoubleUp
+command display_DebugHistory pDisplayTitle, pAlsoArray
+   put "mDoubleUp_DebugHistory" into mDoubleClick
    --
    put line 1 to -2 of the executionContexts into eContexts
    put debug_ConstructHistoryArray (eContexts) into debugHistoryArray
@@ -43,17 +43,23 @@ command display_DebugHistory pAlsoArray
       _DisplayDebugHistoryArray debugHistoryArray
    end if
    --
-   put debugHistoryArray [1]["revRuggedID"] into rObject
-   put the name of rObject into firstObjectName
+   put debugHistoryArray [1]["revRuggedID"] into firstObject
+   if pDisplayTitle is empty then
+      put the name of firstObject into pDisplayTitle
+   end if
    --
    put _ConstructDebugHistoryHandlers (debugHistoryArray) into debugHistoryLines
    --
-   display_Lines debugHistoryLines, firstObjectName, mDoubleUp, "Debug History", true
+   display_Lines debugHistoryLines, pDisplayTitle, mDoubleClick, "Debug History", true
    put the result into indexView
    --
    set the title_Menu of indexView to "Global | Debug | Tree | Menu"
    set the line_Menu of indexView to "Global | Debug | Tree | Line | Menu"
    set the debug_HistoryArray of indexView to debugHistoryArray
+   --
+   if the shiftKey is "down" then
+      breakpoint
+   end if
    --
    return indexView
 end display_DebugHistory
@@ -244,6 +250,26 @@ end debug_ListHkeyTargets
 
 --> Deps
 -
+function hkeyLine_FindHandlerInObjects hName, objectIndex
+   repeat for each line someObject in objectIndex
+      if exists (someObject) is false then
+         next repeat
+      end if
+      --
+      put the revavailableHandlers of someObject into hTable
+      --
+      put revRuggedID (someObject) into hObject
+      repeat for each line hTableLine in hTable
+         if word 2 of hTableLine = hName then
+            put hKeyLine_AddObject (hTableLine, hObject) into hkeyLine
+            put hkeyLine & CR after hkeyLines
+         end if
+      end repeat
+   end repeat
+   delete char - 1 of hkeyLines
+   return hkeyLines
+end hkeyLine_FindHandlerInObjects
+
 getprop object_NameArray
    put the long id of the target into tObject   
    put the short id of the target into shortID

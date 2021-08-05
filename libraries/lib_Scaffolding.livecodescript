@@ -14,6 +14,21 @@ like named  Controller / Menu and Behavior templates.
 */
 
 
+--> Props
+-
+setprop scaffold_MenuTitle gMenuTitle
+   if menu_Exists (gMenuTitle) is false then
+      menu_Create gMenuTitle
+      put the result into controllerObject
+      edit the script of controllerObject
+   end if
+   put CR & "-" & CR & "Global | Script | Template | Menu" & tab & "submenu" after gMenuTitle
+   --
+   set the title_Menu of the target to gMenuTitle
+   return gMenuTitle
+end scaffold_MenuTitle
+
+
 --> Script Template
 -
 function scaffold_ListShortFiles

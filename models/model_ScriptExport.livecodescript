@@ -150,8 +150,8 @@ end exported_Script
 setprop exported_Script [pExportCalls] someScript
    put the long id of the target into scriptObject
    script_ExportAndIndexMenus scriptObject, pExportCalls
-   put the result into someFile
-   return someFile
+   put the script_File of scriptObject into scriptFile
+   return scriptFile
 end exported_Script
 
 getprop script_IsDifferent

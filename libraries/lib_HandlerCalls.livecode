@@ -28,8 +28,19 @@ Eventually should decide which to use (probably get rid of links.txt, and maybe 
 --> Hkey | Calls
 -
 getprop handler_Calls [shortHkey]
-   put the script_Handler [shortHkey] of the target into someHandler
-   put handler_ExtractCalls (someHandler) into handlerCalls
+   -- put the script_Handler [shortHkey] of the target into someHandler
+   -- put handler_ExtractCalls (someHandler) into handlerCalls
+   
+   put the long id of the target into tObject
+   --
+   put the revAvailableHandlers of tObject into hTable
+   htable_ExactLineOffsets hkeyLine, hTable, startLineNum, endLineNum
+   if endLineNum = 0 then return empty
+   --
+   put the script of tObject into someScript
+   put line startLineNum to endLineNum of someScript into foundHandler
+   put handler_ExtractCalls (foundHandler) into handlerCalls
+   --
    return handlerCalls
 end handler_Calls
 
@@ -126,7 +137,8 @@ function handler_ConstructCallArray someHandler, pSkipHkeyComponents, pSkipHkeyP
                   break
                case testComand = "dispatch"
                   put token 2 of testBit into dispatchCommand
-                  put dispatchCommand,"c" into shortHKey
+                  -- put dispatchCommand,"c" into shortHKey
+                  put "M" && dispatchCommand into shortHKey
                   
                   handler_AddToCallArray tempArray, shortHKey, metadataArray, someHandler, pSkipHkeyComponents, pSkipHkeyProps
                   
@@ -135,7 +147,8 @@ function handler_ConstructCallArray someHandler, pSkipHkeyComponents, pSkipHkeyP
                case testComand is among the items of "send,call"
                   put token 2 of testBit into sendMessage
                   put token 1 of sendMessage into sendComand
-                  put sendComand,"c" into shortHKey
+                  -- put sendComand,"c" into shortHKey
+                  put "M" && sendComand into shortHKey
                   
                   handler_AddToCallArray tempArray, shortHKey, metadataArray, someHandler, pSkipHkeyComponents, pSkipHkeyProps
                   
@@ -143,7 +156,8 @@ function handler_ConstructCallArray someHandler, pSkipHkeyComponents, pSkipHkeyP
                   break
                default
                   -- first word and not a LiveCode term
-                  put testComand,"c" into shortHKey
+                  -- put testComand,"M" into shortHKey
+                  put "M" && testComand into shortHKey
                   
                   handler_AddToCallArray tempArray, shortHKey, metadataArray, someHandler, pSkipHkeyComponents, pSkipHkeyProps
                   
@@ -153,7 +167,8 @@ function handler_ConstructCallArray someHandler, pSkipHkeyComponents, pSkipHkeyP
          
          put _ExtractFunctionCalls (someLine, false) into fNames
          repeat for each line fName in fNames
-            put fName,"f" into shortHKey
+            -- put fName,"F" into shortHKey
+            put "F" && fName into shortHKey
             
             handler_AddToCallArray tempArray, shortHKey, metadataArray, someHandler, pSkipHkeyComponents, pSkipHkeyProps
          end repeat
@@ -186,7 +201,8 @@ function handler_ConstructCallArray someHandler, pSkipHkeyComponents, pSkipHkeyP
                   -- we assume by convention that a virtual property has the form
                   next repeat
                end if
-               put hName,"s" into shortHKey
+               -- put hName,"s" into shortHKey
+               put "S" && hName into shortHKey
                
                handler_AddToCallArray tempArray, shortHKey, metadataArray, someHandler, pSkipHkeyComponents, pSkipHkeyProps
             else -- if setGetPut is among the items of "case,if,get,put" then
@@ -194,7 +210,8 @@ function handler_ConstructCallArray someHandler, pSkipHkeyComponents, pSkipHkeyP
                   -- we assume by convention that a virtual property has the form
                   next repeat
                end if
-               put hName,"g" into shortHKey
+               --put hName,"g" into shortHKey
+               put "G" && hName into shortHKey
                
                handler_AddToCallArray tempArray, shortHKey, metadataArray, someHandler, pSkipHkeyComponents, pSkipHkeyProps
             end if
@@ -216,7 +233,8 @@ end handler_ConstructCallArray
 
 command handler_AddToCallArray @tempArray, shortHKey, handlerArray, someHandler, pSkipHkeyComponents, pSkipHkeyProps
    -- currently no filtering
-   put hkeyLine_FromHkey (shortHkey) into hTableLine
+   -- put hkeyLine_FromHkey (shortHkey) into hTableLine
+   put shortHkey into hTableLine
    put empty into tempArray ["hkeyCalls"][hTableLine]
    put empty into tempArray ["filteredCalls"][hTableLine]
    return empty

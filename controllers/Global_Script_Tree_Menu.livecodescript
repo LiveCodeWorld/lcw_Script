@@ -1,34 +1,96 @@
-﻿script "Global_Script_Tree_Menu"
+﻿script "Global | Script | Tree | Menu"
 --> MetaData
 -
 license: GPLv3
-name: Global_Script_Tree_Menu
+name: Global | Script | Tree | Menu
 type: controller
 target: scriptObject
 version: 0.2
+deps: model_PageArray, lib_MediaWiki, lib_PageArray
 
 
---> Menu | Props
+--> Menu | Init
 -
-getprop hack_Params
-   return "Compile,Menu,Script,Handler,Search"
-end hack_Params
+getprop menu_Target [tObject]
+   -- put the title_Text of displayView into scriptObject
+   put the displayed_Object of tObject into sObject
+   return sObject
+end menu_Target
 
 getprop displayTemplate_Params
    return scaffold_ListShortFiles()
 end displayTemplate_Params
 
+getprop disabled_EditObjectBehavior [sObject]
+   put the behavior of sObject into bObject
+   switch
+      case bObject is empty
+         return "delete"
+      case exists (bObject) is false
+         return true
+      default
+         return false
+   end switch
+end disabled_EditObjectBehavior
+
 
 --> Global | Script | Tree | Menu
 -
+on menu_ListScriptDeps sObject
+   display_ScriptDeps sObject
+end menu_ListScriptDeps
+
+on _
+end _
+
 on menu_EditObjectScript sObject
    edit the script of sObject
 end menu_EditObjectScript
 
+on menu_EditObjectBehavior sObject
+   put the behavior of sObject into bObject
+   edit the script of bObject
+end menu_EditObjectBehavior
+
+on menu_DisplayProject sObject
+   put the project_Name of sObject into projectName
+   --
+   display_ProjectLibs projectName
+end menu_DisplayProject
+
+on _
+end _
+
+on submenu_Display
+   return "Global | Project | Display | Menu"
+end submenu_Display
+
+on submenu_Create
+   return "Global | Project | Create | Menu"
+end submenu_Create
+
+on submenu_MenuTools
+   return "Global | MenuTools | Menu"
+end submenu_MenuTools
+
+on _
+end _
+
+on menu_Refresh sObject
+   display_Script sObject
+end menu_Refresh
+
+on menu_DisplayGitStatus sObject
+   display_GitStatus sObject
+end menu_DisplayGitStatus
+
+on _
+end _
+
 on menu_CreateScriptObjectGraph sObject
    local pGraphStyle, pProcessObject, projectName
    --
-   display_CreateScriptObjectGraph sObject, pProjectName, pGraphStyle, pProcessObject, pForceCreate
+   display_CreateScriptObjectGraph sObject, pGraphStyle, pProcessObject
    --
    display_ObjectDepArray sObject
 end menu_CreateScriptObjectGraph
@@ -36,9 +98,9 @@ end menu_CreateScriptObjectGraph
 on _
 end _
 
-on submenu_Script
+on submenu_EditScript
    return "Global | Script | Menu"
-end submenu_Script
+end submenu_EditScript
 
 on menu_DisplayTemplate sObject, templateName
    display_ScriptTemplate templateName
@@ -48,6 +110,16 @@ on submenu_Folders
    return "Global | Script | Folders | Menu"
 end submenu_Folders
 
+on _
+end _
+
+on submenu_Dev
+   return "Dev | Menu"
+end submenu_Dev
+
+
+--> Dev | Menu
+-
 on submenu_ScriptDeps
    return "Global | Script | Dep | Menu"
 end submenu_ScriptDeps
@@ -55,9 +127,6 @@ end submenu_ScriptDeps
 on submenu_Overlay
    return "Global | Overlay | Menu"
 end submenu_Overlay
-
-on _
-end _
 
 on submenu_ScriptExport
    return "Global | Script | Exported | Menu"
@@ -70,16 +139,13 @@ end submenu_TestExport
 on _
 end _
 
-on submenu_Project
-   return "Global | Project | Stack | Menu"
+-- on submenu_Project
+return "Global | Project | Stack | Menu"
 end submenu_Project
 
-on submenu_ScriptMainstack
-   return "Global | Script | Mainstack | Menu"
+-- on submenu_ScriptMainstack
+return "Global | Script | Mainstack | Menu"
 end submenu_ScriptMainstack
-
-on _
-end _
 
 on submenu_Rig
    return "Global | Rig | Files | Menu"
@@ -88,27 +154,3 @@ end submenu_Rig
 on submenu_Gist
    return "Global | Gist | Menu"
 end submenu_Gist
-
-on _
-end _
-
-on menu_Hack seGroup, whichBehavior
-   switch whichBehavior
-      case "Compile"
-         put scriptEditor_CompileButtonBehavior() into bObject
-         break
-      case "Menu"
-         put scriptEditor_HistoryButtonBehavior() into bObejct
-         break
-      case "Script"
-         put scriptEditor_ScriptFieldBehavior() into bObject
-         break
-      case "Handler"
-         put scriptEditor_HandlerListBehavior() into bObject
-         break
-      case "Search"
-         put scriptEditor_FindFieldBehavior() into bObject
-         break
-   end switch
-   edit the script of bObject
-end menu_Hack

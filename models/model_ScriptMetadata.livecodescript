@@ -63,34 +63,35 @@ end script_Name
 -
 getprop script_MetaData [someKey]
    put the script of the target into someScript
-   put script_GetMetadataArray (someScript) into uRipArray
+   put script_GetMetadataArray (someScript) into sMetaData -- same as (uRIPArray)
    if someKey is empty then
-      return uRIPArray
+      return sMetaData
    else
-      return uRIPArray [someKey]
+      return sMetaData [someKey]
    end if
 end script_MetaData
  
-setprop script_MetaData uRIPArray
+setprop script_MetaData sMetaData
    put the long id of the target into tObject
    put the script of tObject into someScript
    --
-   script_SetMetadataArray someScript, uRipArray
+   script_SetMetadataArray someScript, sMetaData
    put the result into newMetaDataSuite
    --
    set the script of tObject to someScript
-   set the customproperties ["uRIP"] of tObject to uRipArray -- will not be saved for scriptonly stacks
+   set the customproperties ["uRIP"] of tObject to sMetaData -- will not be saved for scriptonly stacks
    --
    return newMetaDataSuite
 end script_MetaData
 
 function script_GetMetadataArray someScript
-   local metadataArray
+   local sMetaData
+   
    put script_GetSuite ("MetaData", someScript) into metaDataSuite
    if metaDataSuite is empty then return empty
    
    script_DeconstructMetaDataSuite metaDataSuite, metadataBit, commentBit, handlerBit
-   put commentBit into metadataArray ["script_Help"]
+   put commentBit into sMetaData ["script_Help"]
    
    -- loop through metadata part of suite
    set the itemdelimiter to ":"
@@ -101,21 +102,19 @@ function script_GetMetadataArray someScript
       
       put word 1 to -1 of someKey into someKey
       put word 1 to -1 of someValue into someValue
-      -- replace quote with empty in someKey
-      -- replace quote with empty in someValue
       
-      put someValue into metadataArray [someKey]
+      put someValue into sMetaData [someKey]
    end repeat
-   return metadataArray
+   return sMetaData
 end script_GetMetadataArray
 
-command script_SetMetadataArray @someScript, uRipArray
+command script_SetMetadataArray @someScript, sMetaData
    -- now add any handlers etc (stuff after an empty line) from old Metadata suite
    put script_GetSuite ("MetaData", someScript) into oldMetaDataSuite
    script_DeconstructMetaDataSuite oldMetaDataSuite, oldMetadataBit, oldCommentBit, handlerBit
    
-   put oldCommentBit into uRipArray ["script_Help"]
-   put script_ConstuctMetaDataHeader (uRipArray) into newMetaDataSuite
+   put oldCommentBit into sMetaData ["script_Help"]
+   put script_ConstuctMetaDataHeader (sMetaData) into newMetaDataSuite
    if handlerBit is not empty then put CR & CR & word 1 to -1 of handlerBit after newMetaDataSuite
    
    put script_DeleteSuite ("Metadata", someScript) into cleanScript

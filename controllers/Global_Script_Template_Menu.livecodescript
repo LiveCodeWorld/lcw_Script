@@ -13,6 +13,7 @@ local LocalArray
 
 on menu_Init tObject   
    put scaffold_ListShortFiles() into shortTemplateFiles
+   sort shortTemplateFiles
    put shortTemplateFiles into LocalArray ["shortTemplateFiles"]
 end menu_Init
 
@@ -69,6 +70,38 @@ end text_EditFile
 
 --> Global | Script | Template | Menu
 -
+on menu_SetMenu displayView
+   put "Global | HTML | TagCloud | Menu" into gMenuTitle
+   put lcw_Ask ("Choose a menu for this template:", gMenuTitle) into gMenuTitle
+   --
+   set the scaffold_MenuTitle of displayView to gMenuTitle
+end menu_SetMenu
+
+on _
+end _
+
+on menu_DisplayTemplate displayView, templateName
+   if the shiftkey is "Down" then put empty into displayView
+   display_ScriptTemplate templateName, displayView
+end menu_DisplayTemplate
+
+on menu_NewTemplateFromClipboard
+   display_AskNewTemplate
+end menu_NewTemplateFromClipboard
+
+on menu_DeleteTemplate textDisplayView, templateName
+   put merge ("Are you sure you want to delete the script template '[[templateName]]'. This cannot be undone!") into someWarning
+   answer warning someWarning with "OK" or "Cancel"
+   if it is "Cancel" then exit to top
+   
+   scaffold_DeleteTemplate templateName
+   put the result into deletedFile
+   answer merge ("Deleted stored template script '[[templateName]]'!")
+end menu_DeleteTemplate
+
+on _
+end _
+
 on menu_Save indexView
    scaffold_SaveDisplayed indexView
    put the result into templateName
@@ -77,13 +110,6 @@ on menu_Save indexView
    --
    lcw_Notify merge ("Stored text as scaffold template '[[templateName]]'")
 end menu_Save
-
-on menu_DisplayTemplate textDisplayView, templateName
-   display_ScriptTemplate templateName
-end menu_DisplayTemplate
-
-on _
-end _
 
 on menu_SaveAs indexView
    put the view_Text of indexView into someScript
@@ -100,28 +126,6 @@ on menu_SaveAs indexView
    set the title_Text of indexView to templateName
 end menu_SaveAs
 
-on menu_DeleteTemplate textDisplayView, templateName
-   put merge ("Are you sure you want to delete the script template '[[templateName]]'. This cannot be undone!") into someWarning
-   answer warning someWarning with "OK" or "Cancel"
-   if it is "Cancel" then exit to top
-   
-   scaffold_DeleteTemplate templateName
-   put the result into deletedFile
-   answer merge ("Deleted stored template script '[[templateName]]'!")
-end menu_DeleteTemplate
-
-on menu_NewTemplateFromClipboard
-   ask "What would you like to call this template as..." with "template_name"
-   put it into templateName
-   if templateName is empty then exit to top
-   
-   put the clipboarddata ["text"] into someScript
-   scaffold_SetTemplate templateName, someScript
-   put the result into savedUrl
-   
-   display_ScriptTemplate templateName
-end menu_NewTemplateFromClipboard
-
 on _
 end _
 
@@ -132,6 +136,15 @@ end submenu_Dev
 
 --> Dev | Menu
 -
+on menu_EditBehavior displayView
+   put the behavior of displayView into bObject
+   edit the script of bObject
+end menu_EditBehavior
+
+on menu_DisplayBrowser
+   display_ScaffoldHtml "Rough Blue"
+end menu_DisplayBrowser
+
 on menu_TextEditTemplate mTarget
    put the displayed_File of mTarget into someFile  
    text_EditFile someFile
@@ -166,7 +179,7 @@ on menu_TestMergeScriptToClipboard mTarget
    put scaffold_GetTemplate (templateName) into templateScript
    
    -- could get all the script metadata
-   put user_GetName() into ObjectAuthor
+   put lcw_GetAuthor() into ObjectAuthor
    put scriptEditor_Object() into scriptObject
    put the view_Name of scriptObject into viewName
    --

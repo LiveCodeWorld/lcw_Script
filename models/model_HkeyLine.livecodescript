@@ -21,26 +21,6 @@ See also lib_FindHkey
 
 --> Working on
 -
-function hkeyLine_FindHandlerInObjects hName, objectIndex
-   repeat for each line someObject in objectIndex
-      if exists (someObject) is false then
-         next repeat
-      end if
-      --
-      put the revavailableHandlers of someObject into hTable
-      --
-      put revRuggedID (someObject) into hObject
-      repeat for each line hTableLine in hTable
-         if word 2 of hTableLine = hName then
-            put hKeyLine_AddObject (hTableLine, hObject) into hkeyLine
-            put hkeyLine & CR after hkeyLines
-         end if
-      end repeat
-   end repeat
-   delete char - 1 of hkeyLines
-   return hkeyLines
-end hkeyLine_FindHandlerInObjects
-
 command hkey_Normalize @hKey
    put hkeyLine_FromHkey (hKey) into hKey
    put word 1 to 2 of hKey into shortHkey
@@ -72,18 +52,27 @@ getprop hkey_Lines
    return hkeyLines
 end hkey_Lines
 
+getprop hkey_LineNums [shortHkey]
+   put the long id of the target into hObject
+   _HkeyOffsets hObject, shortHkey, sLineNum, eLineNum
+   if the result is empty then return empty
+   --
+   return sLineNum,eLineNum
+end hkey_LineNums
 
---> Working on
+private command _HkeyOffsets hObject, shortHkey, @sLineNum, @eLineNum
+   put the hkey_Line [shortHkey] of hObject into hTableLine
+   if hTableLine is empty then return empty
+   --
+   put word 2 of hTableLine into hName
+   put word 3 of hTableLine + 1 into sLineNum
+   put word 4 of hTableLine + 1 into eLineNum
+   return hName
+end _HkeyOffsets
+
+
+--> hKeyLine
 -
-function hKeyLine_Construct hName, hType, hObject
-   replace "c" with "M" in hType
-   put toUpper (hType) && hName into shortHkeyLine
-   if hObject is empty then return shortHkeyLine
-   
-   put hKeyLine_AddObject (shortHkeyLine, hObject) into hkeyLine
-   return hkeyLine
-end hKeyLine_Construct
-
 command hkeyLine_Deconstruct hKeyLine, @hName, @hType, @hObject
    put toUpper (word 1 of hKeyLine) into hType
    put word 2 of hKeyLine into hName
@@ -91,7 +80,34 @@ command hkeyLine_Deconstruct hKeyLine, @hName, @hType, @hObject
    return hType && hName
 end hkeyLine_Deconstruct
 
-function hKeyLine_AddObject hkeyLine, hObject
+function hkey_FromShort shortHkeys, hObject
+   repeat for each line shortHkey in shortHkeys
+      put hKeyLine_AddObject (shortHkey, hObject) into hkeyLine
+      put hkeyLine & CR after hkeyLines
+   end repeat
+   delete char -1 of hkeyLines
+   return hkeyLines
+end hkey_FromShort
+
+function hkey_Construct hName, hType, tObject
+   if exists (tObject) is false then
+      put "Missing" into hObject
+   end if
+   replace "C" with "M" in hType
+   put hKeyLine_Construct (hName, hType, tObject) into hKeyLine
+   return hKeyLine
+end hkey_Construct
+
+function hKeyLine_Construct hName, hType, tObject
+   put hType && hName into shortHkeyLine
+   if tObject is empty then return shortHkeyLine
+   
+   put hKeyLine_AddObject (shortHkeyLine, tObject) into hkeyLine
+   return hkeyLine
+end hKeyLine_Construct
+
+function hKeyLine_AddObject hkeyLine, tObject
+   put revRuggedID (tObject) into hObject
    put word 1 to 2 of hkeyLine && "of" && hObject into hKeyLine
    return hKeyLine
 end hKeyLine_AddObject
@@ -153,26 +169,6 @@ end hkeyLine_ConstructStart
 
 --> Hkey | Do both
 -
-function hkey_Construct hName, hType, hObject
-   if exists (hObject) then
-      put revRuggedID (hObject) into hObject
-   else
-      put "Missing" into hObject
-   end if
-   put hKeyLine_Construct (hName, hType, hObject) into hKeyLine
-   return hKeyLine
-end hkey_Construct
-
-function hkey_FromShort shortHkeys, hObject
-   repeat for each line shortHkey in shortHkeys
-      hkey_Deconstruct shortHkey, hName, hType, xObject, xNum
-      put hKeyLine_Construct (hName, hType, hObject) into hkeyLine
-      put hkeyLine & CR after hkeyLines
-   end repeat
-   delete char -1 of hkeyLines
-   return hkeyLines
-end hkey_FromShort
-
 command hkey_Deconstruct hKey, @hName, @hType, @hObject, @hNum
    -- will deconstruct both
    -- move over to hkeyLine_Deconstruct
@@ -220,6 +216,7 @@ end hkeyLine_GetHandler
 -
 function hkeyLine_FromHkey hKey
    hkey_Deconstruct hKey, hName, hType, hObject, hNum
+   put toUpper(hType) into hType
    put hKeyLine_Construct (hName, hType, hObject) into hkeyLine
    return hkeyLine
 end hkeyLine_FromHkey

@@ -1,10 +1,30 @@
 ﻿script "Global_Script_Changes_Menu"
 --> MetaData
 -
+copyright: David Bovill
 license: GPLv3
 name: Global_Script_Changes_Menu
 type: controller
 version: 0.3
+
+
+--> Menu | Init
+-
+on mDoubleUp_SaveStack indexView, mStackName
+   put the bad_StackArray of indexView into testArray
+   put testArray ["bad path"][mStackName] into stackPath
+   switch
+      case there is a file stackPath
+         put "OK"
+         break
+      default
+         put "Missing:" && stackPath
+   end switch
+end mDoubleUp_SaveStack
+
+getprop displayRecentExports_Params
+   return "5 min,10 min,20 min,30 min,300 min,-,ask"
+end displayRecentExports_Params
 
 
 --> Global | Script | Changes | Menu
@@ -29,20 +49,21 @@ on menu_DisplayRecentExports mTarget, howLong
    display_RecentExports howLong
 end menu_DisplayRecentExports
 
+on _
+end _
+
+on menu_SaveAllEdited
+   stack_SaveRecentStacks
+   put the result into savedStacks
+   --
+   lcw_Notify "Saved all edited stack"
+   put savedStacks
+end menu_SaveAllEdited
+
 on submenu_Dev
    return "Dev | Menu"
 end submenu_Dev
 
-
---> Global | Script | Changes | Menu | Props
--
-getprop how_Longs
-   return "5 min,10 min,20 min,30 min,300 min,-,ask"
-end how_Longs
-
-
---> Global | Script | Changes | Menu | Disabled
--
 
 --> Dev | Menu
 -

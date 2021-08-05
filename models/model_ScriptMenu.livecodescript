@@ -13,7 +13,108 @@ Currently in the process of moving over to the new array based structure which s
 A menu_Controller contains all the information needed to create a menu, and link each menu item to a handler.
 Views are linked to menu_Controllers via the menu_Title and the menu_Controller of the view.
 This combination of mTitle and mController uniquely identifies the menu model for that menu and it's associated script.
+
+command menu_LoadFromScript mController, pSaveCustomProps
+   -- old way that handles multiple global menus in a single script
+   put the script_MenuTitleTableArray of mController into mTitleTableArray
+   menu_UpdateGlobalArray mController, mTitleTableArray
+   put the result into menuTitleArray
+   
+   -- now save as custom property
+   if pSaveCustomProps is true then
+      set the menu_DataArray of mController to mTitleTableArray
+   end if
+end menu_LoadFromScript 
 */
+
+command menu_UpdateGlobalArray mController, mTitleTableArray
+   global gLCW
+   menu_DeleteActiveArray
+   
+   put revRuggedId (mController) into mController
+   --
+   repeat for each key gMenuTile in mTitleTableArray
+      if word 1 of gMenuTile = "Global" and word 2 of gMenuTile = "|" then
+         put mTitleTableArray [gMenuTile] into gMenuTable
+         
+         -- menu_NormalizeTitle gMenuTile
+         put gMenuTable into gLCW ["Global Menus"][gMenuTile]["gMenuTable"]
+         put mController into gLCW ["Global Menus"][gMenuTile]["mController"]
+         
+         -- probably not really needed
+         put gMenuTable into menuTitleArray [gMenuTile]["gMenuTable"]
+         put mController into menuTitleArray [gMenuTile]["mController"]
+      end if
+   end repeat
+   --
+   return menuTitleArray
+end menu_UpdateGlobalArray
+
+--> Working on
+-
+getprop script_GlobalMenuTitles
+   put the script_MenuTitles of the target into mTitles
+   filter mTitles with "Global |*"
+   return mTitles
+end script_GlobalMenuTitles
+
+getprop script_GlobalTitles [suiteType]
+   put the script of the target into someScript
+   put script_ExtractGlobalTitles (someScript, suiteType) into globalMenuTitles
+   return globalMenuTitles
+end script_GlobalTitles
+
+
+--> Menu | Update
+-
+function script_IsMenu someScript
+   -- put the script_Type of mController into sType
+   put script_GetMetadataArray (someScript) into sMetaData
+   put sMetaData ["type"] into sType
+   put sType is among the items of "menu,controller" into isMenu
+   return isMenu
+end script_IsMenu
+
+getprop script_MenuTitleTableArray
+   -- this is what constructs the mTitleTableArray from a script
+   -- we don;t need to save this information all the time?
+   local mTitleTableArray
+   
+   put the long id of the target into mController
+   put the script of mController into someScript
+   
+   /*
+   -- make it only work for metadata indexed menus
+   -- faster for indexing
+   -- but annoying for hand coding
+   if script_IsMenu (someScript) is false then return empty
+   */
+   
+   put the revAvailableHandlers of mController into hTable
+   --
+   put someScript into mTitleLines
+   filter mTitleLines with "--> * Menu"
+   
+   menu_ClearRecursionCheck
+   repeat for each line mTitleLine in mTitleLines
+      put word 2 to -1 of mTitleLine into mTitle
+      put menu_ExtractTableFromScript (mTitle, someScript, hTable, mController) into mTable
+      put mTable into mTitleTableArray [mTitle]
+   end repeat
+   return mTitleTableArray
+end script_MenuTitleTableArray
+
+getprop menu_DataArray
+   -- the problem with this is if the target has been cloned or copied
+   -- the menu_Controller will have changed
+   put the customproperties ["menu_Table"] of the target into mTitleTableArray
+   return mTitleTableArray
+end menu_DataArray
+
+setprop menu_DataArray mTitleTableArray
+   set the customproperties ["menu_Table"] of the target to mTitleTableArray
+end menu_DataArray
+
 
 --> Menu | Name
 -
@@ -36,21 +137,25 @@ setprop menu_Name mName
    put the long id of the target into tObject
    --
    put the script_MetaData of tObject into scriptMetaData
-   
    put scriptMetaData ["type"] into scriptType
-   if scriptType is not "controller" then return empty
+   if scriptType is not "controller" then
+      return empty
+   end if
+   --
    put scriptMetaData ["name"] into oldName
-   if oldName = mName then return mName -- no need to reset
+   if oldName = mName then
+      -- no need to reset. We're good.
+      return scriptMetaData
+   end if
    
    put mName into scriptMetaData ["name"]
-   --
    set the script_MetaData of tObject to scriptMetaData
    --
    return scriptMetaData
 end menu_Name
 
 
---> Working on
+--> Script | MenuTitle
 -
 getprop script_MenuTitleAbove [lineNum]
    put the script of the target into someScript
@@ -87,50 +192,6 @@ getprop script_MenuTitles
    --
    return scriptMenuTitles
 end script_MenuTitles
-
-getprop script_GlobalMenuTitles
-   put the script_MenuTitles of the target into mTitles
-   filter mTitles with "Global |*"
-   return mTitles
-end script_GlobalMenuTitles
-   
-getprop script_GlobalTitles [suiteType]
-   put the script of the target into someScript
-   put script_ExtractGlobalTitles (someScript, suiteType) into globalMenuTitles
-   return globalMenuTitles
-end script_GlobalTitles
-
-getprop script_MenuTitleTableArray
-   -- this is what constructs the mTitleTableArray from a script
-   local mTitleTableArray
-   
-   put the long id of the target into mController
-   put the script of mController into someScript
-   put the revAvailableHandlers of mController into hTable
-   
-   -- put script_OrderedMenuTitles (someScript) into mTitles
-   put someScript into mTitleLines
-   filter mTitleLines with "--> * Menu"
-   
-   menu_ClearRecursionCheck
-   repeat for each line mTitleLine in mTitleLines
-      put word 2 to -1 of mTitleLine into mTitle
-      put menu_ExtractTableFromScript (mTitle, someScript, hTable, mController) into mTable
-      put mTable into mTitleTableArray [mTitle]
-   end repeat
-   return mTitleTableArray
-end script_MenuTitleTableArray
-
-getprop menu_DataArray
-   -- the problem with this is if the target has been cloned or copied
-   -- the menu_Controller will have changed
-   put the customproperties ["menu_Table"] of the target into mTitleTableArray
-   return mTitleTableArray
-end menu_DataArray
-
-setprop menu_DataArray mTitleTableArray
-   set the customproperties ["menu_Table"] of the target to mTitleTableArray
-end menu_DataArray
 
 
 --> Script | MenuTitles
@@ -184,22 +245,21 @@ end script_ExtractMenuSuiteTitles
 
 function script_MenuTitleArrayFromSuiteTitles suiteTitles
    -- not the best way ?
-    local menuTitleArray
-    set the itemdelimiter to "|"
-    put "Menu \((.*)\)" into regularExpression
-    put empty into menuTitles
-    repeat for each line suiteTitle in suiteTitles
-        put word 1 to -1 of last item of suiteTitle into lastMenuItem
-        if lastMenuItem is "Menu" then
-            put suiteTitle & CR after menuTitles
-            put "" into menuTitleArray [suiteTitle]
-        else if matchtext(lastMenuItem, regularExpression, toolMode) is true then
-            put suiteTitle & CR after menuTitles
-            put toolMode into menuTitleArray [suiteTitle]
-        end if
-    end repeat
-    delete last char of menuTitles
-    put menuTitles into menuTitleArray ["OrderedMenuTitles"]
-    return menuTitleArray
+   local menuTitleArray
+   set the itemdelimiter to "|"
+   put "Menu \((.*)\)" into regularExpression
+   put empty into menuTitles
+   repeat for each line suiteTitle in suiteTitles
+      put word 1 to -1 of last item of suiteTitle into lastMenuItem
+      if lastMenuItem is "Menu" then
+         put suiteTitle & CR after menuTitles
+         put "" into menuTitleArray [suiteTitle]
+      else if matchtext(lastMenuItem, regularExpression, toolMode) is true then
+         put suiteTitle & CR after menuTitles
+         put toolMode into menuTitleArray [suiteTitle]
+      end if
+   end repeat
+   delete last char of menuTitles
+   put menuTitles into menuTitleArray ["OrderedMenuTitles"]
+   return menuTitleArray
 end script_MenuTitleArrayFromSuiteTitles
-

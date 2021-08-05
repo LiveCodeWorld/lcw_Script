@@ -19,7 +19,113 @@ This is for the following reasons:
 -
 /*
 Need to rename these "project" handlers to "object_"
+Working on handlers from "Overlay | File | Props" --- need to check them
 */
+
+getprop overlay_Folder [pDontCreate]
+   -- /metadata/objects/ 
+   -- it is the metadata for for a script object
+   
+   put the textStack_MetadataFolder of the target into metadataFolder
+   put metadataFolder & "objects/" into overlayFolder
+   if pDontCreate is false then folder_CreateNested overlayFolder
+   return overlayFolder
+end overlay_Folder
+
+getprop script_OverlayFile [pDontCreate]
+   put the long id of the target into scriptObject
+   put the overlay_Folder [pDontCreate] of scriptObject into overlayFolder
+   
+   -- put overlayFolder & "overlaydata.array" into someFile
+   put overlay_ArrayFile (overlayFolder) into someFile
+   return someFile
+end script_OverlayFile
+
+getprop script_DotFile [pOverlayName]
+   put the long id of the target into scriptObject
+   put scriptObject_DotFile (scriptObject, pOverlayName) into scriptArrayFolder
+   return scriptArrayFolder
+end script_DotFile
+
+getprop script_CmapFile [pOverlayName]
+   put the long id of the target into scriptObject
+   put the textStack_MetadataFolder [true] of scriptObject into scriptFolder
+   
+   scriptObject_NormalizeGraphName pOverlayName, scriptFolder
+   put pOverlayName & ".cmapx" into shortFile
+   put scriptFolder & shortFile into someFile
+   return someFile
+end script_CmapFile
+
+
+--> Script | File | SVG
+-
+getprop script_SvgFile [graphStyle]
+   if graphStyle is empty then put "hierarchical" into shortFile
+   put the long id of the target into scriptObject
+   
+   put the metadataObject_Folder [pDontCreate] of scriptObject into metadataFolder
+   put metadataFolder & shortFile & ".svg" into svgFile
+   return svgFile
+end script_SvgFile
+
+getprop script_SvgFiles
+   put the long id of the target into scriptObject
+   put the metadataObject_Folder [pDontCreate] of scriptObject into metadataFolder
+   put overlay_ListScriptSvgShortFiles (metadataFolder)into shortSvgFiles
+   put file_AddFolderToPaths (shortSvgFiles, overlayFolder, false, ".svg") into svgFiles
+   return svgFiles
+end script_SvgFiles
+
+getprop script_SvgShortFiles
+   put the long id of the target into scriptObject
+   put the metadataObject_Folder [pDontCreate] of scriptObject into metadataFolder
+   put files (metadataFolder) into shortSvgFiles
+   filter shortSvgFiles with "*.svg"
+   return shortSvgFiles
+end script_SvgShortFiles
+
+getprop script_GraphImageFile [pOverlayName]
+   put the long id of the target into scriptObject
+   return scriptObject_ImageFile (scriptObject, pOverlayName)
+end script_GraphImageFile
+
+getprop script_ImageFiles
+   put the script_Files of the target into somePngs
+   filter somePngs with "*.png"
+   return somePngs
+end script_ImageFiles
+
+getprop script_GraphImageFile [pOverlayName]
+   put the long id of the target into scriptObject
+   return scriptObject_ImageFile (scriptObject, pOverlayName)
+end script_GraphImageFile
+
+getprop script_ImageFiles
+   put the script_Files of the target into somePngs
+   filter somePngs with "*.png"
+   return somePngs
+end script_ImageFiles
+
+
+--> Folder | Synonyms
+-
+getprop script_OverlayFolder [pDontCreate]
+   -- same as the metadata_Folder of sObject or the metadataObject_Folder of sObject
+   -- /metadata/objects/stack/overlay/ 
+   -- which is not the "project" metadata folder
+   -- it is the metadata for for a script object
+   
+   put the metadataObject_Folder [pDontCreate] of the target into metadataFolder
+   return metadataFolder
+end script_OverlayFolder
+
+getprop script_Folder [pDontCreate]
+   -- easier to remember synonym for "the dataObject_Folder"
+   put the dataObject_Folder [pDontCreate] of the target into scriptFolder
+   return scriptFolder
+end script_Folder
+
 
 --> Folder | Metadata
 -
@@ -90,83 +196,6 @@ getprop metadataProject_Folder [pDontCreate]
    if pDontCreate is false then folder_CreateNested overlayFolder
    return overlayFolder
 end metadataProject_Folder
-
-
---> Script | File | SVG
--
-getprop scriptObject_SvgFile [shortSvgFile]
-   if shortSvgFile is empty then
-      put "hierarchical.svg" into shortSvgFile
-   end if
-   put the long id of the target into scriptObject
-   put scriptObject_GetSvgFile (scriptObject, shortSvgFile) into svgFile
-   return svgFile
-end scriptObject_SvgFile
-
-getprop script_SvgFile [graphStyle]
-   if graphStyle is empty then put "hierarchical" into shortFile
-   put the long id of the target into scriptObject
-   
-   put the metadataObject_Folder [pDontCreate] of scriptObject into metadataFolder
-   put metadataFolder & shortFile & ".svg" into svgFile
-   return svgFile
-end script_SvgFile
-
-getprop script_SvgShortFiles
-   put the long id of the target into scriptObject
-   put the metadataObject_Folder [pDontCreate] of scriptObject into metadataFolder
-   put files (metadataFolder) into shortSvgFiles
-   filter shortSvgFiles with "*.svg"
-   return shortSvgFiles
-end script_SvgShortFiles
-
-getprop script_SvgFiles
-   put the long id of the target into scriptObject
-   put the metadataObject_Folder [pDontCreate] of scriptObject into metadataFolder
-   put overlay_ListScriptSvgShortFiles (metadataFolder)into shortSvgFiles
-   put file_AddFolderToPaths (shortSvgFiles, overlayFolder, false, ".svg") into svgFiles
-   return svgFiles
-end script_SvgFiles
-
-getprop script_GraphImageFile [pOverlayName]
-   put the long id of the target into scriptObject
-   return scriptObject_ImageFile (scriptObject, pOverlayName)
-end script_GraphImageFile
-
-getprop script_ImageFiles
-   put the script_Files of the target into somePngs
-   filter somePngs with "*.png"
-   return somePngs
-end script_ImageFiles
-
-getprop script_GraphImageFile [pOverlayName]
-   put the long id of the target into scriptObject
-   return scriptObject_ImageFile (scriptObject, pOverlayName)
-end script_GraphImageFile
-
-getprop script_ImageFiles
-   put the script_Files of the target into somePngs
-   filter somePngs with "*.png"
-   return somePngs
-end script_ImageFiles
-
-
---> Folder | Synonyms
--
-getprop script_OverlayFolder [pDontCreate]
-   -- /metadata/objects/stack/overlay/ 
-   -- which is not the "project" metadata folder
-   -- it is the metadata for for a script object
-   
-   put the metadataObject_Folder [pDontCreate] of the target into metadataFolder
-   return metadataFolder
-end script_OverlayFolder
-
-getprop script_Folder [pDontCreate]
-   -- easier to remember synonym for "the dataObject_Folder"
-   put the dataObject_Folder [pDontCreate] of the target into scriptFolder
-   return scriptFolder
-end script_Folder
 
 
 --> Folder | Data | Objects
