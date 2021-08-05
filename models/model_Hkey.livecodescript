@@ -11,7 +11,19 @@ A model for indexing handlers.
 */
 
 
---> hkey | Model | Arrays
+--> Working on
+-
+function hkey_ListVersionNames hKey
+   put hkey_ListShortVersionFolders (hKey) into shortFolders
+   repeat for each line shortFolder in shortFolders
+      put word 2 to -1 of shortFolder & CR after versionNames
+   end repeat
+   delete char -1 of versionNames
+   return versionNames
+end hkey_ListVersionNames
+
+
+--> hKey | Model | Arrays
 -
 /*
 A LinkArray is used to graph arrays. To do this LinkArrays provide a suite of tools that take complex keys and convert them into simple IDs,
@@ -82,7 +94,7 @@ command hkey_SaveOverlayData hKey, overlayData
 end hkey_SaveOverlayData
 
 
---> Working on
+--> Hkey | DotText | Model
 -
 function hkey_GetDotText hKey, pVersionName
    put hkey_DotFile (hKey, pVersionName) into someFile
@@ -155,15 +167,6 @@ function hkey_ScriptLine hKey, someScript
    hkey_FindScriptLine hKey, someScript, scriptLine, lineNum
    return scriptLine
 end hkey_ScriptLine
-
-function hkey_ListVersionNames hKey
-   put hkey_ListShortVersionFolders (hKey) into shortFolders
-   repeat for each line shortFolder in shortFolders
-      put word 2 to -1 of shortFolder & CR after versionNames
-   end repeat
-   delete char -1 of versionNames
-   return versionNames
-end hkey_ListVersionNames
 
 
 --> hkey | Model | BackLinks

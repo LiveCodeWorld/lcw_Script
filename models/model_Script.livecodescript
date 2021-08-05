@@ -137,6 +137,7 @@ end script_Hkeys
 getprop script_HandlerNames [pNotPrivate]
    put the revAvailableHandlers of the target into handlerTable
    put hTable_GetHandlerNames (handlerTable, pNotPrivate) into hNames
+   sort hNames
    return hNames
 end script_HandlerNames
 

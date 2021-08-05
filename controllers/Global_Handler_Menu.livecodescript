@@ -1,8 +1,8 @@
-﻿script "Global_Handler_Menu"
+﻿script "Global | Handler | Menu"
 --> MetaData
 -
 license: GPLv3
-name: Global_Handler_Menu
+name: Global | Handler | Menu
 type: controller
 version: 0.4
 
@@ -17,21 +17,17 @@ See the behavior "Livecode Script History Button"
 
 local LocalArray
 
+getprop menu_Target [tObject]
+   put scriptEditor_GetHkey() into hKey
+   return hKey
+end menu_Target
+
 -- getprop menu_CheckTarget [hKey]
-   put library_HandlerFile (hKey, empty, true) into hkeyFolder
-   put hkeyFolder into LocalArray ["hkeyFolder"]
-   hkey_Deconstruct hKey, hName, hType, hObject, hNum
-   return exists (hObject)
+put library_HandlerFile (hKey, empty, true) into hkeyFolder
+put hkeyFolder into LocalArray ["hkeyFolder"]
+hkey_Deconstruct hKey, hName, hType, hObject, hNum
+return exists (hObject)
 end menu_CheckTarget
-
-on menu_Init tObject
-   /*
-   put hArray_ListHkeyObjects (hKey) into otherObjects
-   line_Delete hObject, otherObjects
-   put word 1 to -1 of otherObjects into LocalArray ["other objects"]
-   */
-end menu_Init
-
 
 
 --> Global | Handler | Menu

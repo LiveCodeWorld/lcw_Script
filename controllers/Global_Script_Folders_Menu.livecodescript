@@ -1,10 +1,88 @@
-﻿script "Global_Script_Folders_Menu"
+﻿script "Global | Script | Folders | Menu"
 --> MetaData
 -
 license: GPLv3
-name: Global_Script_Folders_Menu
+name: Global | Script | Folders | Menu
 type: controller
 version: 0.2
+
+
+--> Menu | Props
+-
+getprop menu_Target [tObject]
+   put scriptEditor_Object() into scriptObject
+   return scriptObject
+end menu_Target
+
+getprop disabled_ProjectOverlayDot [scriptObject]
+   put the projectOverlay_File ["lcw_Menus.dot"] of scriptObject into someFile
+   put there is not a file someFile into fileIsMissing
+   return fileIsMissing
+end disabled_ProjectOverlayDot
+
+getprop disabled_ProjectOverlaySvg [scriptObject]
+   put the projectOverlay_SvgFile of scriptObject into someFile
+   put there is not a file someFile into fileIsMissing
+   return fileIsMissing
+end disabled_ProjectOverlaySvg
+
+getprop disabled_ProjectOverlayData [scriptObject]
+   put the projectOverlay_File ["overlayData.array"] of scriptObject into someFile
+   put there is not a file someFile into fileIsMissing
+   return fileIsMissing
+end disabled_ProjectOverlayData
+
+getprop disabled_ProcessedHkeyArray [scriptObject]
+   put the projectOverlay_File ["processedHkey.array"] of scriptObject into someFile
+   put there is not a file someFile into fileIsMissing
+   return fileIsMissing
+end disabled_ProcessedHkeyArray
+
+getprop disabled_ProjectOverlayFile [scriptObject]
+   put the projectOverlay_File of scriptObject into someFile
+   put there is not a file someFile into fileIsMissing
+   return fileIsMissing
+end disabled_ProjectOverlayFile
+
+getprop disabled_ProjectOverlayFolder [scriptObject]
+   put the project_OverlayFolder of scriptObject into someFolder
+   if there is a folder someFolder then
+      return false
+   else
+      return true
+   end if
+end disabled_ProjectOverlayFolder
+
+getprop disabled_ScriptOverlayFolder [scriptObject]
+   put the script_OverlayFolder of scriptObject into someFolder
+   if there is a folder someFolder then
+      return false
+   else
+      return true
+   end if
+end disabled_ScriptOverlayFolder
+
+command display_File someFile
+   put someFile
+   if there is a file someFile then
+      finder_Reveal someFile
+      lcw_Notify "Here is the file..."
+   else
+      put someFile
+      answer warning "File does not exist!"
+   end if
+end display_File
+
+command display_Folder someFolder
+   put someFolder
+   if there is a folder someFolder then
+      finder_Reveal someFolder
+      lcw_Notify "Here is the folder..."
+   else
+      put someFolder
+      answer warning "Folder does not exist!"
+   end if
+end display_Folder
 
 
 --> Global | Script | Folders | Menu
@@ -112,95 +190,19 @@ end submenu_Dev
 
 --> Dev | Menu
 -
-on menu_ProjectFolder scriptObject
+on _ProjectFolder scriptObject
    put the project_Folder of scriptObject into projectFolder
    display_Folder projectFolder
-end menu_ProjectFolder
+end _ProjectFolder
 
-on menu_RevealMainstackDotText scriptObject
+on _RevealMainstackDotText scriptObject
    put the project_OverlayFolder [true] of scriptObject into overlayFolder
    put overlay_ConstructFile ("dot", overlayFolder, "Mainstack Structure") into someFile
    
    display_File someFile
-end menu_RevealMainstackDotText
+end _RevealMainstackDotText
 
-on menu_OpenHandlerLibraryFolder
+on _OpenHandlerLibraryFolder
    put library_HkeyFolder (empty, false) into hkeyFolder
    display_Folder hkeyFolder
-end menu_OpenHandlerLibraryFolder
-
-
---> Global | Script | Folders | Menu | Disabled
--
-getprop disabled_ProjectOverlayDot [scriptObject]
-   put the projectOverlay_File ["lcw_Menus.dot"] of scriptObject into someFile
-   put there is not a file someFile into fileIsMissing
-   return fileIsMissing
-end disabled_ProjectOverlayDot
-
-getprop disabled_ProjectOverlaySvg [scriptObject]
-   put the projectOverlay_SvgFile of scriptObject into someFile
-   put there is not a file someFile into fileIsMissing
-   return fileIsMissing
-end disabled_ProjectOverlaySvg
-
-getprop disabled_ProjectOverlayData [scriptObject]
-   put the projectOverlay_File ["overlayData.array"] of scriptObject into someFile
-   put there is not a file someFile into fileIsMissing
-   return fileIsMissing
-end disabled_ProjectOverlayData
-
-getprop disabled_ProcessedHkeyArray [scriptObject]
-   put the projectOverlay_File ["processedHkey.array"] of scriptObject into someFile
-   put there is not a file someFile into fileIsMissing
-   return fileIsMissing
-end disabled_ProcessedHkeyArray
-
-getprop disabled_ProjectOverlayFile [scriptObject]
-   put the projectOverlay_File of scriptObject into someFile
-   put there is not a file someFile into fileIsMissing
-   return fileIsMissing
-end disabled_ProjectOverlayFile
-
-getprop disabled_ProjectOverlayFolder [scriptObject]
-   put the project_OverlayFolder of scriptObject into someFolder
-   if there is a folder someFolder then
-      return false
-   else
-      return true
-   end if
-end disabled_ProjectOverlayFolder
-
-getprop disabled_ScriptOverlayFolder [scriptObject]
-   put the script_OverlayFolder of scriptObject into someFolder
-   if there is a folder someFolder then
-      return false
-   else
-      return true
-   end if
-end disabled_ScriptOverlayFolder
-
-
---> Deps
--
-command display_File someFile
-   put someFile
-   if there is a file someFile then
-      finder_Reveal someFile
-      lcw_Notify "Here is the file..."
-   else
-      put someFile
-      answer warning "File does not exist!"
-   end if
-end display_File
-
-command display_Folder someFolder
-   put someFolder
-   if there is a folder someFolder then
-      finder_Reveal someFolder
-      lcw_Notify "Here is the folder..."
-   else
-      put someFolder
-      answer warning "Folder does not exist!"
-   end if
-end display_Folder
+end _OpenHandlerLibraryFolder

@@ -1,10 +1,49 @@
-﻿script "Global_Handler_Calls_Menu"
+﻿script "Global | Handler | Calls | Menu"
 --> MetaData
 -
 license: GPLv3
-name: Global_Handler_Calls_Menu
+name: Global | Handler | Calls | Menu
 type: controller
 version: 0.2
+
+
+--> Menu | Props
+-
+local LocalArray
+
+getprop menu_Target [tObject]
+   put scriptEditor_GetHkey() into hKey
+   return hKey
+end menu_Target
+
+getprop disabled_ExportHandlerCalls [hKey]
+   put hkey_FetchHandler (hKey) into exportedHandler
+   --  if exportedHandler is empty then return false
+   
+   put handler_Get (hKey) into objectHandler
+   if objectHandler = exportedHandler then
+      return true
+   else
+      return false
+   end if
+end disabled_ExportHandlerCalls
+   
+getprop disabled_EditHandlerCalls [hKey]
+   return _callFileExists (hKey)
+end disabled_EditHandlerCalls
+
+getprop disabled_ListHandlerCalls [hKey]
+   return _callFileExists (hKey)
+end disabled_ListHandlerCalls
+
+private function _callFileExists hKey
+   put hkey_CallsFile (hKey) into callsFile
+   if there is a file callsFile then
+      return false
+   else
+      return true
+   end if
+end _callFileExists
 
 
 --> Global | Handler | Calls | Menu
@@ -34,39 +73,3 @@ end _
 on submenu_Dictionary
    return "Global | Handler | Dictionary | Menu"
 end submenu_Dictionary
-
-
---> Global | Handler | Calls | Menu | Props
--
-
-
---> Global | Handler | Calls | Menu | Disabled
--
-getprop disabled_ExportHandlerCalls [hKey]
-   put hkey_FetchHandler (hKey) into exportedHandler
-   --  if exportedHandler is empty then return false
-   
-   put handler_Get (hKey) into objectHandler
-   if objectHandler = exportedHandler then
-      return true
-   else
-      return false
-   end if
-end disabled_ExportHandlerCalls
-   
-getprop disabled_EditHandlerCalls [hKey]
-   return _callFileExists (hKey)
-end disabled_EditHandlerCalls
-
-getprop disabled_ListHandlerCalls [hKey]
-   return _callFileExists (hKey)
-end disabled_ListHandlerCalls
-
-private function _callFileExists hKey
-   put hkey_CallsFile (hKey) into callsFile
-   if there is a file callsFile then
-      return false
-   else
-      return true
-   end if
-end _callFileExists

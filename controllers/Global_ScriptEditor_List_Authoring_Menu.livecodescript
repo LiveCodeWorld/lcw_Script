@@ -63,13 +63,13 @@ end menu_DisplayHkeySvg
 on _
 end _
 
-on submenu_HandlerFiles
-   return "Global | Handler | Calls | Menu"
-end submenu_HandlerFiles
+on submenu_Files
+   return "Global | Script | Folders | Menu"
+end submenu_Files
 
-on submenu_HandlerLibrary
-   return "Global | Handler | Library | Menu"
-end submenu_HandlerLibrary
+on submenu_HandlerCalls
+   return "Global | Handler | Calls | Menu"
+end submenu_HandlerCalls
 
 on submenu_Dev
    return "Dev | Menu"
@@ -78,9 +78,13 @@ end submenu_Dev
 
 --> Dev | Menu
 -
-on menu_EditOldMenu
+on submenu_HandlerLibrary
+   return "Global | Handler | Library | Menu"
+end submenu_HandlerLibrary
+
+on _EditOldMenu
    menu_Edit "Global | ScriptEditor | Hkey | Menu"
-end menu_EditOldMenu
+end _EditOldMenu
 
 on _
 end _

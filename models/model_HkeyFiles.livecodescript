@@ -23,8 +23,23 @@ The old hkey_Folder was here:
 -  put library_HkeyFolder (hKey, pDontCreate) into hkeyFolder
 */
 
---> Props
+--> Working on
 -
+function hkey_Files hKey
+   -- put hkey_Folder (hKey) into someFolder
+   put hkey_DataFolder (hKey, true) into someFolder
+   put folder_ShortFiles (someFolder) into someFiles
+   return someFiles
+end hkey_Files
+
+function hkey_GraphFiles hKey, pOverlayName, pVersionName
+   put library_HandlerFile (hKey, empty, true) into dotFolder
+   overlay_Files dotFolder, dotFile, imageFile, cmapFile, xdotFile, dotArrayFile, pOverlayName
+   put dotFile,imageFile,cmapFile,xdotFile,dotArrayFile,pOverlayName into someFiles
+   replace comma with  CR in someFiles
+   return someFiles
+end hkey_GraphFiles
+
 
 --> TextStack | Construct
 -
@@ -48,8 +63,40 @@ function textStack_ConstructHandlerFolder hKeyLine, dataFolder
 end textStack_ConstructHandlerFolder
 
 
---> Working on
+--> Hkey | Files | List
 -
+function hkey_ListSvgFiles hKey
+   put hkey_MetadataFolder (hKey) into someFolder
+   put file_ListShort (someFolder) into someFiles
+   filter someFiles with "*.svg"
+   return someFiles
+end hkey_ListSvgFiles
+
+function hkey_ImageMapPngs hKey
+   put hkey_MetadataFolder (hKey) into someFolder
+   put file_ListShort (someFolder) into someFiles
+   filter somePngs with "*.png"
+   return somePngs
+end hkey_ImageMapPngs
+
+function hkey_ListShortFolders
+   put library_PluginFolder ("opn_Text/rev/handlers/") into helpFolder
+   put the defaultfolder into oFolder
+   set the defaultfolder to helpFolder
+   put the folders into tFolders
+   filter tFolders without ".*"
+   set the defaultfolder to oFolder  
+   return tFolders
+end hkey_ListShortFolders 
+
+function hkey_ListShortVersionFolders hKey
+   local versionNames
+   put hkey_ListShortFolders() into shortFolders
+   
+   put hkey_FolderName (hKey) into folderName
+   filter shortFolders with (folderName & " *")
+   return shortFolders
+end hkey_ListShortVersionFolders
 
 
 --> hkey | Handler | File
@@ -58,7 +105,6 @@ function hkey_HandlerFile hKey, pDontCreate
    put hkey_DataFolder (hKey, pDontCreate) into dataFolder
    put textStack_ConstructHandlerFile (hKey, dataFolder) into handlerFile
    return handlerFile
-   -- return hkey_Folder (hKey, pDontCreate) & "script.txt"
 end hkey_HandlerFile
 
 command hkey_DeleteHandlerFile hKey
@@ -196,29 +242,6 @@ function hkey_FolderName hKey
 end hkey_FolderName
 
 
---> Hkey | Files
--
-function hkey_Files hKey, pVersionName
-   put library_HandlerFile (hKey, empty, true) into someFolder
-   put folder_ShortFiles (someFolder) into someFiles
-   return someFiles
-end hkey_Files
-
-function hkey_ImageMapPngs hKey, pVersionName
-   put hkey_Files (hKey, pVersionName) into somePngs
-   filter somePngs with "*.png"
-   return somePngs
-end hkey_ImageMapPngs
-
-function hkey_GraphFiles hKey, pOverlayName, pVersionName
-   put library_HandlerFile (hKey, empty, true) into dotFolder
-   overlay_Files dotFolder, dotFile, imageFile, cmapFile, xdotFile, dotArrayFile, pOverlayName
-   put dotFile,imageFile,cmapFile,xdotFile,dotArrayFile,pOverlayName into someFiles
-   replace comma with  CR in someFiles
-   return someFiles
-end hkey_GraphFiles
-
-
 --> Hkey | Files | Delete
 -
 command hkey_DeleteArrayFile hKey
@@ -247,25 +270,3 @@ command hkey_DeleteHelpFile hKey
    put hkey_HelpFile (hKey) into someFile
    delete file someFile
 end hkey_DeleteHelpFile
-
-
---> Hkey | Data
--
-function hkey_ListShortFolders
-   put library_PluginFolder ("opn_Text/rev/handlers/") into helpFolder
-   put the defaultfolder into oFolder
-   set the defaultfolder to helpFolder
-   put the folders into tFolders
-   filter tFolders without ".*"
-   set the defaultfolder to oFolder  
-   return tFolders
-end hkey_ListShortFolders 
-
-function hkey_ListShortVersionFolders hKey
-   local versionNames
-   put hkey_ListShortFolders() into shortFolders
-   
-   put hkey_FolderName (hKey) into folderName
-   filter shortFolders with (folderName & " *")
-   return shortFolders
-end hkey_ListShortVersionFolders
