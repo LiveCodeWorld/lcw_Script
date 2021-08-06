@@ -54,24 +54,24 @@ getprop hkey_LineNums [shortHkey]
    return sLineNum,eLineNum
 end hkey_LineNums
 
-command hkeyLine_Offsets hObject, shortHkey, @sLineNum, @eLineNum
-   put the hkey_Line [shortHkey] of hObject into hTableLine
-   if hTableLine is empty then return empty
-   --
-   put word 2 of hTableLine into hName
-   put word 3 of hTableLine + 1 into sLineNum
-   put word 4 of hTableLine + 1 into eLineNum
-   return hName
-end hkeyLine_Offsets
-
 
 --> Hkey | Do both
 -
 command hkey_Normalize @hKey
+   -- same as old "hkeyLine_Normalize"
    put hkeyLine_FromHkey (hKey) into hKey
    put word 1 to 2 of hKey into shortHkey
    return shortHkey
 end hkey_Normalize
+
+function hkey_Construct hName, hType, tObject
+   if exists (tObject) is false then
+      put "Missing" into hObject
+   end if
+   replace "C" with "M" in hType
+   put hKeyLine_Construct (hName, hType, tObject) into hKeyLine
+   return hKeyLine
+end hkey_Construct
 
 command hkey_Deconstruct hKey, @hName, @hType, @hObject, @hNum
    -- will deconstruct both
@@ -103,15 +103,6 @@ function hkey_FromShort shortHkeys, hObject
    return hkeyLines
 end hkey_FromShort
 
-function hkey_Construct hName, hType, tObject
-   if exists (tObject) is false then
-      put "Missing" into hObject
-   end if
-   replace "C" with "M" in hType
-   put hKeyLine_Construct (hName, hType, tObject) into hKeyLine
-   return hKeyLine
-end hkey_Construct
-
 
 --> hKeyLine
 -
@@ -130,90 +121,6 @@ function hKeyLine_Construct hName, hType, tObject
    return hkeyLine
 end hKeyLine_Construct
 
-function hKeyLine_AddObject hkeyLine, tObject
-   put revRuggedID (tObject) into hObject
-   put word 1 to 2 of hkeyLine && "of" && hObject into hKeyLine
-   return hKeyLine
-end hKeyLine_AddObject
-
-
---> HkeyLine | Normalize
--
-function hkeyLine_ScriptLineToType scriptLine
-   put word 1 of scriptLine into onWord
-   switch onWord
-      case "private"
-         put word 2 of scriptLine into onWord
-         put _ScriptLineToType (onWord) into hType
-         return "P" & hType
-      default
-         put _ScriptLineToType (onWord) into hType
-         return hType
-   end switch
-end hkeyLine_ScriptLineToType
-
-command hkeyLine_Normalize @hKey
-   breakpoint
-   hkey_Normalize hKey
-end hkeyLine_Normalize
-
-function hkeyLine_ConstructStart hKey
-   hkey_Deconstruct hKey, hName, hType, hObject, hNum
-   switch hType
-      case "a"
-         put "after" into handlerStartLine
-         break
-      case "b"
-         put "before" into handlerStartLine
-         break
-      case "m"
-      case "c"
-         put "command" into handlerStartLine
-         break
-      case "pc"
-         put "private command" into handlerStartLine
-         break
-      case "f"
-         put "function" into handlerStartLine
-         break
-      case "pf"
-         put "private function" into handlerStartLine
-         break
-      case "g"
-         put "getprop" into handlerStartLine
-         break
-      case "s"
-         put "setprop" into handlerStartLine
-         break
-   end switch
-   put space & hName after handlerStartLine
-   return handlerStartLine
-end hkeyLine_ConstructStart
-
-
---> hKeyLine | Handler
--
-function hkeyLine_GetHandlers hkeyLines, hTable, someScript
-   repeat for each line hkeyLine in hkeyLines
-      put hkeyLine_GetHandler (hkeyLine, hTable, someScript) into foundHandler
-      if foundHandler is empty then next repeat
-      put foundHandler & CR & CR after foundHandlers
-   end repeat
-   delete char -2 to -1 of foundHandlers
-   return foundHandlers
-end hkeyLine_GetHandlers
-
-function hkeyLine_GetHandler hkeyLine, hTable, someScript
-   -- required by "menu_Update" (was in "lib_MenuAuthoring")
-   htable_ExactLineOffsets hkeyLine, hTable, startLineNum, endLineNum
-   if endLineNum = 0 then return empty
-   put line startLineNum to endLineNum of someScript into foundHandler
-   return foundHandler
-end hkeyLine_GetHandler
-
-
---> hKeyLine
--
 function hkeyLine_FromHkey hKey
    hkey_Deconstruct hKey, hName, hType, hObject, hNum
    put toUpper(hType) into hType
@@ -237,6 +144,61 @@ command hkeyLine_DeconstructStart handlerLine, @hName, @hType, @privateBit
    end if
    put handler_GetType (handlerLine) into hType
 end hkeyLine_DeconstructStart
+
+
+--> hKeyLine
+-
+command hkeyLine_Offsets hObject, shortHkey, @sLineNum, @eLineNum
+   -- uses revAvailableHandleers
+   put the hkey_Line [shortHkey] of hObject into hTableLine
+   if hTableLine is empty then return empty
+   --
+   put word 2 of hTableLine into hName
+   put word 3 of hTableLine + 1 into sLineNum
+   put word 4 of hTableLine + 1 into eLineNum
+   return hName
+end hkeyLine_Offsets
+
+function hKeyLine_AddObject hkeyLine, tObject
+   -- used quite a lot
+   put revRuggedID (tObject) into hObject
+   put word 1 to 2 of hkeyLine && "of" && hObject into hKeyLine
+   return hKeyLine
+end hKeyLine_AddObject
+
+function hkeyLine_ScriptLineToType scriptLine
+   put word 1 of scriptLine into onWord
+   switch onWord
+      case "private"
+         put word 2 of scriptLine into onWord
+         put _ScriptLineToType (onWord) into hType
+         return "P" & hType
+      default
+         put _ScriptLineToType (onWord) into hType
+         return hType
+   end switch
+end hkeyLine_ScriptLineToType
+
+
+--> hKeyLine | Handler
+-
+function hkeyLine_GetHandlers hkeyLines, hTable, someScript
+   repeat for each line hkeyLine in hkeyLines
+      put hkeyLine_GetHandler (hkeyLine, hTable, someScript) into foundHandler
+      if foundHandler is empty then next repeat
+      put foundHandler & CR & CR after foundHandlers
+   end repeat
+   delete char -2 to -1 of foundHandlers
+   return foundHandlers
+end hkeyLine_GetHandlers
+
+function hkeyLine_GetHandler hkeyLine, hTable, someScript
+   -- required by "menu_Update" (was in "lib_MenuAuthoring")
+   htable_ExactLineOffsets hkeyLine, hTable, startLineNum, endLineNum
+   if endLineNum = 0 then return empty
+   put line startLineNum to endLineNum of someScript into foundHandler
+   return foundHandler
+end hkeyLine_GetHandler
 
 
 --> Private

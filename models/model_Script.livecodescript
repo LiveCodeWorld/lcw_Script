@@ -100,7 +100,7 @@ getprop script_Handlers [whichType]
                -- put "* [[" & shortHkey & "]]" & CR after hLines
                break
             case "start line"
-               put hkeyLine_ConstructStart (shortHkey) into hLine
+               put _ScriptHandlersStart (shortHkey) into hLine
                put hLine & CR after hLines
             default
                put word 2 of someLine & CR after hLines
@@ -385,6 +385,42 @@ command script_SetPrivateHandlerOffsets @startHandler, @endHandler, handlerName,
       return empty
    end if
 end script_SetPrivateHandlerOffsets
+
+
+--> Private
+-
+private function _ScriptHandlersStart hKey
+   hkey_Deconstruct hKey, hName, hType, hObject, hNum
+   switch hType
+      case "a"
+         put "after" into handlerStartLine
+         break
+      case "b"
+         put "before" into handlerStartLine
+         break
+      case "m"
+      case "c"
+         put "command" into handlerStartLine
+         break
+      case "pc"
+         put "private command" into handlerStartLine
+         break
+      case "f"
+         put "function" into handlerStartLine
+         break
+      case "pf"
+         put "private function" into handlerStartLine
+         break
+      case "g"
+         put "getprop" into handlerStartLine
+         break
+      case "s"
+         put "setprop" into handlerStartLine
+         break
+   end switch
+   put space & hName after handlerStartLine
+   return handlerStartLine
+end _ScriptHandlersStart
 
 private function script_MatchEnd handlerName, startHandler, someScript
    put CR after someScript -- in case handler is at end
