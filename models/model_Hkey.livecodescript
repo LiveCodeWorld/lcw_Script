@@ -7,11 +7,60 @@ type: model
 version: 0.9
 
 /*
-A model for indexing handlers.
+A model for handlers using the hKey notation. 
+The aim is to use this library for key handlers that refer to locally stored handler metadata.
 */
 
 
 --> Working on
+-
+function hkey_GetDotText hKey, pGraphStyle
+   put hkey_DotFile (hKey, pGraphStyle) into someFile
+   put url ("file:" & someFile) into dotText
+   return dotText
+end hkey_GetDotText
+
+command hkey_SetDotText hKey, dotText, pGraphStyle
+   put hkey_DotFile (hKey, pGraphStyle) into someFile
+   put dotText into url ("file:" & someFile)
+   return someFile
+end hkey_SetDotText
+
+
+--> Hkey | MetaData | Image
+-
+function hkey_GetImage hKey, pGraphStyle
+   put hkey_ImageFile (hKey, pGraphStyle) into someFile
+   get url ("binfile:" & someFile)
+   return it
+end hkey_GetImage
+
+command hkey_SetImage hKey, imageFile, pGraphStyle
+   put hkey_ImageFile (hKey, pGraphStyle) into someFile
+   put imageFile into url ("binfile:" & someFile)
+end hkey_SetImage
+
+
+--> Hkey | Help
+-
+function hkey_FetchHelp hKey
+   put hkey_HelpFile (hKey, true) into someFile
+   put text_Get (someFile) into someHelp
+   return someHelp
+end hkey_FetchHelp
+
+command hkey_StoreHelp hKey, helpText
+   put hkey_HelpFile (hKey, false) into someFile
+   if helptext is empty then
+      delete file someFile
+   else
+      put helpText into url ("binfile:" & someFile)
+   end if
+   return someFile
+end hkey_StoreHelp
+
+
+--> hKey | Model | Versions
 -
 function hkey_ListVersionNames hKey
    put hkey_ListShortVersionFolders (hKey) into shortFolders
@@ -92,54 +141,6 @@ command hkey_SaveOverlayData hKey, overlayData
       return empty
    end if
 end hkey_SaveOverlayData
-
-
---> Hkey | DotText | Model
--
-function hkey_GetDotText hKey, pVersionName
-   put hkey_DotFile (hKey, pVersionName) into someFile
-   put url ("file:" & someFile) into dotText
-   return dotText
-end hkey_GetDotText
-
-command hkey_SetDotText hKey, dotText, pVersionName
-   put hkey_DotFile (hKey, pVersionName) into someFile
-   put dotText into url ("file:" & someFile)
-   return someFile
-end hkey_SetDotText
-
-
---> Hkey | MetaData | Image
--
-function hkey_GetImage hKey, pGraphStyle
-   put hkey_ImageFile (hKey, pGraphStyle) into someFile
-   get url ("binfile:" & someFile)
-   return it
-end hkey_GetImage
-
-command hkey_SetImage hKey, imageFile, pGraphStyle
-   put hkey_ImageFile (hKey, pGraphStyle) into someFile
-   put imageFile into url ("binfile:" & someFile)
-end hkey_SetImage
-
-
---> Hkey | Help
--
-function hkey_FetchHelp hKey
-   put hkey_HelpFile (hKey, true) into someFile
-   put text_Get (someFile) into someHelp
-   return someHelp
-end hkey_FetchHelp
-
-command hkey_StoreHelp hKey, helpText
-   put hkey_HelpFile (hKey, false) into someFile
-   if helptext is empty then
-      delete file someFile
-   else
-      put helpText into url ("binfile:" & someFile)
-   end if
-   return someFile
-end hkey_StoreHelp
 
 
 --> Script | scriptLine

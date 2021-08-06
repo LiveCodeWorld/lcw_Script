@@ -50,19 +50,6 @@ on submenu_GraphHandler
    return "Global | Hkey | Walk | Menu"
 end submenu_GraphHandler
 
-on menu_DisplayHkeySvg hKey
-   put hkey_SvgFile (hKey) into svgFile
-   if scriptEditor_PaneExists ("Deps") then
-      display_ScriptEditorSvg svgFile
-   end if
-   
-   put hkey into stackLabel
-   display_SVG svgFile, stackLabel
-end menu_DisplayHkeySvg
-
-on _
-end _
-
 on submenu_Files
    return "Global | Script | Folders | Menu"
 end submenu_Files

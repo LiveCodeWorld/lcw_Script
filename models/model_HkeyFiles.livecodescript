@@ -65,6 +65,13 @@ end textStack_ConstructHandlerFolder
 
 --> Hkey | Files | List
 -
+function hkey_ListDotFiles hKey
+   put hkey_MetadataFolder (hKey) into someFolder
+   put file_ListShort (someFolder) into someFiles
+   filter someFiles with "*.dot"
+   return someFiles
+end hkey_ListDotFiles
+
 function hkey_ListSvgFiles hKey
    put hkey_MetadataFolder (hKey) into someFolder
    put file_ListShort (someFolder) into someFiles
