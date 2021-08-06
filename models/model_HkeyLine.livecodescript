@@ -21,12 +21,6 @@ See also lib_FindHkey
 
 --> Working on
 -
-command hkey_Normalize @hKey
-   put hkeyLine_FromHkey (hKey) into hKey
-   put word 1 to 2 of hKey into shortHkey
-   return shortHkey
-end hkey_Normalize
-
 
 --> Props
 -
@@ -71,14 +65,34 @@ command hkeyLine_Offsets hObject, shortHkey, @sLineNum, @eLineNum
 end hkeyLine_Offsets
 
 
---> hKeyLine
+--> Hkey | Do both
 -
-command hkeyLine_Deconstruct hKeyLine, @hName, @hType, @hObject
-   put toUpper (word 1 of hKeyLine) into hType
-   put word 2 of hKeyLine into hName
-   put word 4 to -1 of hKeyLine into hObject
-   return hType && hName
-end hkeyLine_Deconstruct
+command hkey_Normalize @hKey
+   put hkeyLine_FromHkey (hKey) into hKey
+   put word 1 to 2 of hKey into shortHkey
+   return shortHkey
+end hkey_Normalize
+
+command hkey_Deconstruct hKey, @hName, @hType, @hObject, @hNum
+   -- will deconstruct both
+   -- move over to hkeyLine_Deconstruct
+   
+   if the number of items of hkey = 1 then
+      hkeyLine_Deconstruct hKey, hName, hType, hObject
+      put 1 into hNum
+   else
+      -- old version
+      put word 1 to -1 of item 1 of hKey into hName
+      put word 1 to -1 of item 2 of hKey into hType
+      if hType is empty then put "c" into hType
+      put word 1 to -1 of item 3 of hKey into hObject
+      put item 4 of hKey into hNum
+      if hNum is empty then put 1 into hNum
+   end if
+   
+   put hKeyLine_Construct (hName, hType, hObject) into hkeyLine
+   return hkeyLine
+end hkey_Deconstruct
 
 function hkey_FromShort shortHkeys, hObject
    repeat for each line shortHkey in shortHkeys
@@ -97,6 +111,16 @@ function hkey_Construct hName, hType, tObject
    put hKeyLine_Construct (hName, hType, tObject) into hKeyLine
    return hKeyLine
 end hkey_Construct
+
+
+--> hKeyLine
+-
+command hkeyLine_Deconstruct hKeyLine, @hName, @hType, @hObject
+   put toUpper (word 1 of hKeyLine) into hType
+   put word 2 of hKeyLine into hName
+   put word 4 to -1 of hKeyLine into hObject
+   return hType && hName
+end hkeyLine_Deconstruct
 
 function hKeyLine_Construct hName, hType, tObject
    put hType && hName into shortHkeyLine
@@ -165,30 +189,6 @@ function hkeyLine_ConstructStart hKey
    put space & hName after handlerStartLine
    return handlerStartLine
 end hkeyLine_ConstructStart
-
-
---> Hkey | Do both
--
-command hkey_Deconstruct hKey, @hName, @hType, @hObject, @hNum
-   -- will deconstruct both
-   -- move over to hkeyLine_Deconstruct
-   
-   if the number of items of hkey = 1 then
-      hkeyLine_Deconstruct hKey, hName, hType, hObject
-      put 1 into hNum
-   else
-      -- old version
-      put word 1 to -1 of item 1 of hKey into hName
-      put word 1 to -1 of item 2 of hKey into hType
-      if hType is empty then put "c" into hType
-      put word 1 to -1 of item 3 of hKey into hObject
-      put item 4 of hKey into hNum
-      if hNum is empty then put 1 into hNum
-   end if
-   
-   put hKeyLine_Construct (hName, hType, hObject) into hkeyLine
-   return hkeyLine
-end hkey_Deconstruct
 
 
 --> hKeyLine | Handler
