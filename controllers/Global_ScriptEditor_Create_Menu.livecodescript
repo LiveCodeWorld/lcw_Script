@@ -46,13 +46,14 @@ on menu_CreateView scriptObject
 end menu_CreateView
 
 on menu_CreateBehavior scriptObject
-   breakpoint
    put "Choose a name for your script-only behavior stack...." into someQuestion
    put the script_MetaData ["name"] of scriptObject into scriptName
    if scriptName is empty then put "Example" into scriptName
    put "behavior_" & scriptName into suggestedAnswer
    
-   project_CreateScriptOnlyStack "behaviors", someQuestion, suggestedAnswer
+   put the project_Name of scriptObject into projectName
+   breakpoint
+   ask_CreateProjectStack "behaviors", projectName, someQuestion, suggestedAnswer
 end menu_CreateBehavior
 
 on menu_CreateLibrary scriptObject

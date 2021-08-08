@@ -21,7 +21,7 @@ getprop menu_Target [mTitlePath]
 end menu_Target
 
 private function _getScriptObject
-   put menu_GetTargetObject() into mTarget
+   put menu_GetTopTargetObject() into mTarget
    put the index_View of mTarget into indexView
    if exists (indexView) then
       put the view_Object of mTarget into someView

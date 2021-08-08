@@ -191,8 +191,6 @@ function debug_GetCallingContextLine pNum
    put (pNum + 2) * -1 into lineNum
    --
    get the executioncontexts
-   --
-   -- put line -3 of it into contextLine
    put line lineNum of it into contextLine
    return contextLine
 end debug_GetCallingContextLine

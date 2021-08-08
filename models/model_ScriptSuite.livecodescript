@@ -18,6 +18,14 @@ See also "Old | Suite" of stack "model_ScriptMenu"
 
 --> Working on
 -
+command script_RenameSuite @someScript, suiteTitle, newSuiteTitle
+   script_SetSuiteOffsets suiteTitle, someScript, startLineNum, endLineNum
+   if the result is true then
+      put "-->" && newSuiteTitle into line startLineNum of someScript
+   end if
+   return startLineNum
+end script_RenameSuite
+
 function index_ConstructUnique someIndex
    set the itemdelimiter to tab
    repeat for each line someLine in someIndex

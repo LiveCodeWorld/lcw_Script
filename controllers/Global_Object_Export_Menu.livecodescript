@@ -1,8 +1,8 @@
-﻿script "Global_Object_Export_Test_Menu"
+﻿script "Global | Object | Export | Menu"
 --> MetaData
 -
 license: GPLv3
-name: Global_Object_Export_Test_Menu
+name: Global | Object | Export | Menu
 type: controller
 version: 0.1
 
@@ -12,7 +12,7 @@ version: 0.1
 local LocalArray
 
 
---> Global | Object | Export | Test | Menu
+--> Global | Object | Export | Menu
 -
 on menu_RevealTextStackFolder scriptObject
    put the textStack_Folder of scriptObject into someFolder
