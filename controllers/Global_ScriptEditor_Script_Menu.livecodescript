@@ -38,17 +38,6 @@ on menu_ScriptTools sObject
    display_Script sObject
 end menu_ScriptTools
 
-on _
-end _
-
-on menu_DisplayTemplate sObject, templateName
-   display_ScriptTemplate templateName
-end menu_DisplayTemplate
-
-on menu_NewTemplateFromScript sObject
-   display_AskNewTemplate sObject
-end menu_NewTemplateFromScript
-
 on menu_DisplayRigControllers
    if env_ProjectIsActive("lcw_RevIgniter") is false then
       lcw_Answer "Do you want to start the lcw_RevIgniter project?"
@@ -59,6 +48,17 @@ on menu_DisplayRigControllers
    display_RigControllerArray
    ide_SetScriptEditorTitles "RevIgniter"
 end menu_DisplayRigControllers
+
+on _
+end _
+
+on menu_DisplayTemplate sObject, templateName
+   display_ScriptTemplate templateName
+end menu_DisplayTemplate
+
+on menu_NewTemplateFromScript sObject
+   display_AskNewTemplate sObject
+end menu_NewTemplateFromScript
 
 
 --> Dev

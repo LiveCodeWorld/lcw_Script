@@ -36,13 +36,25 @@ on menu_OpenInFinder sObject
    stack_RevealInFinder stackName
 end menu_OpenInFinder
 
-on _
-end _
-
 on menu_ObjectProperties sObject
    revIDEInspectObjects sObject
    -- display_ObjectProperties sObject
 end menu_ObjectProperties
+
+on _
+end _
+
+on menu_Terminal sObject
+   put the stack_Folder of sObject into stackFolder
+   launch_Terminal stackFolder
+end menu_Terminal
+
+
+--> Dev | Menu
+-
+on menu_SetMainScreen sObject
+   object_GoTo sObject, true
+end menu_SetMainScreen
 
 on menu_FindLoadedStack sObject
    -- put the stacksinuse into stackNames
@@ -55,43 +67,3 @@ on menu_FindLoadedStack sObject
    put empty into pIndexView
    display_Stacks stackNames, "Found Stacks"
 end menu_FindLoadedStack
-
-on _
-end _
-
-on menu_DisplayTransporters
-   display_Transporters
-end menu_DisplayTransporters
-
-on menu_DisplayTransportLibs
-   display_TransporterLibs
-end menu_DisplayTransportLibs
-
-on _
-end _
-
-on menu_Terminal sObject
-   put the stack_Folder of sObject into stackFolder
-   launch_Terminal stackFolder
-end menu_Terminal
-
-on menu_GitStatus sObject
-   put the stack_Folder of sObject into stackFolder
-   display_GitFolderStatus stackFolder
-end menu_GitStatus
-
-on menu_NewScriptTemplate sObject
-   display_AskNewTemplate sObject
-end menu_NewScriptTemplate
-
-on _
-end _
-
-on menu_SetMainScreen sObject
-   object_GoTo sObject, true
-end menu_SetMainScreen
-
-
-
---> Deps
--

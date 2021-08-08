@@ -112,8 +112,8 @@ getprop disabled_SaveRecentStacks
    end if
 end disabled_SaveRecentStacks
 
-getprop disabled_Create [scriptObject]
-   get the script_Type of scriptObject
+-- getprop disabled_Create [scriptObject]
+   -- get the script_Type of scriptObject
    put the project_Name of scriptObject into projectName
    put projectName is empty into isNotProject
    return isNotProject
@@ -179,13 +179,13 @@ on menu_RecentScripts scriptObject, recentObject
    end if
 end menu_RecentScripts
 
-on submenu_Help
-   return "Global | Script | Help | Menu"
-end submenu_Help
-
 on submenu_Git
    return "Global | GIT | Simple | Object | Menu"
 end submenu_Git
+
+on submenu_Help
+   return "Global | Script | Help | Menu"
+end submenu_Help
 
 on menu_SaveEdited
    stack_SaveEdited "all"

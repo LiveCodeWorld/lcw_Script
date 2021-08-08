@@ -13,114 +13,30 @@ Currently in the process of moving over to the new array based structure which s
 A menu_Controller contains all the information needed to create a menu, and link each menu item to a handler.
 Views are linked to menu_Controllers via the menu_Title and the menu_Controller of the view.
 This combination of mTitle and mController uniquely identifies the menu model for that menu and it's associated script.
-
-command menu_LoadFromScript mController, pSaveCustomProps
-   -- old way that handles multiple global menus in a single script
-   put the script_MenuTitleTableArray of mController into mTitleTableArray
-   menu_UpdateGlobalArray mController, mTitleTableArray
-   put the result into menuTitleArray
-   
-   -- now save as custom property
-   if pSaveCustomProps is true then
-      set the menu_DataArray of mController to mTitleTableArray
-   end if
-end menu_LoadFromScript 
 */
 
-command menu_UpdateGlobalArray mController, mTitleTableArray
-   global gLCW
-   menu_DeleteActiveArray
-   
-   put revRuggedId (mController) into mController
-   --
-   repeat for each key gMenuTile in mTitleTableArray
-      if word 1 of gMenuTile = "Global" and word 2 of gMenuTile = "|" then
-         put mTitleTableArray [gMenuTile] into gMenuTable
-         
-         -- menu_NormalizeTitle gMenuTile
-         put gMenuTable into gLCW ["Global Menus"][gMenuTile]["gMenuTable"]
-         put mController into gLCW ["Global Menus"][gMenuTile]["mController"]
-         
-         -- probably not really needed
-         put gMenuTable into menuTitleArray [gMenuTile]["gMenuTable"]
-         put mController into menuTitleArray [gMenuTile]["mController"]
-      end if
-   end repeat
-   --
-   return menuTitleArray
-end menu_UpdateGlobalArray
-
---> Working on
+--> Menu | Props
 -
-getprop script_GlobalMenuTitles
-   put the script_MenuTitles of the target into mTitles
-   filter mTitles with "Global |*"
-   return mTitles
-end script_GlobalMenuTitles
+getprop menu_Array [pMenuTitle]
+   put the long id of the target into tObject
+   if pMenuTitle is empty then
+      put line 1 of the script_MenuTitles of tObject into pMenuTitle
+   end if
+   put mArray_FromTitleTable (pMenuTitle, tObject) into mArray
+   return mArray
+end menu_Array
 
-getprop script_GlobalTitles [suiteType]
-   put the script of the target into someScript
-   put script_ExtractGlobalTitles (someScript, suiteType) into globalMenuTitles
+getprop menu_GlobalTitle
+   put the script_GlobalTitles ["Menu"] of the target into globalMenuTitles
    return globalMenuTitles
-end script_GlobalTitles
+end menu_GlobalTitle
 
 
---> Menu | Update
--
-function script_IsMenu someScript
-   -- put the script_Type of mController into sType
-   put script_GetMetadataArray (someScript) into sMetaData
-   put sMetaData ["type"] into sType
-   put sType is among the items of "menu,controller" into isMenu
-   return isMenu
-end script_IsMenu
-
-getprop script_MenuTitleTableArray
-   -- this is what constructs the mTitleTableArray from a script
-   -- we don;t need to save this information all the time?
-   local mTitleTableArray
-   
-   put the long id of the target into mController
-   put the script of mController into someScript
-   
-   /*
-   -- make it only work for metadata indexed menus
-   -- faster for indexing
-   -- but annoying for hand coding
-   if script_IsMenu (someScript) is false then return empty
-   */
-   
-   put the revAvailableHandlers of mController into hTable
-   --
-   put someScript into mTitleLines
-   filter mTitleLines with "--> * Menu"
-   
-   menu_ClearRecursionCheck
-   repeat for each line mTitleLine in mTitleLines
-      put word 2 to -1 of mTitleLine into mTitle
-      put menu_ExtractTableFromScript (mTitle, someScript, hTable, mController) into mTable
-      put mTable into mTitleTableArray [mTitle]
-   end repeat
-   return mTitleTableArray
-end script_MenuTitleTableArray
-
-getprop menu_DataArray
-   -- the problem with this is if the target has been cloned or copied
-   -- the menu_Controller will have changed
-   put the customproperties ["menu_Table"] of the target into mTitleTableArray
-   return mTitleTableArray
-end menu_DataArray
-
-setprop menu_DataArray mTitleTableArray
-   set the customproperties ["menu_Table"] of the target to mTitleTableArray
-end menu_DataArray
-
-
---> Menu | Name
+--> Menu | Props | Name
 -
 /*
 The menu_Name is the name value of the script metadata of the controller
-It "should"" be the saem as the stack name
+It "should"" be the same as the stack name and the namme of the first menu script suite
 */
 
 getprop menu_Name
@@ -155,8 +71,26 @@ setprop menu_Name mName
 end menu_Name
 
 
---> Script | MenuTitle
+--> Script | Menu | Titles
 -
+getprop script_GlobalMenuTitles
+   put the script_MenuTitles of the target into mTitles
+   filter mTitles with "Global |*"
+   return mTitles
+end script_GlobalMenuTitles
+
+getprop script_GlobalTitles [suiteType]
+   put the script of the target into someScript
+   put script_ExtractGlobalTitles (someScript, suiteType) into globalMenuTitles
+   return globalMenuTitles
+end script_GlobalTitles
+
+getprop script_MenuTitles
+   put the script of the target into someScript
+   put script_ExtractMenuSuiteTitles (someScript) into scriptMenuTitles
+   return scriptMenuTitles
+end script_MenuTitles
+
 getprop script_MenuTitleAbove [lineNum]
    put the script of the target into someScript
    --
@@ -170,6 +104,37 @@ getprop script_MenuTitleAbove [lineNum]
    return empty
 end script_MenuTitleAbove
 
+getprop script_MenuTitleTableArray
+   -- old thorough and slow
+   -- this is what constructs the mTitleTableArray from a script
+   local mTitleTableArray
+   put the long id of the target into mController
+   put the script of mController into someScript
+   put the revAvailableHandlers of mController into hTable
+   --
+   put someScript into mTitleLines
+   filter mTitleLines with "--> * Menu"
+   
+   menu_ClearRecursionCheck
+   repeat for each line mTitleLine in mTitleLines
+      put word 2 to -1 of mTitleLine into mTitle
+      put menu_ExtractTableFromScript (mTitle, someScript, hTable, mController) into mTable
+      put mTable into mTitleTableArray [mTitle]
+   end repeat
+   return mTitleTableArray
+end script_MenuTitleTableArray
+
+
+--> Script | Menu | Utils
+-
+function script_IsMenu someScript
+   -- put the script_Type of mController into sType
+   put script_GetMetadataArray (someScript) into sMetaData
+   put sMetaData ["type"] into sType
+   put sType is among the items of "menu,controller" into isMenu
+   return isMenu
+end script_IsMenu
+
 function script_ExtractGlobalMenu scriptLine
    put "^-->\s*(Global\s*\|\s*.*Menu)" into someReg
    get matchChunk (scriptLine, someReg, startChar, endChar)
@@ -182,44 +147,6 @@ function script_ExtractGlobalMenu scriptLine
    end if
 end script_ExtractGlobalMenu
 
-getprop script_MenuTitles
-   put the long id of the target into tObject
-   
-   -- put the script_MenuTitleTableArray of tObject into mTitleTableArray (not in order)
-   -- put menu_ListCustomPropertyTitles (tObject) into mTitles -- not using custom props
-   put the script of tObject into someScript
-   put script_ExtractMenuSuiteTitles (someScript) into scriptMenuTitles
-   --
-   return scriptMenuTitles
-end script_MenuTitles
-
-
---> Script | MenuTitles
--
-getprop menu_GlobalTitle
-   put the script_GlobalTitles ["Menu"] of the target into globalMenuTitles
-   return globalMenuTitles
-end menu_GlobalTitle
-
-setprop menu_GlobalTitle globalMenuTitles
-   put the long id of the target into scriptObject
-   repeat for each line globalMenuTitle in globalMenuTitles
-      menu_SetGlobalController globalMenuTitle, scriptObject
-   end repeat
-end menu_GlobalTitle
-
-setprop menu_Table [pMenuTitle] mTable
-   if pMenuTitle is empty then put the menu_Title of the target into pMenuTitle
-   if pMenuTitle is empty then return empty
-   put the menu_Controller [pMenuTitle] of the target into mController
-   
-   menu_SetTable pMenuTitle, mController, mTable
-   return the result
-end menu_Table
-
-
---> Menu | List
--
 function menu_ListGlobalNames
    global gLCW
    put gLCW ["Global Menus"] into menuArray

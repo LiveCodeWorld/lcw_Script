@@ -56,10 +56,6 @@ end insert_HeaderMenu
 on _
 end _
 
-on submenu_Create sObject
-   return "Global | Project | Create | Menu"
-end submenu_Create
-
 on submenu_Script
    return "Global | ScriptEditor | Script | Menu"
 end submenu_Script
