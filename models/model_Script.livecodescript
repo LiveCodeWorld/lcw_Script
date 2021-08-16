@@ -13,6 +13,42 @@ Handlers that work on the scripts of objects
 
 --> Working on
 -
+getprop script_HandlerNames [pNotPrivate]
+   put the revAvailableHandlers of the target into handlerTable
+   switch pNotPrivate
+      case true
+      case false
+      case empty
+         break
+         put hTable_GetHandlerNames (handlerTable, pNotPrivate) into hNames
+      default
+         put toUpper (char 1 of pNotPrivate) && "*" into someFilter
+         filter handlerTable with someFilter
+         put hTable_GetHandlerNames (handlerTable, true) into hNames
+   end switch
+   return hNames
+end script_HandlerNames
+
+getprop script_CommandLines
+   put the script_HandlerNames ["M"] of the target into cNames
+   -- put the long id of the target into scriptObject
+   -- put the script of scriptObject into someScript
+   -- put script_ExtractCommandLines (someScript, scriptObject) into cNames
+   return cNames
+end script_CommandLines
+
+getprop script_CommandHandlers
+   put the long id of the target into scriptObject
+   put the script of scriptObject into someScript
+   return script_ExtractCommandHandlers (someScript, scriptObject)
+end script_CommandHandlers
+
+getprop script_FunctionHandlers
+   put the long id of the target into scriptObject
+   put the script of scriptObject into someScript
+   return script_ExtractFunctionHandlers (someScript, scriptObject)
+end script_FunctionHandlers
+
 
 --> Script | Handler | Model
 -
@@ -134,13 +170,6 @@ getprop script_Hkeys [fetchHow]
    end switch
 end script_Hkeys
 
-getprop script_HandlerNames [pNotPrivate]
-   put the revAvailableHandlers of the target into handlerTable
-   put hTable_GetHandlerNames (handlerTable, pNotPrivate) into hNames
-   sort hNames
-   return hNames
-end script_HandlerNames
-
 getprop script_ShortHKeys
    -- this is the new version of shortHekys
    -- should be able to use "the revAvailableHandlers" instead
@@ -211,28 +240,10 @@ getprop script_Command [cName]
    return commandHandler
 end script_Command
 
-getprop script_CommandHandlers
-   put the long id of the target into scriptObject
-   put the script of scriptObject into someScript
-   return script_ExtractCommandHandlers(someScript, scriptObject)
-end script_CommandHandlers
-
-getprop script_CommandLines
-   put the long id of the target into scriptObject
-   put the script of scriptObject into someScript
-   return script_ExtractCommandLines(someScript, scriptObject)
-end script_CommandLines
-
 getprop script_Function [fName]
    put the script of the target into someScript
    return script_GetFunction (fName, someScript)
 end script_Function
-
-getprop script_FunctionHandlers
-   put the long id of the target into scriptObject
-   put the script of scriptObject into someScript
-   return script_ExtractFunctionHandlers (someScript, scriptObject)
-end script_FunctionHandlers
 
 
 --> Script | Handler | Offsets 

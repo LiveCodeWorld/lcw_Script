@@ -58,32 +58,10 @@ on submenu_HandlerCalls
    return "Global | Handler | Calls | Menu"
 end submenu_HandlerCalls
 
+on menu_MenuHelp
+   launch_MenuHelp "Global | ScriptEditor | List | Authoring | Menu"
+end menu_MenuHelp
+
 on submenu_Dev
-   return "Dev | Menu"
+return menu_Create ("Global | Dev | ScriptEditor | List | Authoring | Menu")
 end submenu_Dev
-
-
---> Dev | Menu
--
-on submenu_HandlerLibrary
-   return "Global | Handler | Library | Menu"
-end submenu_HandlerLibrary
-
-on _EditOldMenu
-   menu_Edit "Global | ScriptEditor | Hkey | Menu"
-end _EditOldMenu
-
-on _
-end _
-
-on _TestMergeHandler hKey
-   hkey_Deconstruct hKey, hName, hType, hObject, hNum
-   put the exported_Script of hObject into exportedScript
-   put the script of hObject into realScript
-   if realScript is not exportedScript then
-      put exportedScript
-      answer warning "The scripts differ. Check for duplicate handlers?"
-   else
-      answer "Scripts are the same!" 
-   end if
-end _TestMergeHandler
