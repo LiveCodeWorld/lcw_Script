@@ -114,43 +114,5 @@ on _
 end _
 
 on submenu_Dev
-   return "Dev | Menu"
+   return menu_Create ("Global | Script | Dev | Menu")
 end submenu_Dev
-
-
---> Dev | Menu
--
-on submenu_ScriptDeps
-   return "Global | Script | Dep | Menu"
-end submenu_ScriptDeps
-
-on submenu_Overlay
-   return "Global | Overlay | Menu"
-end submenu_Overlay
-
-on submenu_ScriptExport
-   return "Global | Script | Exported | Menu"
-end submenu_ScriptExport
-
-on submenu_TestExport
-   return "Global | Object | Export | Test | Menu"
-end submenu_TestExport
-
-on _
-end _
-
--- on submenu_Project
-return "Global | Project | Stack | Menu"
-end submenu_Project
-
--- on submenu_ScriptMainstack
-return "Global | Script | Mainstack | Menu"
-end submenu_ScriptMainstack
-
-on submenu_Rig
-   return "Global | Rig | Files | Menu"
-end submenu_Rig
-
-on submenu_Gist
-   return "Global | Gist | Menu"
-end submenu_Gist

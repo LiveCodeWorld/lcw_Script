@@ -15,32 +15,26 @@ These values are stored in the handler_Folder, and retrieved using "hkey_FetchCa
 --> Working on
 -
 command display_CreateFastHandlerGraph hKey
-   put "fast undirected spring" into pGraphStyle
-   --
-   graph_Hkey hKey, pGraphStyle
-   put the result into svgFile
-   --
-   display_SVG svgFile
-   return hKey
+   display_CreateHandlerGraph hKey, "fast undirected spring"
 end display_CreateFastHandlerGraph
 
-command display_CreateHandlerGraph hKey, pClusterBoolean
+command display_CreateHandlerGraph hKey, pGraphStyle
+   graph_Hkey hKey, pGraphStyle
+   put the result into svgFile
+   display_SVG svgFile
+   return hKey
+   
+   -- buggy: doesn't use lib_HkeyWalk
    -- used by "Global_Hkey_Walk_Menu"
-   -- traverses the hkey dependency graph using a slow crawl of Livecode objects
    set the cursor to watch
    put the long id of me into processObject
-   --
    hkey_Deconstruct hKey, hName, hType, hObject, hNum
    put the project_Name of hObject into projectName
-   --
    graph_HkeyDependency hkey, projectName, "hierarchical", pClusterBoolean, processObject
    put the result into svgFile
    --
    display_SVG svgFile, hKey
-   --
-   -- display_HkeySVG hkey -- not working?
    put the result into displayView
-   --
    return svgFile
 end display_CreateHandlerGraph
 

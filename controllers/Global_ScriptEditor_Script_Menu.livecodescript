@@ -1,11 +1,11 @@
 ﻿script "Global | ScriptEditor | Script | Menu"
 --> MetaData
 -
-copyright: Anonymous
+copyright: David Bovill
 license: GPLv3
 name: Global | ScriptEditor | Script | Menu
 type: controller
-version: 0.1
+version: 0.2
 
 /*Here you can describe this menu.
 Full help text should be provided on the linked wiki.*/
@@ -21,11 +21,6 @@ getprop menu_Target
    put scriptEditor_Object() into sObject
    return sObject
 end menu_Target
-
-getprop menu_CheckTarget [mTarget]
-   -- use to do initialisation
-   pass menu_CheckTarget
-end menu_CheckTarget
 
 getprop displayTemplate_Params
    return scaffold_ListShortFiles()

@@ -1,15 +1,14 @@
-﻿script "Global | ScriptEditor | List | Authoring | Menu"
+﻿script "Global | ScriptEditor | List | Watch | Menu"
 --> MetaData
 -
 license: GPLv3
-name: Global | ScriptEditor | List | Authoring | Menu
+name: Global | ScriptEditor | List | Watch | Menu
 type: controller
 version: 0.1
 
-/*
-Here you can describe this menu.
-Full help text should be provided on the linked wiki.
-*/
+/*Here you can describe this menu.
+Full help text should be provided on the linked wiki.*/
+
 
 --> Variables
 -
@@ -33,7 +32,7 @@ getprop disabled_DisplayHkeySvg [hKey]
 end disabled_DisplayHkeySvg
 
 
---> Global | ScriptEditor | List | Authoring | Menu
+--> Global | ScriptEditor | List | Watch | Menu
 -
 on submenu_SendHkey
    return "Global | Hkey | Send | Menu"
@@ -63,5 +62,5 @@ on menu_MenuHelp
 end menu_MenuHelp
 
 on submenu_Dev
-return menu_Create ("Global | Dev | ScriptEditor | List | Authoring | Menu")
+   return menu_Create ("Global | Dev | ScriptEditor | List | Authoring | Menu")
 end submenu_Dev

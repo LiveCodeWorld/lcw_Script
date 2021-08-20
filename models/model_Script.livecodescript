@@ -19,8 +19,8 @@ getprop script_HandlerNames [pNotPrivate]
       case true
       case false
       case empty
-         break
          put hTable_GetHandlerNames (handlerTable, pNotPrivate) into hNames
+         break
       default
          put toUpper (char 1 of pNotPrivate) && "*" into someFilter
          filter handlerTable with someFilter

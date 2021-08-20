@@ -88,62 +88,42 @@ end submenu_Dev
 
 --> Dev | Menu
 -
-on _
-end _
-
-on menu_SetMenu sObject, shortName
-   ide_SetMenuTitle "Recent", shortName
-   --
-   put ide_GetMenuTitle ("Recent") into mTitle
-   --
-   menu_Edit mTitle
-   put mTitle
-end menu_SetMenu
-
-on menu_MenuStyle sObject, mStyle
+on _MenuStyle sObject, mStyle
    set the menu_Style of stack "lib_MenuArray" to mStyle
-end menu_MenuStyle
+end _MenuStyle
 
 on _
 end _
 
-on menu_Compile
+on _Compile
    put scriptEditor_CompileButtonBehavior() into bObject
    edit the script of bObject
-end menu_Compile
+end _Compile
 
-on menu_History
+on _History
    put scriptEditor_HistoryButtonBehavior() into bObject
    edit the script of bObject
-end menu_History
+end _History
 
-on menu_Script
+on _Script
    put scriptEditor_ScriptFieldBehavior() into bObject
    edit the script of bObject
-end menu_Script
+end _Script
 
-on menu_Handler
+on _Handler
    put scriptEditor_HandlerListBehavior() into bObject
    edit the script of bObject
-end menu_Handler
+end _Handler
 
-on menu_Search
+on _Search
    put scriptEditor_FindFieldBehavior() into bObject
    edit the script of bObject
-end menu_Search
-
---  on submenu_SetIdeBehavior
-   return "Global | ScriptEditor | Behavior | Menu"
-end submenu_SetIdeBehavior
-
--- on submenu_Ide
-   return "Global | IDE | Menu"
-end submenu_Ide
+end _Search
 
 on _
 end _
 
-on menu_TestRecentMenu
+on _TestRecentMenu
    put "Recent" into ideElement
    put "Watch" into shortTitle
    --
@@ -160,8 +140,4 @@ on menu_TestRecentMenu
    put menu_GetGlobalController (mTitle) into mController
    --
    edit the script of mController
-end menu_TestRecentMenu
-
-on menu_ReindexIdeMenu
-   ide_ReIndexMenus
-end menu_ReindexIdeMenu
+end _TestRecentMenu

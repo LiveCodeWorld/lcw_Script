@@ -217,17 +217,10 @@ on submenu_Tabs
    return "Global | ScriptEditor | Tabs | Menu"
 end submenu_Tabs
 
+on submenu_Ide
+   return "Global | ScriptEditor | Menu"
+end submenu_Ide
+
 on submenu_MyMenu
    return "Global | ScriptEditor | Recent | Custom | Menu"
 end submenu_MyMenu
-
-on _
-end _
-
-on menu_SetMenuGroup sObject, shortTitle
-   ide_SetScriptEditorTitles shortTitle
-end menu_SetMenuGroup
-
-on menu_EditIdeMenu sObject, mElement
-   ide_EditMenu mElement
-end menu_EditIdeMenu

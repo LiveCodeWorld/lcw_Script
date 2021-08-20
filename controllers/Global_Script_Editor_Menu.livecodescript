@@ -230,9 +230,9 @@ on menu_Go mTarget, whichStack
          break
       case "libOPN_Menus"
          go to stack "libOPN_Menus"
-         get menu_ListGlobalNames()
-         sort it
-         display_Lines it
+         --
+         display_EnvironmentMenus
+         --
          break
       case "libOPN_GIT"
          go to stack "libOPN_GIT"
