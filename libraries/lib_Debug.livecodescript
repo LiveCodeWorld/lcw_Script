@@ -14,6 +14,26 @@ the sequence of handlers that were involved in an actual execution of a script.
 */
 
 
+-->Working on
+-
+function debug_CallingObject pNum
+   if pNum is empty then put 2 into pNum
+   put (pNum + 2) * -1 into lineNum
+   get the executioncontexts
+   put item 1 of line lineNum of it into callingObject
+   return callingObject
+end debug_CallingObject
+
+function debug_GetCallingContextLine pNum
+   if pNum is empty then put 2 into pNum
+   put (pNum + 2) * -1 into lineNum
+   --
+   get the executioncontexts
+   put line lineNum of it into contextLine
+   return contextLine
+end debug_GetCallingContextLine
+
+
 --> Debug | Display | Events
 -
 on mDoubleUp_DebugHistory indexView, hName
@@ -179,21 +199,6 @@ function debug_GetCommentAbove
          return empty -- not a comment
    end switch
 end debug_GetCommentAbove
-
-function debug_GetCallingObject pNum
-   put debug_GetCallingContextLine (pNum) into contextLine
-   put item 1 of contextLine into callingObject
-   return callingObject
-end debug_GetCallingObject
-
-function debug_GetCallingContextLine pNum
-   if pNum is empty then put 1 into pNum
-   put (pNum + 2) * -1 into lineNum
-   --
-   get the executioncontexts
-   put line lineNum of it into contextLine
-   return contextLine
-end debug_GetCallingContextLine
 
 function debug_GetCallingHkey pNum
    if pNum is empty then put 1 into pNum
