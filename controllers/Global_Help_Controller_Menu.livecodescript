@@ -38,47 +38,6 @@ private command _Init mController
    put helpActive into LocalArray ["helpActive"]
 end _Init
 
-command launch_MenuControllerHelp mController, pDisplayView
-   put the menu_GlobalTitle of mController into gMenuTitle
-   if gMenuTitle is empty then return "Error, no menu_GlobalTitle for:" && mController
-   
-   -- put the help_Url [true] of mController into helpURL
-   put help_ConstructMenuUrl (gMenuTitle, true) into helpURL
-   if helpURL is not empty then
-      launch url helpURL
-      return helpURL
-   end if
-   
-   ask_CreateMenuPage mController, pDisplayView
-   put the result into helpURL
-   return helpURL
-end launch_MenuControllerHelp
-
-command ask_CreateMenuPage mController, pDisplayView
-   put the name of mController into oName
-   if pDisplayView is empty then
-      put rev_ScriptEditorStack () into pDisplayView
-   end if
-   get "Are you sure you wish to create the wiki help page for the script of [[oName]]? This will overwrite any existing page."
-   lcw_Answer it, pDisplayView, oName
-   
-   help_CreateMenuPage mController
-   put the result into helpURL
-   return helpURL
-end ask_CreateMenuPage
-
-command help_CreateMenuPage mController
-   put the menu_GlobalTitle of mController into gMenuTitle
-   if gMenuTitle is empty then return "Error, no menu_GlobalTitle for:" && mController
-   
-   ask_PushGithub mController
-   help_CreateMenuPage gMenuTitle, mController
-   --
-   put help_ConstructMenuUrl (gMenuTitle, true) into helpURL
-   launch url helpURL
-   return helpURL
-end help_CreateMenuPage
-
 
 --> Global | Help | Controller | Menu
 -
@@ -104,10 +63,10 @@ launch_ObjectHelp sObject
 end menu_UpdateCodeSection
 
 -- on menu_UpdateObjectHelp sObject
-   help_UpdateFromObject sObject
-   launch_ObjectHelp sObject
+help_UpdateFromObject sObject
+launch_ObjectHelp sObject
 end menu_UpdateObjectHelp
 
 -- on menu_UploadGraph sObject, sGraph
-   breakPoint
+breakPoint
 end menu_UploadGraph
