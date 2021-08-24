@@ -17,7 +17,7 @@ the sequence of handlers that were involved in an actual execution of a script.
 -->Working on
 -
 function debug_CallingObject pNum
-   if pNum is empty then put 2 into pNum
+   if pNum is empty then put 1 into pNum
    put (pNum + 2) * -1 into lineNum
    get the executioncontexts
    put item 1 of line lineNum of it into callingObject
@@ -25,7 +25,7 @@ function debug_CallingObject pNum
 end debug_CallingObject
 
 function debug_GetCallingContextLine pNum
-   if pNum is empty then put 2 into pNum
+   if pNum is empty then put 1 into pNum
    put (pNum + 2) * -1 into lineNum
    --
    get the executioncontexts

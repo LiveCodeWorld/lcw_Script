@@ -14,10 +14,6 @@ while you switch menu tool environments.*/
 -
 local LocalArray
 
-on menu_Init tObject
-   pass menu_Init
-end menu_Init
-
 getprop menu_Target [tObject]
    _Init
    put LocalArray ["sObject"] into sObject
@@ -47,6 +43,7 @@ private command _Init
    put sObject into LocalArray ["sObject"]
    --
    put the script_IsDifferent of sObject is true into LocalArray ["scriptIsDifferent"]
+   put the script_Type of sObject into LocalArray ["scriptType"]
 end _Init
 
 getprop disabled_DisplayLocalChanges [sObject]
@@ -119,9 +116,8 @@ end disabled_SaveRecentStacks
    return isNotProject
 end disabled_Create
 
-getprop disabled_MenuTools [scriptObject]
-   get the script_Type of scriptObject
-   if it = "controller" then
+getprop disabled_MenuTools [scriptObject]   
+   if LocalArray ["scriptType"]= "controller" then
       return false
    else
       return true
@@ -184,7 +180,13 @@ on submenu_Git
 end submenu_Git
 
 on submenu_Help
-   return "Global | Script | Help | Menu"
+   switch LocalArray ["scriptType"]
+      case "menu"
+      case "controller"
+         return "Global | Help | Controller | Menu"
+      default
+         return "Global | Help | Object | Menu"
+   end switch
 end submenu_Help
 
 on menu_SaveEdited
