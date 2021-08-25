@@ -22,18 +22,13 @@ getprop menu_Target [tObject]
    return hKey
 end menu_Target
 
-getprop disabled_DisplayHkeySvg [hKey]
-   put hkey_SvgFile (hKey) into svgFile
-   if there is a file svgFile then
-      return false
-   else
-      return true
-   end if
-end disabled_DisplayHkeySvg
-
 
 --> Global | ScriptEditor | List | Watch | Menu
 -
+on menu_Help
+   launch_MenuHelp
+end menu_Help
+
 on submenu_SendHkey
    return "Global | Hkey | Send | Menu"
 end submenu_SendHkey
@@ -57,10 +52,6 @@ on submenu_HandlerCalls
    return "Global | Handler | Calls | Menu"
 end submenu_HandlerCalls
 
-on menu_MenuHelp
-   launch_MenuHelp "Global | ScriptEditor | List | Authoring | Menu"
-end menu_MenuHelp
-
 on submenu_Dev
-   return menu_Create ("Global | Dev | ScriptEditor | List | Authoring | Menu")
+   return "Global | Dev | ScriptEditor | List | Authoring | Menu"
 end submenu_Dev

@@ -33,3 +33,7 @@ end _
 on submenu_Script
    return "Global | ScriptEditor | Script | Menu"
 end submenu_Script
+
+on menu_MenuHelp
+   launch_MenuHelp
+end menu_MenuHelp
