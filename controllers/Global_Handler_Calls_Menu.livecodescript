@@ -48,6 +48,10 @@ end _callFileExists
 
 --> Global | Handler | Calls | Menu
 -
+on submenu_Dependency
+   return "Global | Hkey | Dependency | Menu"
+end submenu_Dependency
+
 on menu_EditHandlerCalls hKey
    put hkey_CallsFile (hKey) into callsFile
    atom_DisplayFile callsFile
@@ -62,14 +66,14 @@ on menu_ListHandlerCalls hKey
   display_HandlerCalls hKey
 end menu_ListHandlerCalls
 
-on menu_RevealHandlerFolder hKey
-   put hkey_Folder (hKey) into handlerFolder
-   finder_Reveal handlerFolder
-end menu_RevealHandlerFolder
+on menu_CollectDependencies hKey
+   
+end menu_CollectDependencies
 
 on _
 end _
 
-on submenu_Dictionary
-   return "Global | Handler | Dictionary | Menu"
-end submenu_Dictionary
+on menu_RevealHandlerFolder hKey
+   put hkey_Folder (hKey) into handlerFolder
+   finder_Reveal handlerFolder
+end menu_RevealHandlerFolder

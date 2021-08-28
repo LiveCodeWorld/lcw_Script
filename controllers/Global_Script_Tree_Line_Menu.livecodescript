@@ -1,8 +1,8 @@
-﻿script "Global_Script_Tree_Line_Menu"
+﻿script "Global | Script | Tree | Line | Menu"
 --> MetaData
 -
 license: GPLv3
-name: Global_Script_Tree_Line_Menu
+name: Global | Script | Tree | Line | Menu
 type: controller
 version: 0.1
 

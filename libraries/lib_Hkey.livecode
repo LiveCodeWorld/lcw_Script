@@ -46,8 +46,28 @@ function script_HkeysFromAvailable handlerTable, someScript, pReturnHow
 end script_HkeysFromAvailable
 
 
---> Hkey | Type
+--> Hkey | Tests
 -
+function is_Hkey hKey
+   hkeyLine_Deconstruct hKey, hName, hType, hObject
+   if exists (hObject) is false then return false
+   if hType is not among the items of "g,s,c,m,f,pg,ps,pc,pm,pf" then return false
+   --
+   return true
+end is_Hkey
+
+function hKey_IsHandler hKey, handlerName, handlerType
+   if handlerType is empty then
+      return item 1 of hKey is handlerName
+   else
+      return item 1 of hKey is handlerName and item 2 of hKey is handlerType
+   end if
+end hKey_IsHandler
+
+function hKey_IsMissingProperty hKey
+   return item 2 of hKey is among the chars of "gs" and item 4 of hKey is "Missing"
+end hKey_IsMissingProperty
+
 function hkey_IsMenuHandler hKey
    -- not sure how best to check this
    put hkey_GetMenuTitle (hKey) into mTitle
@@ -58,6 +78,9 @@ function hkey_IsMenuHandler hKey
    end if
 end hkey_IsMenuHandler
 
+
+--> Hkey | Type
+-
 function hkey_GetMenuTitle hKey
    -- see also "script_MenuTitles"
    put hkey_GetSuiteTitle (hKey) into suiteTitle
@@ -382,13 +405,6 @@ function library_ConstructDisplayDataArray hKeys
 end library_ConstructDisplayDataArray
 
 
---> Hkey | Tests
--
-function is_Hkey hKey
-   return item 2 of hKey is among the items of "g,s,c,m,f,pg,ps,pc,pm,pf"
-end is_Hkey
-
-
 --> Work in Progress
 -
 function script_HkeyLineNumber hKey, pScript
@@ -663,18 +679,6 @@ command script_HandlerTableOffsets shortHkey, handlerTable, @startLineNum, @endL
    put 0 into handlerNum
    return false
 end script_HandlerTableOffsets
-
-function hKey_IsHandler hKey, handlerName, handlerType
-   if handlerType is empty then
-      return item 1 of hKey is handlerName
-   else
-      return item 1 of hKey is handlerName and item 2 of hKey is handlerType
-   end if
-end hKey_IsHandler
-
-function hKey_IsMissingProperty hKey
-   return item 2 of hKey is among the chars of "gs" and item 4 of hKey is "Missing"
-end hKey_IsMissingProperty
 
 function hkey_SearchDatabase hKey, pAskKwords
    -- was "script_SearchDatabase"

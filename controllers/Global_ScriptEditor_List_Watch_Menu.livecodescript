@@ -25,10 +25,6 @@ end menu_Target
 
 --> Global | ScriptEditor | List | Watch | Menu
 -
-on menu_Help
-   launch_MenuHelp
-end menu_Help
-
 on submenu_SendHkey
    return "Global | Hkey | Send | Menu"
 end submenu_SendHkey
@@ -36,6 +32,10 @@ end submenu_SendHkey
 on submenu_HelpMenu
    return "Global | Hkey | Help | Menu"
 end submenu_HelpMenu
+
+on menu_MenuHelp
+   launch_MenuHelp
+end menu_MenuHelp
 
 on _
 end _

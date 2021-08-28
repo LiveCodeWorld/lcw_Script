@@ -1,8 +1,8 @@
-﻿script "Global | Handler | Menu"
+﻿script "Global | Handler | Gist | Menu"
 --> MetaData
 -
 license: GPLv3
-name: Global | Handler | Menu
+name: Global | Handler | Gist | Menu
 type: controller
 version: 0.4
 
@@ -30,7 +30,7 @@ return exists (hObject)
 end menu_CheckTarget
 
 
---> Global | Handler | Menu
+--> Global | Handler | Gist | Menu
 -
 on menu_DeleteHandler hKey
    hkey_Deconstruct hKey, hName, hType, hObject, hNum

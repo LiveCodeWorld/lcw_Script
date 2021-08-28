@@ -74,39 +74,6 @@ end hkey_ListVersionNames
 
 --> hKey | Model | Arrays
 -
-/*
-A LinkArray is used to graph arrays. To do this LinkArrays provide a suite of tools that take complex keys and convert them into simple IDs,
-and dictionaries to translate from these IDS to the orginal keys.
-*/
-
-function hkey_GetLinkArray hKey, pOverlayName
-   put hkey_GetOverlayArray (hKey, pOverlayName) into overlayArray
-   put overlayArray ["data"]["linkArray"] into hkeyArray
-   return hkeyArray
-end hkey_GetLinkArray
-
-command hkey_SetLinkArray hKey, hkeyArray, pOverlayName
-   -- fixed to do a simple write
-   put hkey_FetchOverlayData (hKey) into overlayData
-   overlayData_NormalizeName pOverlayName, overlayData
-   --
-   put hkeyArray into overlayData [pOverlayName]["data"]["linkArray"]
-   --
-   hkey_SaveOverlayData hKey, overlayData
-   return overlayArray
-   
-   /*
-   -- makes no sense to set hkeyArray without setting the rest of the derived arrays
-   -- umm yes it does
-   put library_HandlerFile (hKey, empty, false) into overlayFolder
-   overlay_SetLinkArray overlayFolder, hkeyArray, pOverlayName, pGraphStyle
-   overlay_CreateGraph overlayFolder, hKeyArray, pOverlayName, pOverlayOf, pGraphStyle, pDotCluster, pMainstackHash, pImageFormat, pProcessObject
-   
-   put the result into overlayArray
-   return overlayArray
-   */
-end hkey_SetLinkArray
-
 function hkey_GetOverlayArray hKey, pOverlayName
    put hkey_FetchOverlayData (hKey) into overlayData
    overlayData_NormalizeName pOverlayName, overlayData

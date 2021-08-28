@@ -18,21 +18,26 @@ local LocalArray
 --> Menu | Props
 -
 getprop menu_Target [tObject]
-   -- called first
-   pass menu_Target
+   put the display_View of tObject into dView
+   return dView
 end menu_Target
 
-getprop menu_CheckTarget [mTarget]
-   -- use to do initialisation
-   pass menu_CheckTarget
-end menu_CheckTarget
+getprop disabled_EditHkey [dView]
+   put the selected_Line of dView into hKey
+   if is_Hkey (hKey) then
+      return false
+   else
+      return true
+   end if
+end disabled_EditHkey
 
 
 --> Global | Script | Dep | Line | Menu
 -
-on menu_TestChecked
-  put menu_GetChecked (the params)
-end menu_TestChecked
+on menu_EditHkey dView
+   put the selected_Line of dView into hKey
+   hkey_Edit hKey
+end menu_EditHkey
 
 on _
 end _

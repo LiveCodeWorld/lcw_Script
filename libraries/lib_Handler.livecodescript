@@ -119,7 +119,7 @@ function hkey_GetObjectHandler hKey, pNotPrivate
    return someHandler
 end hkey_GetObjectHandler
 
-function handler_Get hKey
+function handler_Get hKey, pMatchPrivate
    -- defaults to matching private or public
    hkey_Deconstruct hKey, hName, hType, hObject, hNum 
    try
