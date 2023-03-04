@@ -27,17 +27,18 @@ getprop menu_Target [tObject]
    return sObject
 end menu_Target
 
+getprop hkeyArrayGraph_Params
+   return "hierarchical,fast undirected spring"
+end hkeyArrayGraph_Params
+
 
 --> Global | Script | Dep | Menu
 -
-on menu_HkeyArrayGraph sObject
+on menu_HkeyArrayGraph sObject, graphStyle
    local pGraphStyle, pProcessObject, projectName
    --
-   -- display_CreateScriptObjectGraph sObject, projectName, pGraphStyle, pProcessObject, false
-   -- display_ObjectDepArray sObject
-   
    put LocalArray ["hkeyArray"] into hkeyArray
-   graph_CreateScriptObjectHkeyArray hkeyArray, sObject, "fast undirected spring"
+   graph_CreateScriptObjectHkeyArray hkeyArray, sObject, graphStyle
    put the result into svgFile
    --
    display_SVG svgFile

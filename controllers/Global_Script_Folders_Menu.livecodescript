@@ -10,7 +10,12 @@ version: 0.2
 --> Menu | Props
 -
 getprop menu_Target [tObject]
-   put scriptEditor_Object() into scriptObject
+   put the display_View of tObject into dView
+   if exists (dView) then
+      put the displayed_Object of dView into scriptObject
+   else
+      put scriptEditor_Object() into scriptObject
+   end if
    return scriptObject
 end menu_Target
 

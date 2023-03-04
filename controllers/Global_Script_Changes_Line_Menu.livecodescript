@@ -1,8 +1,8 @@
-﻿script "Global_Script_Changes_Line_Menu"
+﻿script "Global | Script | Changes | Line | Menu"
 --> MetaData
 -
 license: GPLv3
-name: Global_Script_Changes_Line_Menu
+name: Global | Script | Changes | Line | Menu
 type: controller
 version: 0.3
 

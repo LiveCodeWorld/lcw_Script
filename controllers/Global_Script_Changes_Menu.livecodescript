@@ -1,9 +1,9 @@
-﻿script "Global_Script_Changes_Menu"
+﻿script "Global | Script | Changes | Menu"
 --> MetaData
 -
 copyright: David Bovill
 license: GPLv3
-name: Global_Script_Changes_Menu
+name: Global | Script | Changes | Menu
 type: controller
 version: 0.3
 

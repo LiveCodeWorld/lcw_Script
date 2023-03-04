@@ -48,7 +48,9 @@ end checked_RecentButton
 on menu_RecentButton mTarget
    put rev_HistoryButton() into topRecentButton
    --
-   put scriptEditor_CompileButtonBehavior() into bObject
+   -- put scriptEditor_CompileButtonBehavior() into bObject
+   put scriptEditor_HistoryButtonBehavior() into bObject
+   --
    set the behavior of topRecentButton to bObject
 end menu_RecentButton
 

@@ -1,7 +1,7 @@
 ﻿script "lib_ScriptFetch"
 --> MetaData
 -
-copyright: David bovill
+copyright: David Bovill
 license: GPLv3
 name: lib_ScriptFetch
 type: library
@@ -20,7 +20,7 @@ A modern library for getting and fetching scripts.
 function hkey_CollectFromObjects hKeys, pSort
    local newScript
    put word 1 to -1 of hKeys into hKeys
-   if pSort is true then sort hKeys by item 1 of each
+   if pSort is true then hkey_SortIndex hKeys
    repeat for each line hKey in hKeys
       put handler_Get (hKey) into someHandler
       text_AddParagraph someHandler, newScript

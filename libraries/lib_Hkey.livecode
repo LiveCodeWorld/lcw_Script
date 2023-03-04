@@ -19,6 +19,12 @@ with the "script_" extension being replaces by "hkey_"
 
 --> Working on
 -
+command hkey_SortIndex @hKeys
+   sort hKeys by word -1 of each
+   sort hKeys by word 2 of each
+   sort hKeys by word 1 of each
+end hkey_SortIndex
+
 function script_HkeysFromAvailable handlerTable, someScript, pReturnHow
    repeat for each line someLine in handlerTable
       put word 1 of someLine into handlerType

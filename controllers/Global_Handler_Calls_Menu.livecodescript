@@ -66,9 +66,9 @@ on menu_ListHandlerCalls hKey
   display_HandlerCalls hKey
 end menu_ListHandlerCalls
 
-on menu_CollectDependencies hKey
-   
-end menu_CollectDependencies
+on menu_CollectDepScript hKey
+   display_HkeyDepScript hKey
+end menu_CollectDepScript
 
 on _
 end _

@@ -40,6 +40,12 @@ on menu_ListScriptDeps sObject
    display_ScriptDeps sObject
 end menu_ListScriptDeps
 
+on menu_DisplayLocalChanges scriptObject
+   put the script of scriptObject into nowScript
+   put the exported_Script of scriptObject into exportedScript
+   terminal_Diff exportedScript, nowScript, "the exported_Script of mTarget", "the script of mTarget"
+end menu_DisplayLocalChanges
+
 on _
 end _
 
