@@ -30,6 +30,10 @@ end insert_HeaderMenu
 on _
 end _
 
+on submenu_Card
+   return "Global | Card | Menu"
+end submenu_Card
+
 on submenu_Script
    return "Global | ScriptEditor | Script | Menu"
 end submenu_Script

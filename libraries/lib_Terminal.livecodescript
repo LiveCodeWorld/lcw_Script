@@ -1,7 +1,7 @@
 ﻿script "lib_Terminal"
 --> MetaData
 -
-copyright: Anonymous
+copyright: David Bovill
 license: GPLv3
 name: lib_Terminal
 type: library
@@ -35,9 +35,15 @@ command terminal_PasteScript shellScript, pDelayTime
    replace "'" with quote in mScript
    --
    do mScript as AppleScript
-   put the result into someText
+   put the result into someError
    --
-   return mScript
+   switch someError
+      case "execution error"
+         return someError & CR&CR & mScript
+         break
+      default
+         return mScript
+   end switch
 end terminal_PasteScript
 
 command terminal_PasteInNewTab shellScript, pDelayTime
