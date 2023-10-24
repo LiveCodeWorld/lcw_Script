@@ -23,10 +23,6 @@ getprop editIdeBehavior_Params
    return stackNames
 end editIdeBehavior_Params
 
-getprop checked_SetSimple
-   return mArray_GetSimple()
-end checked_SetSimple
-
 getprop editMenu_Params
    put ide_ListMenuElements() into shortNames
    return shortNames
@@ -66,8 +62,3 @@ end submenu_SetIdeBehavior
 on menu_RestIdeMenus
    ide_ResetMenus
 end menu_RestIdeMenus
-    
-on menu_SetSimple
-   put mArray_GetSimple() is false into isSimple
-   mArray_SetSimple isSimple
-end menu_SetSimple

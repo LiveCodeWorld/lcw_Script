@@ -1,1 +1,62 @@
-<!DOCTYPE html><html lang="en"><head>    <meta charset="UTF-8">    <meta http-equiv="X-UA-Compatible" content="IE=edge">    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <style>        @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300);        body {            font-family: 'Open Sans', sans-serif;            font-weight: 400;        }        div {            width: 480px;            margin: 5em auto 2.5em;        }        div:first-child {            margin-top: 3em;        }        .tagcloud01 ul {            margin: 0;            padding: 0;            list-style: none;        }        .tagcloud ul li {            display: inline-block;            margin: 0 .3em .3em 0;            padding: 0;        }        .tagcloud01 ul li a {            display: inline-block;            max-width: 100px;            height: 28px;            line-height: 28px;            padding: 0 1em;            background-color: #fff;            border: 1px solid #aaa;            border-radius: 3px;            white-space: nowrap;            text-overflow: ellipsis;            overflow: hidden;            color: #333;            font-size: 13px;            text-decoration: none;            -webkit-transition: .2s;            transition: .2s;        }        .tagcloud ul li a:hover {            background-color: #3498db;            border: 1px solid #3498db;            color: #fff;        }    </style>    <title>Document</title></head><body>        <ul>            <li><a href="#">tag</a></li>        </ul></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300);
+        body {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 400;
+        }
+        div {
+            width: 480px;
+            margin: 5em auto 2.5em;
+        }
+        div:first-child {
+            margin-top: 3em;
+        }
+
+        .tagcloud01 ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .tagcloud ul li {
+            display: inline-block;
+            margin: 0 .3em .3em 0;
+            padding: 0;
+        }
+        .tagcloud01 ul li a {
+            display: inline-block;
+            max-width: 100px;
+            height: 28px;
+            line-height: 28px;
+            padding: 0 1em;
+            background-color: #fff;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            color: #333;
+            font-size: 13px;
+            text-decoration: none;
+            -webkit-transition: .2s;
+            transition: .2s;
+        }
+        .tagcloud ul li a:hover {
+            background-color: #3498db;
+            border: 1px solid #3498db;
+            color: #fff;
+        }
+    </style>
+    <title>Document</title>
+</head>
+<body>
+        <ul>
+            <li><a href="#">tag</a></li>
+        </ul>
+</body>
+</html>

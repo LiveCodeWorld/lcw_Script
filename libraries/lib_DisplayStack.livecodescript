@@ -351,7 +351,7 @@ function stack_OutlineFromObjectArray objectArray
    repeat for each key objectName in objectArray
       put objectArray [objectName] into someObject
       object_Deconstruct someObject, someControl, cardObject, stackName
-      array_AddToIndex objectName, stackName, stackArray
+      indexArray_Add objectName, stackName, stackArray
    end repeat
    put array_ExpandSorted(stackArray, true) into stackOutline
    return stackOutline

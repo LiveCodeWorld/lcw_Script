@@ -1,0 +1,32 @@
+digraph G {
+    splines=ortho; edgesep=1; ranksep=0.2; nodesep=1
+    node [shape = circle];
+    node [fontname="Arial" fontsize="8" fixedsize="true" width="1.2" height="1.2"];
+    edge [arrowhead=vee; arrowsize="0.5"]
+
+    n0 [label="Configuración \n de usuarios", color="#455A64"; style="filled"; fillcolor="#0097A7"; fontcolor="white"];
+    n1 [label="Grupos usuarios \n finanzas", color="#455A64"; style="filled"; fillcolor="#FFA000"; fontcolor="black"; fontcolor="white"];
+    n2 [label="Grupos usuarios \n gestión", color="#455A64"; style="filled"; fillcolor="#C2185B"; fontcolor="black"; fontcolor="white"];
+    n3 [label="Permisos", shape="box"; width="2.5"; height="0.3"; color="#455A64"];
+    n4 [label="Valores", shape="box"; width="2.5"; height="0.3"; color="#455A64"];
+    n5 [label="Agrupaciones \n de permisos", shape="box"; width="2.5"; height="0.3"; color="#455A64"; style="filled"; fillcolor="#4CAF50"; fontcolor="white"];
+    n6 [label="Preferencias \n y parámetros", shape="box"; width="2.5"; height="0.3"; color="#455A64"; style="filled"; fillcolor="#607D8B"; fontcolor="white"];
+    n7 [label="wic_conf", shape="box"; width="2.5"; height="0.3"; color="#00695C"];
+    n8 [label="usuario", shape="box"; width="2.5"; height="0.3"; color="#00695C"];
+
+    {rank=same; n1; n2; n0};
+
+    n1 -> n0
+    n0 -> n2 [dir="back"]
+    n5 -> n1
+    n5 -> n2
+    n3 -> n4 [dir="back"]
+    n5 -> n3 [dir="back"]
+    n1 -> n6 [dir="back"]
+    n2 -> n6 [dir="back"]
+    n7 -> n8 [dir="back"]
+    n0 -> n7 [dir="back"]
+    n8 -> n6 [dir="back", style="invis"]
+    n4 -> n0 [dir="back", style="invis"]
+
+}

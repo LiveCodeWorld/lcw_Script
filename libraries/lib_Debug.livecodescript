@@ -77,10 +77,6 @@ command display_DebugHistory pDisplayTitle, pAlsoArray
    set the line_Menu of indexView to "Global | Debug | Tree | Line | Menu"
    set the debug_HistoryArray of indexView to debugHistoryArray
    --
-   if the shiftKey is "down" then
-      breakpoint
-   end if
-   --
    return indexView
 end display_DebugHistory
 

@@ -15,19 +15,23 @@ This library is for displaying and editing script templates that use the "lib_Sc
 -
 command display_ScriptTemplate templateName, pDisplayView, pMenuTitle
    if pMenuTitle is empty then put "Global | Script | Template | Menu" into pMenuTitle
-   put scaffold_GetFile (templateName) into someFile
+   if the shiftKey is "Down" then
+      put scaffold_GetUrl (templateName) into someUrl
+      put url someUrl into someText
+      --
+      scaffold_SetTemplate templateName, someText
+   else
+      put scaffold_GetTemplate (templateName) into someText
+   end if
    --
    if exists (pDisplayView) then
-      lock screen
-      put "file:" & someFile into someUrl
-      put url someUrl into someText
-      set the displayed_Text of pDisplayView to someText
+      set the displayed_Text [templateName] of pDisplayView to someText
       --
+      put scaffold_GetFile (templateName) into someFile
       set the displayed_File of pDisplayView to someFile
-      set the title_Text of pDisplayView to templateName
       set the menu_Title of pDisplayView to pMenuTitle
-      unlock screen
    else
+      put scaffold_GetFile (templateName) into someFile
       display_TextFile someFile, templateName, pMenuTitle, "Script Template"
       put the result into pDisplayView
    end if

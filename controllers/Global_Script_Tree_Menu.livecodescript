@@ -46,7 +46,7 @@ on menu_DisplayLocalChanges scriptObject
    terminal_Diff exportedScript, nowScript, "the exported_Script of mTarget", "the script of mTarget"
 end menu_DisplayLocalChanges
 
-on _
+private on _
 end _
 
 on menu_EditObjectScript sObject

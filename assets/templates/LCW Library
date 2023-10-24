@@ -1,1 +1,28 @@
---> MetaData-copyright: [[AuthorName]]license: GPLv3name: [[libStackName]]type: libraryversion: 0.1/*Some help*/getprop dep_StackNames   return ""end dep_StackNames--> Working on---> [[defaultScriptSectionTitle]]---> Deps-
+--> MetaData
+-
+copyright: [[AuthorName]]
+license: GPLv3
+name: [[libStackName]]
+type: library
+version: 0.1
+
+
+/*
+Some help
+*/
+
+getprop dep_StackNames
+   return ""
+end dep_StackNames
+
+
+--> Working on
+-
+
+
+--> [[defaultScriptSectionTitle]]
+-
+
+
+--> Deps
+-

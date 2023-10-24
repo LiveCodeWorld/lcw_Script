@@ -11,11 +11,14 @@ version: 0.3
 -
 local LocalArray
 
-on menu_Init tObject   
+getprop menu_Target [tObject]   
    put scaffold_ListShortFiles() into shortTemplateFiles
    sort shortTemplateFiles
    put shortTemplateFiles into LocalArray ["shortTemplateFiles"]
-end menu_Init
+   --
+   put the display_View of tObject into indexView
+   return indexView
+end menu_Target
 
 
 --> Menu | Props
@@ -70,18 +73,7 @@ end text_EditFile
 
 --> Global | Script | Template | Menu
 -
-on menu_SetMenu displayView
-   put "Global | HTML | TagCloud | Menu" into gMenuTitle
-   put lcw_Ask ("Choose a menu for this template:", gMenuTitle) into gMenuTitle
-   --
-   set the scaffold_MenuTitle of displayView to gMenuTitle
-end menu_SetMenu
-
-on _
-end _
-
 on menu_DisplayTemplate displayView, templateName
-   if the shiftkey is "Down" then put empty into displayView
    display_ScriptTemplate templateName, displayView
 end menu_DisplayTemplate
 
@@ -91,16 +83,16 @@ end menu_NewTemplateFromClipboard
 
 on menu_DeleteTemplate textDisplayView, templateName
    put merge ("Are you sure you want to delete the script template '[[templateName]]'. This cannot be undone!") into someWarning
-   answer warning someWarning with "OK" or "Cancel"
+   answer warning someWarning with "OK" or "Cancel" as sheet
    if it is "Cancel" then exit to top
    
    scaffold_DeleteTemplate templateName
    put the result into deletedFile
-   answer merge ("Deleted stored template script '[[templateName]]'!")
+   answer merge ("Deleted stored template script '[[templateName]]'!") as sheet
 end menu_DeleteTemplate
 
-on _
-end _
+private on __
+end __
 
 on menu_Save indexView
    scaffold_SaveDisplayed indexView
@@ -110,6 +102,21 @@ on menu_Save indexView
    --
    lcw_Notify merge ("Stored text as scaffold template '[[templateName]]'")
 end menu_Save
+
+-- on menu_SaveBinary indexView
+   put the title_Text of indexView into templateName
+   put ".gv" after templateName
+   --
+   put the displayed_Text of indexView into someText
+   scaffold_GetTemplate templateName, someText
+   put the result into newUrl
+   --
+   put scaffold_GetTemplate (templateName) into someText
+   set the displayed_Text of indexView to someText
+   --
+   set the displayed_Url of indexView to newUrl
+   set the title_Text of indexView to templateName
+end menu_SaveBinary
 
 on menu_SaveAs indexView
    put the view_Text of indexView into someScript
@@ -126,79 +133,9 @@ on menu_SaveAs indexView
    set the title_Text of indexView to templateName
 end menu_SaveAs
 
-on _
-end _
+private on ___
+end ___
 
 on submenu_Dev
-   return "Dev | Menu"
+   return menu_DevTitle ("Global | Script | Template | Menu")
 end submenu_Dev
-
-
---> Dev | Menu
--
-on menu_EditBehavior displayView
-   put the behavior of displayView into bObject
-   edit the script of bObject
-end menu_EditBehavior
-
-on menu_DisplayBrowser
-   display_ScaffoldHtml "Rough Blue"
-end menu_DisplayBrowser
-
-on menu_TextEditTemplate mTarget
-   put the displayed_File of mTarget into someFile  
-   text_EditFile someFile
-end menu_TextEditTemplate
-
-on menu_AtomEditTemplate mTarget, templateName
-   put scaffold_GetFolder (templateName) into someFile
-   atom_DisplayFile someFile
-   return the result
-end menu_AtomEditTemplate
-
-on _
-end _
-
-on menu_CopyTemplateToClipboard indexView
-   put the title_Text of indexView into templateName
-   --
-   put the view_Text of indexView into displayedScript
-   put scaffold_GetTemplate (templateName) into templateScript
-   if displayedScript is not templateScript then
-      lcw_Answer "The stored and dispayed tmeplates differ. Do you want to continue and use the displayed version?"
-   end if
-   --
-   set the clipboarddata ["text"] to displayedScript
-   --
-   lcw_Notify "Template copied to clipboard!"
-end menu_CopyTemplateToClipboard
-
-on menu_TestMergeScriptToClipboard mTarget
-   put the title_Text of textDisplayView into templateName
-   --
-   put scaffold_GetTemplate (templateName) into templateScript
-   
-   -- could get all the script metadata
-   put lcw_GetAuthor() into ObjectAuthor
-   put scriptEditor_Object() into scriptObject
-   put the view_Name of scriptObject into viewName
-   --
-   put merge (templateScript) into someScript
-   --
-   set the clipboarddata ["text"] to merge (someScript)
-   put someScript
-   lcw_Notify "Script copied to clipboard!"
-end menu_TestMergeScriptToClipboard
-
-on _
-end _
-
-on menu_RevealTemplateFolder
-   put scaffold_GetFolder() into someFolder
-   finder_Reveal someFolder
-end menu_RevealTemplateFolder
-
-on menu_TopLevel textDisplayView
-   put the stack_Name of textDisplayView into stackName
-   toplevel stackName
-end menu_TopLevel

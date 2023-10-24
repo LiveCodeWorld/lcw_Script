@@ -1,0 +1,30 @@
+digraph G {
+    splines=ortho;  edgesep=0.5; ranksep=0.2; nodesep=0.5
+    node [fontname="Arial" fontsize="10" shape="box" width=1.5 color="#616161"];
+    edge [arrowhead=vee; arrowsize="0.5"]
+    rankdir=TB
+
+    n1 [label="Artículo", color="#00695C"];
+    n2 [label="Variable logística VL"; color="#0097A7";];
+    n3 [label="Almacén"; color="#FFA000";];
+    n4 [label="Proveedores",style="filled";  fillcolor="#C2185B"; fontcolor="white"; ];
+    n5 [label="Niveles de stock"; style="filled"; fillcolor="#455A64"; fontcolor="white"; fillcolor="#0097A7"];
+    n6 [label="Reposición automática", style="filled"; fillcolor="#00BCD4"; fontcolor="white"];
+    n7 [label="Propuesta de reposición",  style="filled"; fillcolor="#455A64"; fontcolor="white"; fillcolor="#4CAF50"];
+    n8 [label="Pedido de reposición",  style="filled"; fillcolor="#455A64"; fontcolor="white"; fillcolor="#607D8B"];
+    point [shape="point"; label=""; height=0; width=0]
+
+    subgraph clusterA {n1 n2 n3 }
+     
+    {rank=same; n8; n4};
+    
+    n4 -> n1;
+    n1 -> point [ arrowhead="none" ];
+    n2 -> point[ arrowhead="none" ];
+    n3 -> point[ arrowhead="none" ];
+    point -> n5 
+    n5 -> n6 -> n7 -> n8
+    n8 -> n4
+    n6 -> n8
+    n4 -> n1
+}

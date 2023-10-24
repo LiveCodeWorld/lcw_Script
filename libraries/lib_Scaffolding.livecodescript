@@ -29,6 +29,41 @@ setprop scaffold_MenuTitle gMenuTitle
 end scaffold_MenuTitle
 
 
+--> Scaffold | Model
+-
+function scaffold_GetTemplate tName
+   put scaffold_GetBinaryUrl (tName) into someUrl
+   put url someUrl into utf8Text
+   put textDecode (utf8Text, "UTF-8") into someText
+   return someText
+end scaffold_GetTemplate
+
+command scaffold_SetTemplate tName, someText
+   put scaffold_GetBinaryUrl (tName) into someUrl
+   put textEncode (someText, "UTF-8") into utf8Text
+   put utf8Text into url someUrl
+   return someUrl
+end scaffold_SetTemplate
+
+-- function scaffold_GetTemplate tName
+   put scaffold_GetUrl (tName) into someUrl
+   put url someUrl into someScript
+   return someScript
+end scaffold_GetTemplate
+
+-- command scaffold_SetTemplate tName, someText
+   put scaffold_GetUrl (tName) into someUrl
+   put someText into url someUrl
+   return someUrl
+end scaffold_SetTemplate
+
+command scaffold_DeleteTemplate tName
+    put scaffold_GetFile (tName) into someFile
+    delete file someFile
+    return someFile
+end scaffold_DeleteTemplate
+
+
 --> Script Template
 -
 function scaffold_ListShortFiles
@@ -39,7 +74,13 @@ end scaffold_ListShortFiles
 
 
 --> Script Template | Files
- -
+-
+function scaffold_GetBinaryUrl tName
+   put scaffold_GetFile (tName) into someFile
+   put "binfile:" & someFile into someURL
+   return someURL
+end scaffold_GetBinaryUrl
+
 function scaffold_GetUrl tName
    put scaffold_GetFile (tName) into someFile
    put "file:" & someFile into someURL
@@ -57,24 +98,3 @@ function scaffold_GetFolder
    put asset_GetFolder (projectFolder, "templates") into templateFolder
    return templateFolder
 end scaffold_GetFolder
-
-
---> Scaffold | Model
--
-function scaffold_GetTemplate tName
-   put scaffold_GetUrl (tName) into someUrl
-   put url someUrl into someScript
-   return someScript
-end scaffold_GetTemplate
-
-command scaffold_SetTemplate tName, someText
-   put scaffold_GetUrl (tName) into someUrl
-   put someText into url someUrl
-   return someUrl
-end scaffold_SetTemplate
-
-command scaffold_DeleteTemplate tName
-    put scaffold_GetFile (tName) into someFile
-    delete file someFile
-    return someFile
-end scaffold_DeleteTemplate
