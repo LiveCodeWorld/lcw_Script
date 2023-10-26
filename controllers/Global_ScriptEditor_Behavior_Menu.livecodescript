@@ -1,14 +1,15 @@
 ﻿script "Global | ScriptEditor | Behavior | Menu"
 --> MetaData
 -
-copyright: Anonymous
+copyright: David Bovill
 license: GPLv3
 name: Global | ScriptEditor | Behavior | Menu
 type: controller
-version: 0.1
+version: 0.3
 
-/*Here you can describe this menu.
-Full help text should be provided on the linked wiki.*/
+/*
+This menu lets you access intereting IDE behaviors.
+.*/
 
 
 --> Variables
@@ -18,6 +19,11 @@ local LocalArray
 
 --> Menu | Init
 -
+getprop menu_Target [seTarget]
+   put the se_DisplayedObject of seTarget into sObject
+   return sObject
+end menu_Target
+
 getprop checked_HandlerField
    put rev_HandlerTreeField() into topHanderField
    if exists (topHanderField) is false then return false
@@ -42,9 +48,30 @@ getprop checked_RecentButton
    return someBoolean
 end checked_RecentButton
 
+getprop disabled_AfterActionCompile [sObject]
+   put exists (stack "behavior_RevSEStackBehavior") into bExists
+   return bExists is false
+end disabled_AfterActionCompile
+
+getprop checked_AfterActionCompile
+   put the behavior of stack "revSEStackBehavior" into bObject
+   return bObject = the name of stack "behavior_RevSEStackBehavior"
+end checked_AfterActionCompile
+
 
 --> Global | ScriptEditor | Behavior | Menu
 -
+on menu_AfterActionCompile sObject
+   -- actionCompile
+   put the name of stack "behavior_RevSEStackBehavior" into actionBehavior
+   put the behavior of stack "revSEStackBehavior" into bObject
+   if actionBehavior = bObject then
+      set the behavior of stack "revSEStackBehavior" to empty
+   else
+      set the behavior of stack "revSEStackBehavior" to actionBehavior
+   end if
+end menu_AfterActionCompile
+
 on menu_RecentButton mTarget
    put rev_HistoryButton() into topRecentButton
    --
@@ -66,3 +93,15 @@ on menu_HandlerField mTarget
       set the behavior of topHanderField to bObject
    end if
 end menu_HandlerField
+
+private command _
+end _
+
+on menu_EditAfterActionBehavior sObject
+   put the name of stack "behavior_RevSEStackBehavior" into actionBehavior
+   edit the script of actionBehavior
+end menu_EditAfterActionBehavior
+
+on submenu_Dev
+   return menu_DevTitle ("Global | ScriptEditor | Behavior | Menu")
+end submenu_Dev

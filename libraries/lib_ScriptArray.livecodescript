@@ -1,10 +1,12 @@
 ﻿script "lib_ScriptArray"
 --> MetaData
 -
-license: GPLv3
 name: lib_ScriptArray
 type: library
 version: 0.5
+author: David Bovill
+copyright: David Bovill
+license: GPLv3
 
 
 --> Working on

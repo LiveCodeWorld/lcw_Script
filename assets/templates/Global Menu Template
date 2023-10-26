@@ -22,10 +22,9 @@ getprop menu_Target [tObject]
    return the display_View of tObject
 end menu_Target
 
-getprop menu_IsSimple
+getprop menu_CheckTarget
    return true
-end menu_IsSimple
-
+end menu_CheckTarget
 
 --> [[mTitle]]
 -
@@ -40,6 +39,13 @@ end _
 on menu_MenuEdit displayView
    menu_Edit "[[mTitle]]"
 end menu_MenuEdit
+
+on submenu_Dev
+   return menu_DevTitle ("[[mTitle]]")
+end submenu_Dev
+
+private on __
+end __
 
 on submenu_Dev
    return menu_DevTitle ("[[mTitle]]")

@@ -14,9 +14,18 @@ while you switch menu tool environments.*/
 -
 local LocalArray
 
-getprop menu_Target [tObject]
+getprop menu_Target [seTarget]
+   put seTarget into LocalArray ["seTargetControl"]
+   put the se_Stack of seTarget into seStack
+   put seStack into LocalArray ["seStack"]
+   put the se_DisplayedObject of seTarget into sObject
+   -- put scriptEditor_Object() into sObject
+   put sObject into LocalArray ["sObject"]
+   --
+   put the script_IsDifferent of sObject is true into LocalArray ["scriptIsDifferent"]
+   put the script_Type of sObject into LocalArray ["scriptType"]
+   --
    _Init
-   put LocalArray ["sObject"] into sObject
    return sObject
 end menu_Target
 
@@ -38,19 +47,13 @@ private command _Init
    objects_MakeFriendly historyObjects, orderedFriendlyObjects, friendlyArray
    put friendlyArray into LocalArray ["friendlyArray"]
    put keys (friendlyArray) into LocalArray ["recentObjects"]
-   --
-   put scriptEditor_Object() into sObject
-   put sObject into LocalArray ["sObject"]
-   --
-   put the script_IsDifferent of sObject is true into LocalArray ["scriptIsDifferent"]
-   put the script_Type of sObject into LocalArray ["scriptType"]
 end _Init
 
 getprop disabled_DisplayLocalChanges [sObject]
    if LocalArray ["scriptIsDifferent"] then
       return false
    else
-      return "delete"
+      return true -- "delete"
    end if
 end disabled_DisplayLocalChanges
 
@@ -72,8 +75,8 @@ getprop recentScripts_Params
    return recentObjects
 end recentScripts_Params
 
-getprop disabled_ObjectProperties [scriptObject]
-   put the stack_Name of scriptObject into stackName
+getprop disabled_ObjectProperties [sObject]
+   put the stack_Name of sObject into stackName
    if the scriptonly of stack stackName is true then
       return "delete"
    else
@@ -109,14 +112,7 @@ getprop disabled_SaveRecentStacks
    end if
 end disabled_SaveRecentStacks
 
--- getprop disabled_Create [scriptObject]
-   -- get the script_Type of scriptObject
-   put the project_Name of scriptObject into projectName
-   put projectName is empty into isNotProject
-   return isNotProject
-end disabled_Create
-
-getprop disabled_MenuTools [scriptObject]   
+getprop disabled_MenuTools [sObject]
    if LocalArray ["scriptType"]= "controller" then
       return false
    else
@@ -144,15 +140,15 @@ command objects_MakeFriendly someObjects, @orderedFriendlyObjects, @friendlyArra
    delete the last char of orderedFriendlyObjects
 end objects_MakeFriendly
 
-function object_MakeFriendly scriptObject
+function object_MakeFriendly sObject
    -- same as Script Editor" function "seFriendlyObject"
-   put word 1 of the name of scriptObject & space into tFriendlyName
+   put word 1 of the name of sObject & space into tFriendlyName
    
-   if the name of scriptObject is the short name of scriptObject then
+   if the name of sObject is the short name of sObject then
       -- This means that the object essentially has no name, eg its name is: card id 1002 or similar.
-      put word -1 of the short name of scriptObject after tFriendlyName
+      put word -1 of the short name of sObject after tFriendlyName
    else
-      put quote & the short name of scriptObject & quote after tFriendlyName
+      put quote & the short name of sObject & quote after tFriendlyName
    end if
    return tFriendlyName
 end object_MakeFriendly
@@ -160,13 +156,11 @@ end object_MakeFriendly
 
 --> Global | ScriptEditor | Header | Menu
 -
-on menu_DisplayLocalChanges scriptObject
-   put the script of scriptObject into nowScript
-   put the exported_Script of scriptObject into exportedScript
-   terminal_Diff exportedScript, nowScript, "the exported_Script of mTarget", "the script of mTarget"
+on menu_DisplayLocalChanges sObject
+   display_ScriptIsDifferent sObject
 end menu_DisplayLocalChanges
 
-on menu_RecentScripts scriptObject, recentObject
+on menu_RecentScripts sObject, recentObject
    put LocalArray ["friendlyArray"][recentObject] into someObject
    if exists (someObject) then
       edit the script of someObject
@@ -189,11 +183,24 @@ on submenu_Help
    end switch
 end submenu_Help
 
+on menu_Clean sObject
+   put LocalArray ["seStack"] into seStack
+   lcw_Answer "Sure you want to format and clean start and end handler lines of [[sName]]", seStack, sObject
+   --
+   put the short name of seStack into seName
+   se_Clean seName, true, true
+   --
+   put the script_Diff of sObject into uDiff
+   if uDiff is not empty then
+      display_ScriptDiff sObject, 3
+   end if
+end menu_Clean
+
 on menu_SaveEdited
    stack_SaveEdited "all"
 end menu_SaveEdited
 
-on _
+private on _
 end _
 
 on submenu_Display
@@ -208,8 +215,8 @@ on submenu_MenuTools
    return "Global | MenuTools | Menu"
 end submenu_MenuTools
 
-on _
-end _
+private on __
+end __
 
 on submenu_Go
    return "Global | ScriptEditor | Go | Menu"
@@ -223,6 +230,13 @@ on submenu_Ide
    return "Global | ScriptEditor | Menu"
 end submenu_Ide
 
-on submenu_MyMenu
-   return "Global | ScriptEditor | Recent | Custom | Menu"
+-- on submenu_MyMenu
+return "Global | ScriptEditor | Recent | Custom | Menu"
 end submenu_MyMenu
+
+private on ___
+end ___
+
+on submenu_Dev
+   return menu_DevTitle()
+end submenu_Dev

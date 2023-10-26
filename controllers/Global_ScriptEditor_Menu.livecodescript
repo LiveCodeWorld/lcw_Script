@@ -18,10 +18,10 @@ local LocalArray
 
 --> Menu | Props
 -
-getprop editIdeBehavior_Params
+getprop editHackBehavior_Params
    put project_ListBehaviorStackNames ("lcw") into stackNames
    return stackNames
-end editIdeBehavior_Params
+end editHackBehavior_Params
 
 getprop editMenu_Params
    put ide_ListMenuElements() into shortNames
@@ -37,6 +37,10 @@ getprop menuSet_Params
    return shortNames
 end menuSet_Params
 
+getprop editIdeBehavior_Params
+   return ide_ListToolBarBehaviorNames()
+end editIdeBehavior_Params
+
 
 --> Global | ScriptEditor | Menu
 -
@@ -48,16 +52,23 @@ on menu_MenuSet mTarget, mTitle
    ide_SetScriptEditorTitles mTitle
 end menu_MenuSet
 
-on _
+private command _
 end _
-
-on menu_EditIdeBehavior sObject, stackName
-   edit the script of stack stackName
-end menu_EditIdeBehavior
 
 on submenu_SetIdeBehavior
    return "Global | ScriptEditor | Behavior | Menu"
 end submenu_SetIdeBehavior
+
+on menu_EditIdeBehavior mTarget, bName
+   edit the script of stack bName
+end menu_EditIdeBehavior
+
+on menu_EditHackBehavior sObject, stackName
+   edit the script of stack stackName
+end menu_EditHackBehavior
+
+private command __
+end __
 
 on menu_RestIdeMenus
    ide_ResetMenus

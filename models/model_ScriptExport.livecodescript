@@ -25,13 +25,66 @@ For now we look to move all access to this model so we can make changes globally
 Uses "script_ExportAndIndexMenus"
 
 For old name format you can change ShortHandlerFile = "script.txt" -- old and "_ConstructHandlerFile" to "_ConstructOldHandlerFile"
+
+private command hack_UpdateBinFile @someData, someFile
+   if someData contains numtochar (13) then
+      -- old "file" export
+      breakpoint
+      replace numtochar (13) with CR in someData
+      put someData into url ("binfile:" & someFile)
+   end if
+end hack_UpdateBinFile
 */
 
 --> Variables
 -
 local LocalArray -- used by the script_MergeLines function to restore the original script
 constant ShortHandlerFile = "lcw_Handler.txt" -- new
--- constant ShortHandlerFile = "script.txt" -- old
+
+
+--> Working on
+-
+getprop script_IsDifferent
+   -- even if the only difference is whitespace (we tolerate empty space at start and end of scripts)
+   -- which means a diff program may show no diference when this returns true
+   put the long id of the target into targetObject
+   try
+      put the script of targetObject into someScript
+      put the exported_Script of targetObject into exportedScript
+      --
+      -- get DiffCompare (someScript, exportedScript, 0) into uDiff
+      --
+      if exportedScript is empty then return false -- added as if there is no exported script to compare it is no different
+      put word 1 to -1 of exportedScript is not word 1 to -1 of someScript into someBoolean
+      return someBoolean
+   catch someError
+      return empty  -- script may be protected
+   end try
+end script_IsDifferent
+
+/*
+Not unicode compiant - but scripts should be ascii?
+
+These work for handlers and scripts.
+If you use these handlers then we have a single place to test / switch / ensure we use the correct binary or text encoding for stored script files.
+At one time Git was not dealing with Livecode OSX files for instance.
+*/
+function text_Get someFile
+   -- was "script_FetchRaw"
+   -- put url ("binfile:" & someFile) into someText
+   put url ("file:" & someFile) into someText
+   return someText
+end text_Get
+
+command text_Set someFile, someText
+   put someFile into scriptFolder
+   set the itemdelimiter to slash
+   put empty into item -1 of scriptFolder
+   folder_CreateNested scriptFolder
+   -- put word 1 to -1 of someText into url ("binfile:" & scriptFile)
+   put word 1 to -1 of someText into url ("file:" & someFile)
+   return the result
+end text_Set
 
 
 --> Merge | Export | _FetchHandler
@@ -71,7 +124,7 @@ private function _ConstructOldHandlerFile hName, hType, objectScriptFolder
 end _ConstructOldHandlerFile
 
 
---> Working on
+--> Script | Reconstruct
 -
 function script_ReconstructFromExported dataFolder, pDontMerge
    text_AddTrailing dataFolder, slash
@@ -104,41 +157,6 @@ function textStack_ScriptFile dataFolder, pDontCreate
 end textStack_ScriptFile
 
 
---> Text | File
--
-/*
-These work for handlers and scripts.
-If you use these handlers then we have a single place to test / switch / ensure we use the correct binary or text encoding for stored script files.
-At one time Git was not dealing with Livecode OSX files for instance.
-*/
-
-function text_Get someFile
-   -- was "script_FetchRaw"
-   -- put url ("binfile:" & someFile) into someText
-   put url ("file:" & someFile) into someText
-   return someText
-end text_Get
-
-command text_Set someFile, someText
-   put someFile into scriptFolder
-   set the itemdelimiter to slash
-   put empty into item -1 of scriptFolder
-   folder_CreateNested scriptFolder
-   -- put word 1 to -1 of someText into url ("binfile:" & scriptFile)
-   put word 1 to -1 of someText into url ("file:" & someFile)
-   return the result
-end text_Set
-
-private command hack_UpdateBinFile @someData, someFile
-   if someData contains numtochar (13) then
-      -- old "file" export
-      breakpoint
-      replace numtochar (13) with CR in someData
-      put someData into url ("binfile:" & someFile)
-   end if
-end hack_UpdateBinFile
-
-
 --> Props
 -
 getprop exported_Script [pDontMerge]
@@ -153,21 +171,6 @@ setprop exported_Script [pExportCalls] someScript
    put the script_File of scriptObject into scriptFile
    return scriptFile
 end exported_Script
-
-getprop script_IsDifferent
-   -- even if the only difference is whitespace (we tolerate empty space at start and end of scripts)
-   -- which means a diff program may show no diference when this returns true
-   put the long id of the target into targetObject
-   try
-      put the script of targetObject into someScript
-      put the exported_Script of targetObject into exportedScript
-      if exportedScript is empty then return false -- added as if there is no exported script to compare it is no different
-      put word 1 to -1 of exportedScript is not word 1 to -1 of someScript into someBoolean
-      return someBoolean
-   catch someError
-      return empty  -- script may be protected
-   end try
-end script_IsDifferent
 
 setprop script_IsIndexed someBoolean
    put the long id of the target into scriptObject
