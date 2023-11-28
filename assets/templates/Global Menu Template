@@ -22,9 +22,10 @@ getprop menu_Target [tObject]
    return the display_View of tObject
 end menu_Target
 
-getprop menu_CheckTarget
-   return true
+getprop menu_CheckTarget [cameraView]
+   return exists (cameraView)
 end menu_CheckTarget
+
 
 --> [[mTitle]]
 -

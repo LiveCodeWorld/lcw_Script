@@ -54,28 +54,21 @@ getprop disabled_AfterActionCompile [sObject]
 end disabled_AfterActionCompile
 
 getprop checked_AfterActionCompile
-   put the behavior of stack "revSEStackBehavior" into bObject
-   return bObject = the name of stack "behavior_RevSEStackBehavior"
+   put ide_GetAfterActionCompile() into sBoolean
+   return sBoolean
 end checked_AfterActionCompile
 
 
 --> Global | ScriptEditor | Behavior | Menu
 -
 on menu_AfterActionCompile sObject
-   -- actionCompile
-   put the name of stack "behavior_RevSEStackBehavior" into actionBehavior
-   put the behavior of stack "revSEStackBehavior" into bObject
-   if actionBehavior = bObject then
-      set the behavior of stack "revSEStackBehavior" to empty
-   else
-      set the behavior of stack "revSEStackBehavior" to actionBehavior
-   end if
+   put ide_GetAfterActionCompile() into sBoolean
+   ide_SetAfterActionCompile (sBoolean is false)
 end menu_AfterActionCompile
 
 on menu_RecentButton mTarget
    put rev_HistoryButton() into topRecentButton
    --
-   -- put scriptEditor_CompileButtonBehavior() into bObject
    put scriptEditor_HistoryButtonBehavior() into bObject
    --
    set the behavior of topRecentButton to bObject

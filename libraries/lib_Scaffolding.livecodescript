@@ -31,31 +31,31 @@ end scaffold_MenuTitle
 
 --> Scaffold | Model
 -
-function scaffold_GetTemplate tName
+function scaffold_Get tName
    put scaffold_GetBinaryUrl (tName) into someUrl
    put url someUrl into utf8Text
    put textDecode (utf8Text, "UTF-8") into someText
    return someText
-end scaffold_GetTemplate
+end scaffold_Get
 
-command scaffold_SetTemplate tName, someText
+command scaffold_Set tName, someText
    put scaffold_GetBinaryUrl (tName) into someUrl
    put textEncode (someText, "UTF-8") into utf8Text
    put utf8Text into url someUrl
    return someUrl
-end scaffold_SetTemplate
+end scaffold_Set
 
--- function scaffold_GetTemplate tName
+-- function scaffold_Get tName
    put scaffold_GetUrl (tName) into someUrl
    put url someUrl into someScript
    return someScript
-end scaffold_GetTemplate
+end scaffold_Get
 
--- command scaffold_SetTemplate tName, someText
+-- command scaffold_Set tName, someText
    put scaffold_GetUrl (tName) into someUrl
    put someText into url someUrl
    return someUrl
-end scaffold_SetTemplate
+end scaffold_Set
 
 command scaffold_DeleteTemplate tName
     put scaffold_GetFile (tName) into someFile
@@ -64,7 +64,7 @@ command scaffold_DeleteTemplate tName
 end scaffold_DeleteTemplate
 
 
---> Script Template
+--> Scaffold
 -
 function scaffold_ListShortFiles
    put scaffold_GetFolder() into scriptTemplateFolder

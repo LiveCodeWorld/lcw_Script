@@ -16,6 +16,75 @@ but for now this is one single flat array.
 See also "Old | Suite" of stack "model_ScriptMenu"
 */
 
+--> Menu | Not Simple
+-
+/*
+Handlers in this section were used for the older complex and slower ways of creating menus from scritps.
+No we use revAvailableHandlers
+*/
+
+getprop slow_MenuHandlers [mTitle]
+   put the long id of the target into mController
+   if mTitle is empty then
+      put line 1 of the script_MenuTitles of mController into mTitle
+   end if
+   --
+   put _SlowMenuHandlers (mController, mTitle) into hNames
+   return hNames
+end slow_MenuHandlers
+
+getprop menu_IsSimple
+   breakpoint -- don't need any more
+   return menu_GetSimple()
+end menu_IsSimple
+
+function menu_GetSimple 
+   ## Check the script (slow)
+   -- put the script_HandlerExists ["M submenu_Dev"] of the target is false into isSimple
+   put the script_MenuTitles of the target into mTitles
+   put the number of lines of mTitles = 1 into isSimple
+   return isSimple
+end menu_GetSimple
+
+private function _SlowMenuHandlers mController, mTitle
+   local hNames
+   put the script of mController into someScript
+   --
+   put script_GetSuite (mTitle, someScript) into scriptLines
+   delete line 1 of scriptLines
+   -- filter scriptLines with "on *"
+   --
+   repeat for each line scriptLine in scriptLines
+      put word 1 of scriptLine into firstWord
+      put word 2 of scriptLine into hName
+      switch
+         case firstWord = "-->"
+            exit repeat
+         case hName ends with "_"
+            ## Divider is a command ending with "_"
+            put "_" & CR after hNames
+            break
+         case firstWord is not "on"
+            next repeat
+         case hName = "submenu_Dev"
+            if the shiftKey is "Down" then
+               put hName & CR after hNames
+            end if
+            break
+         case hName begins with "submenu_"
+         case hName begins with "insert_"
+         case hName begins with "menu_"
+            put hName & CR after hNames
+            break
+         default
+            -- not a menu
+      end switch
+   end repeat
+   delete char -1 of hNames
+   return hNames
+end _SlowMenuHandlers
+
+
 --> Working on
 -
 command script_RenameSuite @someScript, suiteTitle, newSuiteTitle

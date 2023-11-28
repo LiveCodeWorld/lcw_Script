@@ -70,6 +70,10 @@ end menu_EditHackBehavior
 private command __
 end __
 
+on menu_InitLcw
+   ide_InitLcw
+end menu_InitLcw
+
 on menu_RestIdeMenus
    ide_ResetMenus
 end menu_RestIdeMenus

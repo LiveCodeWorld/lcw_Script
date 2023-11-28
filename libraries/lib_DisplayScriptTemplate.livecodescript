@@ -19,9 +19,9 @@ command display_ScriptTemplate templateName, pDisplayView, pMenuTitle
       put scaffold_GetUrl (templateName) into someUrl
       put url someUrl into someText
       --
-      scaffold_SetTemplate templateName, someText
+      scaffold_Set templateName, someText
    else
-      put scaffold_GetTemplate (templateName) into someText
+      put scaffold_Get (templateName) into someText
    end if
    --
    if exists (pDisplayView) then
@@ -51,7 +51,7 @@ command display_AskNewTemplate sObject
    end if
    put lcw_Ask (someQuestion, "Some Template") into templateName
    
-   scaffold_SetTemplate templateName, someScript
+   scaffold_Set templateName, someScript
    put the result into savedUrl
    --
    display_ScriptTemplate templateName

@@ -57,7 +57,7 @@ command scaffold_SaveDisplayed indexView
       put lcw_Ask ("What naem would you like to give this template text?", tName) into tName
    end if
    put the view_Text of indexView into someText
-   scaffold_SetTemplate tName, someText
+   scaffold_Set tName, someText
    put the result into savedUrl
    return tName
 end scaffold_SaveDisplayed
@@ -98,7 +98,7 @@ on menu_Save indexView
    scaffold_SaveDisplayed indexView
    put the result into templateName
    --
-   put scaffold_GetTemplate (templateName) into savedText
+   put scaffold_Get (templateName) into savedText
    --
    lcw_Notify merge ("Stored text as scaffold template '[[templateName]]'")
 end menu_Save
@@ -108,10 +108,10 @@ end menu_Save
    put ".gv" after templateName
    --
    put the displayed_Text of indexView into someText
-   scaffold_GetTemplate templateName, someText
+   scaffold_Get templateName, someText
    put the result into newUrl
    --
-   put scaffold_GetTemplate (templateName) into someText
+   put scaffold_Get (templateName) into someText
    set the displayed_Text of indexView to someText
    --
    set the displayed_Url of indexView to newUrl
@@ -126,7 +126,7 @@ on menu_SaveAs indexView
    put it into templateName
    if templateName is empty then exit to top
    
-   scaffold_SetTemplate templateName, someScript
+   scaffold_Set templateName, someScript
    put the result into newUrl
    
    set the displayed_Url of indexView to newUrl
