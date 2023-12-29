@@ -1,0 +1,4 @@
+<div class="footer"><a class="show-page-license" href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a> .
+<a class="show-page-source" href="/[[pageSlug]].json" title="source">JSON</a> .
+<a href="/[[pageSlug]].html" date-slug="[[pageSlug]]" target="[[wikiDomain]]">[[wikiDomain]] </a> .
+<a href="#" class="search">search</a></div>

@@ -107,6 +107,22 @@ end handler_InHierarchy
 
 --> Handler
 -
+function handler_Construct hType, hName, hBody, pIsPrivate
+   put tolower(char 1 of hName) into char 1 of hName
+   --
+   put hType && hName into someHandler
+   put CR after someHandler
+   repeat for each line scriptLine in hBody
+      put "   " & scriptLine & CR after someHandler
+   end repeat
+   put "end" && word 1 of hName after someHandler
+   --
+   if pIsPrivate is true then
+      put "private " before someHandler
+   end if
+   return someHandler
+end handler_Construct
+
 function hkey_GetObjectHandler hKey, pNotPrivate
    put item 3 of hKey into hObject
    if exists (hObject) is false then return empty

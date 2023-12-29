@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<style>
+canvas {
+  border: 1px solid black;
+}
+</style>
+<body>
+<h1>HTML5 Canvas</h1>
+
+</body>
+</html>

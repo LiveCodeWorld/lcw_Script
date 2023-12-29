@@ -1,0 +1,91 @@
+getProp propertyMetadata [pProperty]
+   switch pProperty
+      case "menu"
+         return { \
+               "default": "Menu", \
+               "label": "menu", \
+               "editor": "com.livecode.pi.text", \
+               "section": "Contents" }
+   end switch
+end propertyMetadata
+
+/**[[PropertyMetadata]]*/
+getprop title_Menu
+   put the title_Menu of me into mName
+   if mName is empty then 
+      return "Title | Menu"
+   else
+      return mName
+   end if
+end title_Menu
+
+setprop title_Menu mName
+   set the title_Menu of me to mName
+end title_Menu
+
+on openControl
+   _CreateVisualControls
+   LayoutControl
+   -- updateVisualControls
+end openControl
+
+private command _CreateVisualControls
+   if sHasCreatedControls then return false
+   
+   ## Create Index Field
+   _CreateIndexField
+   
+   ## Create Title Button
+   _CreateTitleButton
+   
+   put true into sHasCreatedControls
+end _CreateVisualControls
+
+private command _CreateTitleButton
+   create button "Title" in me
+   put the id of it into sTitleButtonId
+   --
+   set the style of control id sTitleButtonId to "menu"
+   set the menuMouseButton of control id sTitleButtonId to 1
+   set the menuLines of control id sTitleButtonId to 5
+   set the menuName of control id sTitleButtonId to empty
+   --
+   set the visible of control id sTitleButtonId to true
+   set the opaque of control id sTitleButtonId to true
+   set the backgroundcolor of control id sTitleButtonId to _RandomColour()
+   set the showname of control id sTitleButtonId to true
+   set the showborder of control id sTitleButtonId to true
+   set the autohilite of control id sTitleButtonId to false
+   set the threeD of control id sTitleButtonId to false
+   --
+   set the borderWidth of control id sTitleButtonId to 0
+   --
+   return sTitleButtonId
+end _CreateTitleButton
+
+private command _CreateIndexField
+   create field "Index" in me
+   put the id of it into sIndexFieldId
+   --
+   set the visible of control id sIndexFieldId to true
+   set the traversalOn of control id sIndexFieldId to true
+   set the threeD of control id sIndexFieldId to false
+   set the lockText of control id sIndexFieldId to true
+   set the dontwrap of control id sIndexFieldId to true
+   set the vScrollbar of control id sIndexFieldId to false
+   set the hScrollbar of control id sIndexFieldId to false
+   --
+   set the opaque of control id sIndexFieldId to true
+   --
+   set the showBorder of control id sIndexFieldId to false
+   set the borderwidth of control id sIndexFieldId to 1
+   set the showFocusBorder of control id sIndexFieldId to false
+   --
+   set the autohilite of control id sIndexFieldId to true
+   set the listbehavior of control id sIndexFieldId to true
+   set the multiplehilites of control id sIndexFieldId to false
+   set the noncontiguoushilites of control id sIndexFieldId to false
+   set the togglehilites of control id sIndexFieldId to true
+   --
+   return sIndexFieldId
+end _CreateIndexField

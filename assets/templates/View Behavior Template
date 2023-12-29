@@ -2,7 +2,7 @@
 -
 name: [[bName]]
 type: behavior
-author: [[authorName]]
+copyright: [[authorName]]
 license: GPLv3
 version: 0.1
 

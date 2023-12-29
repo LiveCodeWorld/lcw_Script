@@ -70,10 +70,10 @@ If you use these handlers then we have a single place to test / switch / ensure 
 At one time Git was not dealing with Livecode OSX files for instance.
 */
 function text_Get someFile
-   -- was "script_FetchRaw"
-   -- put url ("binfile:" & someFile) into someText
-   put url ("file:" & someFile) into someText
-   return someText
+   put url ("binfile:" & someFile) into binaryData
+   put textDecode (binaryData, "utf8") into sText
+   -- put url ("file:" & someFile) into sText
+   return sText
 end text_Get
 
 command text_Set someFile, someText
@@ -81,8 +81,10 @@ command text_Set someFile, someText
    set the itemdelimiter to slash
    put empty into item -1 of scriptFolder
    folder_CreateNested scriptFolder
-   -- put word 1 to -1 of someText into url ("binfile:" & scriptFile)
-   put word 1 to -1 of someText into url ("file:" & someFile)
+   --
+   put textEncode (word 1 to -1 of someText, "utf8") into binText
+   put binText into url ("binfile:" & someFile)
+   -- put word 1 to -1 of someText into url ("file:" & someFile)
    return the result
 end text_Set
 

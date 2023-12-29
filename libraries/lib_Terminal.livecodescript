@@ -41,7 +41,8 @@ command diff_CreateTempFile someText, shortFile
    folder_CreateNested compareFolder
    
    put compareFolder & shortFile into someFile
-   put someText into url ("binfile:" & someFile)
+   -- put someText into url ("binfile:" & someFile)
+   text_Set someFile, someText
    return someFile
 end diff_CreateTempFile
 
@@ -74,16 +75,6 @@ command terminal_Diff thisText, lastText, pThisShortFile, pLastShortFile
       set the defaultfolder to compareFolder
       put "opendiff" && kwote(pThisShortFile) && kwote(pLastShortFile) into someShell
       put shell (someShell) into shellResult
-      /*
-      put "opendiff" into someShell
-      put space & kwote(thisFile, "'") && kwote(lastFile, "'") after someShell
-      --
-      open process someShell for neither
-      put the result into sResult
-      put someShell into LocalArray ["opendiffProcessName"]
-      
-      -- diff_Files pThisShortFile, pLastShortFile
-      */
    end if
    return shellResult
 end terminal_Diff

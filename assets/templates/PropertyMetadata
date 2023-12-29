@@ -1,0 +1,9 @@
+
+Name: title_Menu
+Type: property
+Summary: The name of the title menu
+Syntax: get the title_Menu of <widget>
+Syntax: set the title_Menu of <widget> to pTitle
+Value: the title_Menu of the button
+Description:
+Use the title_Menu property to retrieve or change the menu displayed when you click on the title.

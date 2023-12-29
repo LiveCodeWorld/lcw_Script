@@ -64,8 +64,8 @@ on menu_DisplayProject sObject
    display_ProjectLibs projectName
 end menu_DisplayProject
 
-on _
-end _
+private on __
+end __
 
 on submenu_Display
    return "Global | Project | Display | Menu"
@@ -79,8 +79,8 @@ on submenu_MenuTools
    return "Global | MenuTools | Menu"
 end submenu_MenuTools
 
-on _
-end _
+private on ___
+end ___
 
 on menu_Refresh sObject
    display_Script sObject
@@ -90,8 +90,8 @@ on menu_DisplayGitStatus sObject
    display_GitStatus sObject
 end menu_DisplayGitStatus
 
-on _
-end _
+private on ____
+end ____
 
 on menu_CreateScriptObjectGraph sObject
    local pGraphStyle, pProcessObject, projectName
@@ -100,9 +100,6 @@ on menu_CreateScriptObjectGraph sObject
    --
    display_ObjectDepArray sObject
 end menu_CreateScriptObjectGraph
-
-on _
-end _
 
 on submenu_EditScript
    return "Global | Script | Menu"
@@ -116,8 +113,8 @@ on submenu_Folders
    return "Global | Script | Folders | Menu"
 end submenu_Folders
 
-on _
-end _
+private on _____
+end _____
 
 on submenu_Dev
    return menu_Create ("Global | Script | Dev | Menu")

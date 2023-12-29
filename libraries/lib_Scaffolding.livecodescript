@@ -69,6 +69,7 @@ end scaffold_DeleteTemplate
 function scaffold_ListShortFiles
    put scaffold_GetFolder() into scriptTemplateFolder
    put folder_ShortFiles (scriptTemplateFolder) into shortFiles
+   sort shortFiles
    return shortFiles
 end scaffold_ListShortFiles
 

@@ -1,0 +1,7 @@
+<div class="header"><h1 title="[[wikiDomain]]">
+  <span>
+    <a href="/view/[[pageSlug]]" target="[[wikiDomain]]">
+      <img src="/favicon.png" height="32px" class="favicon"></a>
+    [[pageTitle]]
+  </span>
+</h1></div>
