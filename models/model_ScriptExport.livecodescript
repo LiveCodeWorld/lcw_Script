@@ -62,16 +62,9 @@ getprop script_IsDifferent
    end try
 end script_IsDifferent
 
-/*
-Not unicode compiant - but scripts should be ascii?
-
-These work for handlers and scripts.
-If you use these handlers then we have a single place to test / switch / ensure we use the correct binary or text encoding for stored script files.
-At one time Git was not dealing with Livecode OSX files for instance.
-*/
 function text_Get someFile
    put url ("binfile:" & someFile) into binaryData
-   put textDecode (binaryData, "utf8") into sText
+   put textDecode (binaryData, "UTF-8") into sText
    -- put url ("file:" & someFile) into sText
    return sText
 end text_Get
@@ -82,7 +75,7 @@ command text_Set someFile, someText
    put empty into item -1 of scriptFolder
    folder_CreateNested scriptFolder
    --
-   put textEncode (word 1 to -1 of someText, "utf8") into binText
+   put textEncode (word 1 to -1 of someText, "UTF-8") into binText
    put binText into url ("binfile:" & someFile)
    -- put word 1 to -1 of someText into url ("file:" & someFile)
    return the result
