@@ -297,7 +297,7 @@ end script_CmapFile
 getprop script_Files
    put the long id of the target into scriptObject
    put the textStack_MetadataFolder [true] of scriptObject into metadataFolder
-   put folder_ShortFiles (metadataFolder) into someFiles
+   put file_ListShort (metadataFolder) into someFiles
    return someFiles
 end script_Files
 

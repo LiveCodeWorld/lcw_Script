@@ -1,0 +1,4 @@
+on index
+   put pageArray_Construct ("Echo", "Some text") into pageArray
+   fedwiki_ReturnPageArray pageArray
+end index

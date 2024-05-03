@@ -29,6 +29,21 @@ setprop scaffold_MenuTitle gMenuTitle
 end scaffold_MenuTitle
 
 
+--> Snippet
+-
+function snippet_CurlyResult snippetPageSlug, sKey, sValue
+   put snippet_Get (snippetPageSlug) into sSnippet
+   put curly_ReplaceAll (sSnippet, sKey, sValue) into curlyResult
+   return curlyResult
+end snippet_CurlyResult
+
+function snippet_Get tName
+   put pageArray_Get ("scaffold.anarchive.earth", tName) into pageArray
+   put pageArray_GetSectionText (pageArray, "Snippet") into snippetText
+   return snippetText
+end snippet_Get
+
+
 --> Scaffold | Model
 -
 function scaffold_Get tName
@@ -68,7 +83,7 @@ end scaffold_DeleteTemplate
 -
 function scaffold_ListShortFiles
    put scaffold_GetFolder() into scriptTemplateFolder
-   put folder_ShortFiles (scriptTemplateFolder) into shortFiles
+   put file_ListShort (scriptTemplateFolder) into shortFiles
    sort shortFiles
    return shortFiles
 end scaffold_ListShortFiles

@@ -57,16 +57,16 @@ on menu_CreateMenuHelp mController
    ask_CreateMenuPage mController, pDisplayView
 end menu_CreateMenuHelp
 
--- on menu_UpdateCodeSection sObject
-help_UpdateObjectCodeSection sObject
-launch_ObjectHelp sObject
-end menu_UpdateCodeSection
+getprop disabled_CreateHelpWiki [mController]
+   put the help_Domain of mController into wikiDomain
+   put wiki_GetFolder(wikiDomain) is not empty into wikiExists
+   return wikiExists
+end disabled_CreateHelpWiki
 
--- on menu_UpdateObjectHelp sObject
-help_UpdateFromObject sObject
-launch_ObjectHelp sObject
-end menu_UpdateObjectHelp
-
--- on menu_UploadGraph sObject, sGraph
-breakPoint
-end menu_UploadGraph
+on menu_CreateHelpWiki mController
+   put the help_Domain of mController into wikiDomain
+   put lcw_Ask ("Create new wiki...", wikiDomain, "New Wiki") into wikiDomain
+   --
+   wikiServer_Create wikiDomain
+   display_LocalWikis "", "", "*livecode.world"
+end menu_CreateHelpWiki

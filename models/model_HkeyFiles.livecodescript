@@ -28,7 +28,7 @@ The old hkey_Folder was here:
 function hkey_Files hKey
    -- put hkey_Folder (hKey) into someFolder
    put hkey_DataFolder (hKey, true) into someFolder
-   put folder_ShortFiles (someFolder) into someFiles
+   put file_ListShort (someFolder) into someFiles
    return someFiles
 end hkey_Files
 
