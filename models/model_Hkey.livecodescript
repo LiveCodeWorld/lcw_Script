@@ -83,7 +83,7 @@ end hkey_GetOverlayArray
 
 function hkey_FetchOverlayData hKey
    put hkey_OverlayDataFile (hKey) into someFile
-   -- put array_Fetch (hkeyArrayFile) into overlayData
+   -- put array_Get (hkeyArrayFile) into overlayData
    put url ("binfile:" & someFile) into encodedArray
    if encodedArray is empty then return empty
    put arraydecode (encodedArray) into overlayData
