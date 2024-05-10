@@ -169,20 +169,6 @@ on menu_RecentScripts sObject, recentObject
    end if
 end menu_RecentScripts
 
-on submenu_Git
-   return "Global | GIT | Simple | Object | Menu"
-end submenu_Git
-
-on submenu_Help
-   switch LocalArray ["scriptType"]
-      case "menu"
-      case "controller"
-         return "Global | Help | Controller | Menu"
-      default
-         return "Global | Help | Object | Menu"
-   end switch
-end submenu_Help
-
 on menu_Clean sObject
    put LocalArray ["seStack"] into seStack
    lcw_Answer "Sure you want to format and clean start and end handler lines of [[sName]]", seStack, sObject
@@ -215,6 +201,10 @@ on submenu_MenuTools
    return "Global | MenuTools | Menu"
 end submenu_MenuTools
 
+on submenu_Ide
+   return "Global | ScriptEditor | Menu"
+end submenu_Ide
+
 private on __
 end __
 
@@ -226,16 +216,26 @@ on submenu_Tabs
    return "Global | ScriptEditor | Tabs | Menu"
 end submenu_Tabs
 
-on submenu_Ide
+-- on submenu_Ide
    return "Global | ScriptEditor | Menu"
 end submenu_Ide
 
--- on submenu_MyMenu
-return "Global | ScriptEditor | Recent | Custom | Menu"
-end submenu_MyMenu
-
 private on ___
 end ___
+
+on submenu_Git
+   return "Global | GIT | Simple | Object | Menu"
+end submenu_Git
+
+ --on submenu_Help
+   switch LocalArray ["scriptType"]
+      case "menu"
+      case "controller"
+         return "Global | Help | Controller | Menu"
+      default
+         return "Global | Help | Object | Menu"
+   end switch
+end submenu_Help
 
 on submenu_Dev
    return menu_DevTitle()
