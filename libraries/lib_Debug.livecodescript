@@ -43,11 +43,12 @@ on mDoubleUp_DebugHistory indexView, hName
    put debugHistoryArray [lineNum]["revRuggedID"] into rObject
    put debugHistoryArray [lineNum]["behavior"] into bObject
    put debugHistoryArray [lineNum]["lineNum"] into lineNum
+   put debugHistoryArray [lineNum]["handler"] into hName
    --
    if bObject is empty then 
-      scriptEditor_EditAndScroll rObject, lineNum   
+      scriptEditor_EditAndScroll rObject, lineNum, hName
    else
-      scriptEditor_EditAndScroll bObject, lineNum   
+      scriptEditor_EditAndScroll bObject, lineNum, hName
    end if
 end mDoubleUp_DebugHistory
 
@@ -76,6 +77,7 @@ command display_DebugHistory pDisplayTitle, pAlsoArray
    set the title_Menu of indexView to "Global | Debug | Tree | Menu"
    set the line_Menu of indexView to "Global | Debug | Tree | Line | Menu"
    set the debug_HistoryArray of indexView to debugHistoryArray
+   set the mouse_DoubleUp of indexView to "mDoubleUp_DebugHistory"
    --
    return indexView
 end display_DebugHistory

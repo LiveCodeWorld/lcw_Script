@@ -156,6 +156,25 @@ end object_MakeFriendly
 
 --> Global | ScriptEditor | Header | Menu
 -
+on submenu_Help
+   put LocalArray ["scriptType"] into scriptType
+   --
+   switch scriptType
+      case "controller"
+         return "Global | Menu | Group | Help | Menu"
+         -- return "Global | Help | Controller | Menu"
+         -- return "Global | Wiki | Browser | Help | Menu"
+      default
+         return "Global | Menu | Group | Help | Menu"
+         -- return "Global | Help | Object | Menu"
+         -- return "Global | Wiki | Browser | Tools | Menu"
+   end switch
+end submenu_Help
+
+-- on submenu_ObjectHelp
+return "Global | Help | Object | Menu"
+end submenu_ObjectHelp
+
 on menu_DisplayLocalChanges sObject
    display_ScriptIsDifferent sObject
 end menu_DisplayLocalChanges
@@ -217,7 +236,7 @@ on submenu_Tabs
 end submenu_Tabs
 
 -- on submenu_Ide
-   return "Global | ScriptEditor | Menu"
+return "Global | ScriptEditor | Menu"
 end submenu_Ide
 
 private on ___
@@ -226,16 +245,6 @@ end ___
 on submenu_Git
    return "Global | GIT | Simple | Object | Menu"
 end submenu_Git
-
- --on submenu_Help
-   switch LocalArray ["scriptType"]
-      case "menu"
-      case "controller"
-         return "Global | Help | Controller | Menu"
-      default
-         return "Global | Help | Object | Menu"
-   end switch
-end submenu_Help
 
 on submenu_Dev
    return menu_DevTitle()

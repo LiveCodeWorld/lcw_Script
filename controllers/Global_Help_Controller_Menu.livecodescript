@@ -18,6 +18,8 @@ local LocalArray
 --> Menu | Props
 -
 getprop menu_Target [tObject]
+   return scriptEditor_Object()
+   
    put menu_GetTarget ("Global | Help | Object | Menu") into mController
    if exists (mController) is false then put scriptEditor_Object() into mController
    _Init mController
