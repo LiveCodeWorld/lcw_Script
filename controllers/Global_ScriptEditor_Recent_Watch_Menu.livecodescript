@@ -38,6 +38,8 @@ on submenu_Script
    return "Global | ScriptEditor | Script | Menu"
 end submenu_Script
 
-on menu_MenuHelp
-   launch_MenuHelp
-end menu_MenuHelp
+on menu_ObjectHelp seButton
+   -- launch_MenuHelp
+   put scriptEditor_Object() into sObject
+   display_HelpDraft sObject
+end menu_ObjectHelp
