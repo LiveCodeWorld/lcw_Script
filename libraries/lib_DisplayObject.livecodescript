@@ -15,33 +15,6 @@ on mDouble_EditHkey indexView, shortHkey
    hkey_Edit hKeyLine
 end mDouble_EditHkey
 
-on mDoubleUp_ScriptDep displayView, someValue, sPath
-   -- put the selected_Array of displayView into sArray
-   -- put the parent_Array of displayView into sValue
-   switch the number of lines of sPath
-      case 4
-         put line -1 of sPath into hKey
-         put line -2 of sPath into shortMissingHkey
-         --
-         put the displayed_Object of displayView into sObject
-         put the displayed_HkeyArray of displayView into hkeyArray
-         --
-         hkey_Edit hKey
-         --
-         display_MissingHkey hkeyArray, sObject
-         break
-      case 3
-         put line 3 of sPath into objectHkeyParent
-         hkey_Edit objectHkeyParent
-         break
-      default
-         put line -1 of sPath into hObject
-         hkey_Edit hObject
-   end switch
-   --
-   return displayView
-end mDoubleUp_ScriptDep
-
 on mDoubleUp_MissingHkey displayView, someLine
    put the title_Text of displayView into someTitle
    return displayView

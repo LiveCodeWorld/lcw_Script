@@ -11,7 +11,19 @@ version: 0.1
 -
 local LocalArray
 
-on menu_Init tObject
+on mDoubleUp_DisplayShortHkey displayView, shortHkey
+   put the title_Text of displayView into sObject
+   --
+   put the selected_Path of displayView into clickedPath
+   if the number of items of clickedPath = 2 then
+      put item 1 of clickedPath into suiteTitle
+   end if
+   --
+   put hKeyLine_AddObject (shortHkey, sObject) into hKey
+   hkey_Edit hKey
+end mDoubleUp_DisplayShortHkey
+
+getprop menu_Target [tObject]
    put the tree_View of tObject into treeView
    get the selected_Path of treeView
    put treeView into LocalArray ["treeView"]
@@ -23,7 +35,31 @@ on menu_Init tObject
    put the displayed_Object of treeView into hObject
    put shortHkey && "of" && hObject into hKey
    put hKey into LocalArray ["hKey"]
-end menu_Init
+   --
+   return treeView
+end menu_Target
+
+getprop disabled_HandlerSvg
+   put LocalArray ["hKey"] into hKey
+   --
+   put hkey_SvgFile (hKey) into svgFile
+   if there is a file svgFile then
+      return false
+   else
+      return true
+   end if
+end disabled_HandlerSvg
+
+getprop disabled_HandlerOverlayArray
+   put LocalArray ["hKey"] into hKey
+   --
+   put hkey_OverlayDataFile (hKey, true) into overlayDataFile
+   if there is a file overlayDataFile then
+      return false
+   else
+      return true
+   end if
+end disabled_HandlerOverlayArray
 
 
 --> Global | Script | Tree | Line | Menu
@@ -100,31 +136,3 @@ on menu_ObjectMetadataFolder hObject
    put the metadata_Folder of hObject into someFolder
    finder_Reveal someFolder
 end menu_ObjectMetadataFolder
-
-
---> Global | Script | Tree | Line | Menu | Props
--
-
---> Global | Script | Tree | Line | Menu | Disabled
--
-getprop disabled_HandlerSvg
-   put LocalArray ["hKey"] into hKey
-   --
-   put hkey_SvgFile (hKey) into svgFile
-   if there is a file svgFile then
-      return false
-   else
-      return true
-   end if
-end disabled_HandlerSvg
-
-getprop disabled_HandlerOverlayArray
-   put LocalArray ["hKey"] into hKey
-   --
-   put hkey_OverlayDataFile (hKey, true) into overlayDataFile
-   if there is a file overlayDataFile then
-      return false
-   else
-      return true
-   end if
-end disabled_HandlerOverlayArray

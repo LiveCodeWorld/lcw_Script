@@ -27,7 +27,7 @@ on insert_HeaderMenu
    return "Global | ScriptEditor | Header | Menu"
 end insert_HeaderMenu
 
-on _
+private on _
 end _
 
 on submenu_Card
@@ -37,6 +37,9 @@ end submenu_Card
 on submenu_Script
    return "Global | ScriptEditor | Script | Menu"
 end submenu_Script
+
+private on __
+end __
 
 on menu_ObjectHelp seButton
    -- launch_MenuHelp

@@ -12,19 +12,6 @@ Compare with "lib_DisplayGraph"
 
 --> Display | Events
 -
-command mDoubleUp_DisplayShortHkey displayView, shortHkey
-   put the title_Text of displayView into sObject
-   --
-   put the selected_Path of displayView into clickedPath
-   if the number of items of clickedPath = 2 then
-      put item 1 of clickedPath into suiteTitle
-      -- put item 2 of clickedPath into shortHkey
-   end if
-   --
-   put hKeyLine_AddObject (shortHkey, sObject) into hKey
-   hkey_Edit hKey
-end mDoubleUp_DisplayShortHkey
-
 command mDoubleUp_DisplayStack indexView, stackName
    switch
       case exists (stack stackName) is false

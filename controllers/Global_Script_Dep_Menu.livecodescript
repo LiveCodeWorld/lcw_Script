@@ -35,8 +35,6 @@ end hkeyArrayGraph_Params
 --> Global | Script | Dep | Menu
 -
 on menu_HkeyArrayGraph sObject, graphStyle
-   local pGraphStyle, pProcessObject, projectName
-   --
    put LocalArray ["hkeyArray"] into hkeyArray
    graph_CreateScriptObjectHkeyArray hkeyArray, sObject, graphStyle
    put the result into svgFile
@@ -98,10 +96,14 @@ end menu_OverlayFolder
 private on ___
 end ___
 
+on menu_TestStackDeps sObject
+   put the dep_Stacks of sObject
+end menu_TestStackDeps
+
 on menu_ListDepStacks sObject
-   put LocalArray ["displayView"] into displayView
-   -- put the title_Text of displayView into sObject
-   put the displayed_Data of displayView into depObjectData
+   put LocalArray ["hkeyArray"] into hkeyArray
+   put hkeyArray_GetStackDepArray (hkeyArray) into depObjectData
+   --
    delete variable depObjectData [sObject]
    --
    put keys (depObjectData) into depStacks
@@ -117,8 +119,8 @@ on menu_ListDepStacks sObject
    sort projectNames
    replace CR with ", " in projectNames
    --
-   put "libss:" && libNames into libDepLine -- dep_StackNames
-   put "projeects:" && projectNames into projectDepLine -- dep_StackNames
+   put "libs:" && libNames into libDepLine -- dep_StackNames
+   put "projects:" && projectNames into projectDepLine -- dep_StackNames
    
    put libDepLine & CR & projectDepLine
 end menu_ListDepStacks

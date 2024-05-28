@@ -33,6 +33,12 @@ getprop hkey_Either [shortHkey]
    return foundHkey
 end hkey_Either
 
+getprop hkey_Or [shortHkey]
+   put the revAvailableHandlers of the target into hTable
+   put htable_GetOr (shortHkey, hTable) into foundHkey
+   return foundHkey
+end hkey_Or
+
 getprop hkey_Exact [shortHkey]
    -- this finds exactly what you specifiy in shortHkey
    put the revAvailableHandlers of the target into hTable
@@ -186,46 +192,110 @@ command htable_ExactLineOffsets searchHkeyLine, hTable, @startLineNum, @endLineN
    return false
 end htable_ExactLineOffsets
 
+function htable_GetOr searchHkeyLine, hTable
+   put word 1 of searchHkeyLine into hType
+   put word 2 of searchHkeyLine into hName
+   --
+   htable_OrLineOffsets hName, hType, hTable, startLineNum, endLineNum
+   if the result is false then return empty
+   
+   put word 5 to -1 of line 1 of hTable into tObject
+   put word 1 of searchHkeyLine into hType
+   put word 2 of searchHkeyLine into hName
+   put hKeyLine_Construct (hName, hType, tObject) into foundHkey
+   return foundHkey
+end htable_GetOr
+
+command htable_OrLineOffsets hName, hType, hTable, @startLineNum, @endLineNum
+   repeat for each line hLine in hTable
+      if hName is not word 2 of hLine then next repeat
+      
+      switch
+         case hType = word 1 of hLine
+         case (hType = "C") AND (word 1 of hLine = "M")
+         case (hType = "M") AND (word 1 of hLine = "C")
+            put word 3 of hLine into startLineNum
+            put word 4 of hLine into endLineNum
+            return true
+      end switch
+   end repeat
+   put 0 into startLineNum
+   put 0 into endLineNum
+   return false
+end htable_OrLineOffsets
+
 
 --> hTable | Public or Private
 -
 function htable_GetEither searchHkeyLine, hTable
    -- matches either private of public handlers
    -- returns just the foundHkey (we dont need line numbers)
-   put char -1 of word 1 of searchHkeyLine into publicSearchType
+   put char -1 of word 1 of searchHkeyLine into hType
    put word 2 of searchHkeyLine into searchName
    
    repeat for each line hLine in hTable
       put word 2 of hLine into foundName
       put word 1 of hLine into foundPublicType
-      if (foundName = searchName) AND (char -1 of foundPublicType = publicSearchType) then
-         put word 5 to -1 of line 1 of hTable into hObject
-         put hKeyLine_Construct (foundName, foundPublicType, hObject) into foundHkey
-         return foundHkey
-      end if
+      if foundName is not searchName then next repeat
+      
+      put char -1 of foundPublicType into fType
+      switch
+         case hType = fType
+         case (hType = "C") AND (fType = "M")
+         case (hType = "M") AND (fType = "C")
+            put word 5 to -1 of line 1 of hTable into hObject
+            put hKeyLine_Construct (foundName, foundPublicType, hObject) into foundHkey
+            return foundHkey
+      end switch
    end repeat
    return empty
 end htable_GetEither
 
 command htable_EitherLineOffsets searchHkeyLine, hTable, @startLineNum, @endLineNum
-   hkey_Normalize searchHkeyLine
-   -- as fast as possible
-   -- searches hTable for the hType and hName in searchHkeyLine
    -- matches either private of public handlers
-   put char -1 of word 1 of searchHkeyLine into publicType
+   put char -1 of word 1 of searchHkeyLine into hType
+   put word 2 of searchHkeyLine into searchName
    
-   put word 2 of searchHkeyLine into hName
    repeat for each line hLine in hTable
-      put char -1 of word 1 of hLine into foundPublicType
-      if word 2 of hLine = hName and publicType = foundPublicType then
-         put word 3 of hLine into startLineNum
-         put word 4 of hLine into endLineNum
-         return true
-      end if
+      put word 2 of hLine into foundName
+      put word 1 of hLine into foundPublicType
+      if foundName is not searchName then next repeat
+      
+      put char -1 of foundPublicType into fType
+      switch
+         case hType = fType
+         case (hType = "C") AND (fType = "M")
+         case (hType = "M") AND (fType = "C")
+            put word 3 of hLine into startLineNum
+            put word 4 of hLine into endLineNum
+            --
+            return hLine
+      end switch
    end repeat
    put 0 into startLineNum
    put 0 into endLineNum
-   return false
+   return empty
+end htable_EitherLineOffsets
+
+-- command htable_EitherLineOffsets searchHkeyLine, hTable, @startLineNum, @endLineNum
+hkey_Normalize searchHkeyLine
+-- as fast as possible
+-- searches hTable for the hType and hName in searchHkeyLine
+-- matches either private of public handlers
+put char -1 of word 1 of searchHkeyLine into publicType
+
+put word 2 of searchHkeyLine into hName
+repeat for each line hLine in hTable
+   put char -1 of word 1 of hLine into foundPublicType
+   if word 2 of hLine = hName and publicType = foundPublicType then
+      put word 3 of hLine into startLineNum
+      put word 4 of hLine into endLineNum
+      return true
+   end if
+end repeat
+put 0 into startLineNum
+put 0 into endLineNum
+return false
 end htable_EitherLineOffsets
 
 
