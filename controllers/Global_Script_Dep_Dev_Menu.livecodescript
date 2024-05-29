@@ -32,17 +32,25 @@ end menu_CheckTarget
 
 --> Global | Script | Dep | Dev | Menu
 -
+on submenu_Display
+   return "Global | Project | Display | Menu"
+end submenu_Display
 
---> Dev | Menu
--
+on submenu_Create
+   return "Global | Project | Create | Menu"
+end submenu_Create
+
+on submenu_MenuTools
+   return "Global | MenuTools | Menu"
+end submenu_MenuTools
+
 on menu_CreateHkeyArrayObjectGraph sObject
    put LocalArray ["hkeyArray"] into hkeyArray
    --
    graph_CreateScriptObjectHkeyArray hkeyArray, sObject -- in the metadataObject_Folder of sObject
-   
    put the result into svgFile
    --
-   _DisplaySvgFile svgFile
+   _DisplaySvgFile svgFile, the name of sObject
 end menu_CreateHkeyArrayObjectGraph
 
 on menu_DisplayObjectSvg sObject
@@ -50,7 +58,7 @@ on menu_DisplayObjectSvg sObject
    if scriptEditor_PaneExists ("Deps") is true then
       display_ScriptEditorSvg svgFile
    else
-      _DisplaySvgFile svgFile
+      _DisplaySvgFile svgFile, the name of sObject
    end if
 end menu_DisplayObjectSvg
 
@@ -95,7 +103,7 @@ on menu_DisplayProjectSvg sObject
    if scriptEditor_PaneExists ("Deps") is true then
       display_ScriptEditorSvg svgFile
    else
-      _DisplaySvgFile svgFile
+      _DisplaySvgFile svgFile, the name of sObject
    end if
 end menu_DisplayProjectSvg
 
@@ -144,8 +152,8 @@ end menu_DisplayStackDeps
 
 --> Deps
 -
-private command _DisplaySvgFile svgFile
-   display_SVG svgFile
+private command _DisplaySvgFile svgFile, sLabel
+   display_SVG svgFile, sLabel
    put the result into displayView
    if exists (displayView) is false then
       lcw_AnswerWarning "SVG file is empty!", displayView

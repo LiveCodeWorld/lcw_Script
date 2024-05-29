@@ -31,6 +31,11 @@ getprop hkeyArrayGraph_Params
    return "hierarchical,fast undirected spring"
 end hkeyArrayGraph_Params
 
+getprop displayDotText_Params [sObject]
+   put the script_DotFiles [false] of sObject into shortFiles
+   return shortFiles
+end displayDotText_Params
+
 
 --> Global | Script | Dep | Menu
 -
@@ -39,7 +44,8 @@ on menu_HkeyArrayGraph sObject, graphStyle
    graph_CreateScriptObjectHkeyArray hkeyArray, sObject, graphStyle
    put the result into svgFile
    --
-   display_SVG svgFile
+   put the name of sObject into sLabel
+   display_SVG svgFile, sLabel
 end menu_HkeyArrayGraph
 
 on menu_DisplayMissing sObject
@@ -48,10 +54,6 @@ on menu_DisplayMissing sObject
    display_MissingHkey hkeyArray, sObject
 end menu_DisplayMissing
 
-on menu_Refresh sObject
-   display_ScriptDeps sObject
-end menu_Refresh
-
 private on _
 end _
 
@@ -59,25 +61,25 @@ on submenu_Show
    return "Global | HkeyArray | Tree | Menu"
 end submenu_Show
 
-on submenu_Display
-   return "Global | Project | Display | Menu"
-end submenu_Display
-
-on submenu_Create
-   return "Global | Project | Create | Menu"
-end submenu_Create
-
-on submenu_MenuTools
-   return "Global | MenuTools | Menu"
-end submenu_MenuTools
+on menu_Refresh sObject
+   display_ScriptDeps sObject
+end menu_Refresh
 
 private on __
 end __
 
-on menu_ScriptSvgFile sObject
+on menu_DisplayDotText sObject
+   put the script_DotFile of sObject into dotFile
+   --
+   put the name of sObject into displayTitle
+   put "" into mTitle
+   display_TextFile dotFile, displayTitle, mTitle, "Dot"
+end menu_DisplayDotText
+
+on menu_RevealScriptSvgFile sObject
    put the script_SvgFile of sObject into svgFile
    finder_Reveal svgFile
-end menu_ScriptSvgFile
+end menu_RevealScriptSvgFile
 
 on menu_MetadaDataFolder sObject
    -- same as the metadata_Folder of sObject

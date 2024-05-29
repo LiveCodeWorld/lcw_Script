@@ -74,8 +74,15 @@ end hkey_ListVersionNames
 
 --> hKey | Model | Arrays
 -
+function hkey_GetHkeyArray hKey, pOverlayName
+   put hkey_GetOverlayArray (hKey, pOverlayName) into overlayArray
+   put overlayArray ["data"]["linkArray"] into hkeyArray
+   return hkeyArray
+end hkey_GetHkeyArray
+
 function hkey_GetOverlayArray hKey, pOverlayName
    put hkey_FetchOverlayData (hKey) into overlayData
+   --
    overlayData_NormalizeName pOverlayName, overlayData
    put overlayData [pOverlayName] into overlayArray
    return overlayArray

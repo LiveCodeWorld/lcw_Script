@@ -10,18 +10,50 @@ version: 0.9
 We are moving over from old comma based hKeys to new format.
 This is for the following reasons:
 
-- 1) revAvailable handlers returns in this format
-- 2) the tree widget does nto work well with keys that contain commas
-- 3) It reads better on screen and in the wiki
-*/
+- revAvailable handlers returns in this format
+- the tree widget does nto work well with keys that contain commas
+- It reads better on screen and in the wiki
 
---> Working on
--
-/*
 Need to rename these "project" handlers to "object_"
 Working on handlers from "Overlay | File | Props" --- need to check them
 */
 
+--> Working on
+-
+getprop script_DotText
+   put the long id of the target into sObject
+   put the script_DotFile of sObject into dotFile
+   -- put text_Get (dotFile) into dotText
+   put url ("file:" & dotFile) into dotText
+   return dotText
+end script_DotText
+
+getprop script_DotFile [pOverlayName]
+   put the long id of the target into sObject
+   put scriptObject_DotFile (sObject, pOverlayName) into scriptArrayFolder
+   return scriptArrayFolder
+end script_DotFile
+
+getprop script_DotFiles [pLong]
+   put the script_MetadataFiles [pLong] of the target into dotFiles
+   --
+   filter dotFiles with "*.dot"
+   return dotFiles
+end script_DotFiles
+
+command scriptObject_NormalizeGraphName @pOverlayName, overlayFolder
+   -- seems a wrong default?
+   if pOverlayName is empty then
+      put overlay_GetData (overlayFolder) into overlayData
+      put line 1 of keys (overlayData) into pOverlayName
+      if pOverlayName is empty then put "undirected spring" into pOverlayName
+   end if
+   return pOverlayName
+end scriptObject_NormalizeGraphName
+
+
+--> Props
+-
 getprop overlay_Folder [pDontCreate]
    -- /metadata/objects/ 
    -- it is the metadata for for a script object
@@ -33,23 +65,17 @@ getprop overlay_Folder [pDontCreate]
 end overlay_Folder
 
 getprop script_OverlayFile [pDontCreate]
-   put the long id of the target into scriptObject
-   put the overlay_Folder [pDontCreate] of scriptObject into overlayFolder
+   put the long id of the target into sObject
+   put the overlay_Folder [pDontCreate] of sObject into overlayFolder
    
    -- put overlayFolder & "overlaydata.array" into someFile
    put overlay_ArrayFile (overlayFolder) into someFile
    return someFile
 end script_OverlayFile
 
-getprop script_DotFile [pOverlayName]
-   put the long id of the target into scriptObject
-   put scriptObject_DotFile (scriptObject, pOverlayName) into scriptArrayFolder
-   return scriptArrayFolder
-end script_DotFile
-
 getprop script_CmapFile [pOverlayName]
-   put the long id of the target into scriptObject
-   put the textStack_MetadataFolder [true] of scriptObject into scriptFolder
+   put the long id of the target into sObject
+   put the textStack_MetadataFolder [true] of sObject into scriptFolder
    
    scriptObject_NormalizeGraphName pOverlayName, scriptFolder
    put pOverlayName & ".cmapx" into shortFile
@@ -62,32 +88,54 @@ end script_CmapFile
 -
 getprop script_SvgFile [graphStyle]
    if graphStyle is empty then put "hierarchical" into shortFile
-   put the long id of the target into scriptObject
+   put the long id of the target into sObject
    
-   put the metadataObject_Folder [pDontCreate] of scriptObject into metadataFolder
+   put the metadataObject_Folder [pDontCreate] of sObject into metadataFolder
    put metadataFolder & shortFile & ".svg" into svgFile
    return svgFile
 end script_SvgFile
 
+getprop script_DotFiles
+   
+end script_DotFiles
+
 getprop script_SvgFiles
-   put the long id of the target into scriptObject
-   put the metadataObject_Folder [pDontCreate] of scriptObject into metadataFolder
+   put the script_MetadataFiles [true] of the target into svgFiles
+   --
+   filter svgFiles with "*.svg"
+   return svgFiles
+   
+   put the long id of the target into sObject
+   put the metadataObject_Folder [pDontCreate] of sObject into metadataFolder
    put overlay_ListScriptSvgShortFiles (metadataFolder)into shortSvgFiles
    put file_AddFolderToPaths (shortSvgFiles, overlayFolder, false, ".svg") into svgFiles
    return svgFiles
 end script_SvgFiles
 
 getprop script_SvgShortFiles
-   put the long id of the target into scriptObject
-   put the metadataObject_Folder [pDontCreate] of scriptObject into metadataFolder
-   put files (metadataFolder) into shortSvgFiles
+   put the script_MetadataFiles [false] of the target into shortSvgFiles
+   --
    filter shortSvgFiles with "*.svg"
    return shortSvgFiles
 end script_SvgShortFiles
 
+getprop script_MetadataFiles [pLong]
+   put the long id of the target into sObject
+   --
+   put the metadataObject_Folder [true] of sObject into metadataFolder
+   put files (metadataFolder) into shortFiles
+   --
+   if pLong is false then
+      return shortFiles
+   else
+      put file_AddFolderToPaths (shortFiles, metadataFolder, false) into longFiles
+      return longFiles
+   end if
+end script_MetadataFiles
+
 getprop script_GraphImageFile [pOverlayName]
-   put the long id of the target into scriptObject
-   return scriptObject_ImageFile (scriptObject, pOverlayName)
+   put the long id of the target into sObject
+   return scriptObject_ImageFile (sObject, pOverlayName)
 end script_GraphImageFile
 
 getprop script_ImageFiles
@@ -97,8 +145,8 @@ getprop script_ImageFiles
 end script_ImageFiles
 
 getprop script_GraphImageFile [pOverlayName]
-   put the long id of the target into scriptObject
-   return scriptObject_ImageFile (scriptObject, pOverlayName)
+   put the long id of the target into sObject
+   return scriptObject_ImageFile (sObject, pOverlayName)
 end script_GraphImageFile
 
 getprop script_ImageFiles
@@ -256,22 +304,22 @@ getprop script_File [pDontCreate]
 end script_File
 
 getprop script_HelpFile [pDontCreate]
-   put the long id of the target into scriptObject
-   put the textStack_MetadataFolder [pDontCreate] of scriptObject into metadataFolder
+   put the long id of the target into sObject
+   put the textStack_MetadataFolder [pDontCreate] of sObject into metadataFolder
    put metadataFolder & "help.html" into someFile
    return someFile
 end script_HelpFile
 
 getprop script_HelpFile [pDontCreate]
-   put the long id of the target into scriptObject
-   put the textStack_MetadataFolder [pDontCreate] of scriptObject into metadataFolder
+   put the long id of the target into sObject
+   put the textStack_MetadataFolder [pDontCreate] of sObject into metadataFolder
    put metadataFolder & "help.html" into someFile
    return someFile
 end script_HelpFile
 
 getprop script_OverlayFile [pDontCreate]
-   put the long id of the target into scriptObject
-   put the overlay_Folder [pDontCreate] of scriptObject into overlayFolder
+   put the long id of the target into sObject
+   put the overlay_Folder [pDontCreate] of sObject into overlayFolder
    
    -- put overlayFolder & "overlaydata.array" into someFile
    put overlay_ArrayFile (overlayFolder) into someFile
@@ -279,14 +327,14 @@ getprop script_OverlayFile [pDontCreate]
 end script_OverlayFile
 
 getprop script_DotFile [pOverlayName]
-   put the long id of the target into scriptObject
-   put scriptObject_DotFile (scriptObject, pOverlayName) into scriptArrayFolder
+   put the long id of the target into sObject
+   put scriptObject_DotFile (sObject, pOverlayName) into scriptArrayFolder
    return scriptArrayFolder
 end script_DotFile
 
 getprop script_CmapFile [pOverlayName]
-   put the long id of the target into scriptObject
-   put the textStack_MetadataFolder [true] of scriptObject into scriptFolder
+   put the long id of the target into sObject
+   put the textStack_MetadataFolder [true] of sObject into scriptFolder
    
    scriptObject_NormalizeGraphName pOverlayName, scriptFolder
    put pOverlayName & ".cmapx" into shortFile
@@ -295,8 +343,8 @@ getprop script_CmapFile [pOverlayName]
 end script_CmapFile
 
 getprop script_Files
-   put the long id of the target into scriptObject
-   put the textStack_MetadataFolder [true] of scriptObject into metadataFolder
+   put the long id of the target into sObject
+   put the textStack_MetadataFolder [true] of sObject into metadataFolder
    put file_ListShort (metadataFolder) into someFiles
    return someFiles
 end script_Files
@@ -304,22 +352,22 @@ end script_Files
 
 --> Files
 -
-function scriptObject_GetSvgFile scriptObject, shortSvgFile, pDontCreate
-   put the metadataObject_Folder [pDontCreate] of scriptObject into metadataFolder
+function scriptObject_GetSvgFile sObject, shortSvgFile, pDontCreate
+   put the metadataObject_Folder [pDontCreate] of sObject into metadataFolder
    put metadataFolder & shortSvgFile into svgFile
    return svgFile
 end scriptObject_GetSvgFile
 
-function scriptObject_ImageFile scriptObject, pOverlayName
-   put the textStack_MetadataFolder [true] of scriptObject into scriptFolder
+function scriptObject_ImageFile sObject, pOverlayName
+   put the textStack_MetadataFolder [true] of sObject into scriptFolder
    scriptObject_NormalizeGraphName pOverlayName, scriptFolder
    put pOverlayName & "." & "png" into shortFile
    put scriptFolder & shortFile into someFile
    return someFile
 end scriptObject_ImageFile
 
-function scriptObject_DotFile scriptObject, pOverlayName
-   put the metadataObject_Folder [true] of scriptObject into scriptFolder
+function scriptObject_DotFile sObject, pOverlayName
+   put the metadataObject_Folder [true] of sObject into scriptFolder
    scriptObject_NormalizeGraphName pOverlayName, scriptFolder
    put pOverlayName & ".dot" into shortFile
    put scriptFolder & shortFile into someFile

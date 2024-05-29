@@ -7,37 +7,9 @@ type: library
 version: 0.1
 
 
---> Display | Events
--
-on mDouble_EditHkey indexView, shortHkey
-   put the displayed_Object of indexView into hObject
-   put hKeyLine_AddObject (shortHkey, hObject) into hKeyLine
-   hkey_Edit hKeyLine
-end mDouble_EditHkey
-
-on mDoubleUp_MissingHkey displayView, someLine
-   put the title_Text of displayView into someTitle
-   return displayView
-end mDoubleUp_MissingHkey
-
-command display_MissingHkey hkeyArray, pObject
-   get hkeyArray_GetStackDepArray (hkeyArray)
-   put it ["Missing"] into missingArray
-   --
-   if exists (pObject) then
-      put the name of pObject into sTitle
-   else
-      put "HkeyArray" into sTitle
-   end if
-   display_Data missingArray, sTitle, "Missing Hkeys"
-   display_SetInteractions the result, "HkeyArray | Missing", "mDoubleUp_MissingHkey"
-   return the result
-end display_MissingHkey
-
-
 --> Display | Script | Walk
 -
-command display_ScriptDeps sObject
+command display_ScriptDeps sObject, pGraphStyle
    -- put the hkey_ScriptHierarchy of sObject into searchObjects
    -- see "display_TransportObjectDeps" which uses the same "walk_GetObjectHkeyArray"
    
@@ -51,7 +23,16 @@ command display_ScriptDeps sObject
    --
    set the displayed_Object of displayView to sObject
    set the displayed_Style of displayView to "projects"
-   --
+   
+   # Draw Graph
+   if pGraphStyle is not empty then
+      graph_CreateScriptObjectHkeyArray hkeyArray, sObject, pGraphStyle
+      put the result into svgFile
+      --
+      put the name of sObject into sLabel
+      display_SVG svgFile, sLabel
+   end if
+   
    return displayView
 end display_ScriptDeps
 
@@ -88,3 +69,33 @@ command display_ScriptObject scriptObject, someTitle, pHkeys
    set the multiple_Hilites of indexView to false
    return indexView
 end display_ScriptObject
+
+
+--> Display | Events
+-
+on mDouble_EditHkey indexView, shortHkey
+   breakpoint
+   put the displayed_Object of indexView into hObject
+   put hKeyLine_AddObject (shortHkey, hObject) into hKeyLine
+   hkey_Edit hKeyLine
+end mDouble_EditHkey
+
+on mDoubleUp_MissingHkey displayView, someLine
+   breakpoint
+   put the title_Text of displayView into someTitle
+   return displayView
+end mDoubleUp_MissingHkey
+
+command display_MissingHkey hkeyArray, pObject
+   get hkeyArray_GetStackDepArray (hkeyArray)
+   put it ["Missing"] into missingArray
+   --
+   if exists (pObject) then
+      put the name of pObject into sTitle
+   else
+      put "HkeyArray" into sTitle
+   end if
+   display_Data missingArray, sTitle, "Missing Hkeys"
+   display_SetInteractions the result, "HkeyArray | Missing", "mDoubleUp_MissingHkey"
+   return the result
+end display_MissingHkey

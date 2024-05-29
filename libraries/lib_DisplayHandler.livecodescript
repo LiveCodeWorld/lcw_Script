@@ -21,21 +21,9 @@ end display_CreateFastHandlerGraph
 command display_CreateHandlerGraph hKey, pGraphStyle
    graph_Hkey hKey, pGraphStyle
    put the result into svgFile
-   display_SVG svgFile
-   return hKey
-   
-   -- buggy: doesn't use lib_HkeyWalk
-   -- used by "Global_Hkey_Walk_Menu"
-   set the cursor to watch
-   put the long id of me into processObject
-   hkey_Deconstruct hKey, hName, hType, hObject, hNum
-   put the project_Name of hObject into projectName
-   graph_HkeyDependency hkey, projectName, "hierarchical", pClusterBoolean, processObject
-   put the result into svgFile
    --
    display_SVG svgFile, hKey
-   put the result into displayView
-   return svgFile
+   return hKey
 end display_CreateHandlerGraph
 
 command display_HandlerDeps hKeyLine
