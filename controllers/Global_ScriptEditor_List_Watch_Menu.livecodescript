@@ -33,11 +33,10 @@ end menu_HandlerCurlyData
 
 on menu_ObjectCurlyData hKey
    hkey_Deconstruct hKey, hName, hType, hObject, hNum
-   put the script_MetaData ["type"] of hObject into scriptType
    --
-   put help_ObjectCurlyData (hObject, scriptType) into curlyData
+   put the curly_Data of hObject into curlyData
    --
-   display_Data curlyData, hObject, "help_ObjectCurlyData()"
+   display_Data curlyData, hObject, "curly_Data()"
 end menu_ObjectCurlyData
 
 on submenu_HelpMenu

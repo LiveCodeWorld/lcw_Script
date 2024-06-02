@@ -1,0 +1,7 @@
+on mouseDown
+   set the text of me to ide_RevMenubarText ("[[mName]]")
+end mouseDown
+
+on menuPick mItem
+   ide_RevMenubarMenuPick "[[mName]]", mItem
+end menuPick

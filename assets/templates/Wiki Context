@@ -1,0 +1,14 @@
+const identifiers = Object.fromEntries(
+  new URLSearchParams(
+    window.location.hash.substr(1)
+  ).entries()
+)
+
+console.log({
+  origin: identifiers.origin,
+  title: identifiers.title,
+  site: identifiers.site,
+  slug: identifiers.slug,
+  pageKey: identifiers.pageKey,
+  itemId: identifiers.itemId
+})

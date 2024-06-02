@@ -41,8 +41,8 @@ end submenu_Script
 private on __
 end __
 
-on menu_ObjectHelp seButton
+on menu_ScriptHelp seButton
    -- launch_MenuHelp
    put scriptEditor_Object() into sObject
-   display_HelpDraft sObject
-end menu_ObjectHelp
+   draft_ScriptHelp sObject
+end menu_ScriptHelp
