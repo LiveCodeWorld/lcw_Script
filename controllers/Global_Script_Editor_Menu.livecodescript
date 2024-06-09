@@ -127,333 +127,7 @@ getprop disabled_FindInHierarchy [mTarget]
    end if
 end disabled_FindInHierarchy
 
-
---> Global | Script | Editor | Menu
--
-on menu_FindLibraryHandler mTarget, findWhat
-   put _getSelectedText (findWhat) into textToFind
-   
-   -- let's look in handler library folder
-   put library_HandlerFolder() into findInsideFolder
-   put spotlight_Find (textToFind, findInsideFolder) into filePaths
-   
-   -- sort filePaths
-   put file_ConstructFolderArray (filePaths, "*/script.txt", findInsideFolder) into pathArray
-   if pathArray is not an array then
-      answer "I cannot find this handler anywhere!"
-      exit to top
-   end if
-   
-   display_Array pathArray, textToFind, "Files with hKey"
-   put the result into displayView
-   set the mouse_DoubleUp of displayView to "launchFile"
-   set the search_Folder of displayView to findInsideFolder
-   set the search_Text of displayView to textToFind
-end menu_FindLibraryHandler
-
-on menu_FindProjectHandler mTarget, findWhat
-   put _getSelectedText (findWhat) into textToFind
-   
-   local findInsideFolder -- let's look everywhere
-   -- put project_HandlerFolder() into findInsideFolder -- let's look in handler any project folder
-   put spotlight_Find (textToFind, findInsideFolder) into filePaths
-   
-   put "Global | Hkey | Send | Menu" into titleMenu
-   put merge ("Files with hKey '[[item 1 of textToFind]]'") into someTitle
-   display_Files filePaths, findInsideFolder, "launchFile", titleMenu, someTitle
-   -- filePaths,"*/script.txt", fads 
-   
-   -- set the search_Folder of treeWidget to findInsideFolder
-   set the search_Text of treeWidget to textToFind
-end menu_FindProjectHandler
-
-on _
-end _
-
-on menu_HierarchyObject mTarget, someThing
-   menu_SetChoice someThing, someThing, someType
-   put ObjectDictionary [someThing] into scriptObject
-   if someType is "behavior" then
-      put the behavior of scriptObject into scriptObject
-   end if
-   edit the script of scriptObject
-end menu_HierarchyObject
-
-on menu_CardView mTarget, viewThing
-   put view_GetTemplateObject (viewThing) into someView
-   if exists(someView) is false then
-      beep
-      exit to top
-   end if
-   
-   put the behavior of someView into someBehavior
-   if exists(someBehavior) then
-      edit the script of someBehavior
-   else
-      edit the script of someView
-   end if
-end menu_CardView
-
-on _
-end _
-
-on submenu_Script
-   return "Global | Script | Edit | Menu"
-end submenu_Script
-
-on submenu_Behavior
-   return "Global | Script | Behavior | Menu"
-end submenu_Behavior
-
-on submenu_ScriptBehavior
-   return "Global | Dependency | Behavior | Menu"
-end submenu_ScriptBehavior
-
-on submenu_Template
-   return "Global | Script | Template | Menu"
-end submenu_Template
-
-on _
-end _
-
-on menu_Go mTarget, whichStack
-   switch whichStack
-      case "Display Array"
-         go to stack "Display Array"
-         break
-      case "Edit libOPN_Display"
-         edit the script of stack "libOPN_Display"
-         break
-      case "-"
-      case "View Browser"
-         go to stack "libOPN_ViewBrowser"
-         break
-      case "libOPN_Menus"
-         go to stack "libOPN_Menus"
-         --
-         display_EnvironmentMenus
-         --
-         break
-      case "libOPN_GIT"
-         go to stack "libOPN_GIT"
-         break
-   end switch
-end menu_Go
-
-on menu_GoToObject
-   put scriptEditor_Object() into someObject
-   object_GoTo someObject
-end menu_GoToObject
-
-on submenu_Object
-   return "Global | Script | Object | Menu"
-end submenu_Object
-
-on menu_EditBehavior seGroup, whichBehavior
-   switch whichBehavior
-      case "Compile"
-         put scriptEditor_CompileButtonBehavior() into bObject
-         break
-      case "Menu"
-         put scriptEditor_HistoryButtonBehavior() into bObejct
-         break
-      case "Script"
-         put scriptEditor_ScriptFieldBehavior() into bObject
-         break
-      case "Handler"
-         put scriptEditor_HandlerListBehavior() into bObject
-         break
-      case "Search"
-         put scriptEditor_FindFieldBehavior() into bObject
-         break
-   end switch
-   edit the script of bObject
-end menu_EditBehavior
-
-on _
-end _
-
-on submenu_StackHistory
-   return "Global | Git | Stack | History | Menu"
-end submenu_StackHistory
-
--- on submenu_ScriptHistory
-return "Global | Script | History | Menu"
-end submenu_ScriptHistory
-
--- on submenu_Teamster
-return "Global | Teamster | Menu"
-end submenu_Teamster
-
--- on submenu_Script
-return "Global | Script | Menu"
-end submenu_Script
-
-on submenu_Archive
-   return "Global | OPN | Save Count | Menu"
-end submenu_Archive
-
-on _
-end _
-
-on submenu_Library
-   return "Global | Library | Menu"
-end submenu_Library
-
-on submenu_ManageLibrary
-   return "Global | Library | Manage | Menu"
-end submenu_ManageLibrary
-
-on submenu_Stack
-   return "Global | Stack | Menu"
-end submenu_Stack
-
-on _
-end _
-
-on submenu_Dev
-   return "Dev | Menu"
-end submenu_Dev
-
-
---> Deps
--
-command launchFile treeWidget, shortPath
-   -- for "display_Array" in "menu_FindLibraryHandler" and "menu_FindProjectHandler"
-   
-   put the search_Folder of treeWidget into findInsideFolder
-   put the search_Text of treeWidget into textToFind
-   
-   text_AddTrailing findInsideFolder
-   put findInsideFolder & shortPath into somePath
-   set the itemdelimiter to "/"
-   put item 1 of shortPath into shortHandlerFolder
-   put hkey_FromShortFolder (shortHandlerFolder)
-end launchFile
-
-command field_SetSelected scriptField, @textSelected, @someLine, @lineNum, @someScript, @startChar, @endChar
-   put the selectedText into textSelected   
-   put the selectedchunk into chunkSelected
-   put word 2 of the selectedLine into lineNum
-   
-   put word 2 of chunkSelected into startChar
-   put word 4 of chunkSelected into endChar
-   put the text of scriptField into someScript
-   put line lineNum of someScript into someLine
-end field_SetSelected
-
-function hkey_GetSelected scriptField
-   field_SetSelected scriptField, someScript, someLine, lineNum, someScript, startChar, endChar
-   put hkey_FromSelected (someScript, endChar) into shortHkey
-   return shortHkey
-end hkey_GetSelected
-
-function hkey_FromSelected someScript, endChar
-   get char 1 to endChar of someScript
-   put the number of tokens of it into tokenNum
-   
-   put token tokenNum of someScript into thisToken
-   put token (tokenNum + 1) of someScript into nextToken
-   put token (tokenNum - 1) of someScript into previousToken
-   put token (tokenNum - 2) of someScript into setToken
-   
-   if nextToken is "(" then
-      put "f" into handlerType
-   else if previousToken = "the" then
-      if setToken = "set" then
-         put "s" into handlerType
-      else
-         put "g" into handlerType
-      end if
-   else
-      -- what if it is a message?
-      put "c" into handlerType
-   end if
-   
-   -- needs to be short as handler could be anywhere in hierarchy
-   return thisToken, handlerType
-end hkey_FromSelected
-
-
---> Display | Controllers
--
-on tree_MouseDoubleUp treeField 
-   if the tree_IsLeaf of treeField is false then
-      -- pass tree_MouseDoubleUp
-      dispatch "tree_Expand" to treeField
-   else
-      put the tree_SelectedLink of treeField into hKey
-      set the clipboarddata to hKey
-      hkey_Edit hKey
-   end if
-end tree_MouseDoubleUp
-
-
---> Display
--
-command display_ScriptKeywordLinks intersectArray
-   -- display_Array intersectArray
-   put _ConstructSortedOutlineSection ("and", intersectArray) after someOutline
-   put _ConstructSortedOutlineSection ("handler keyword", intersectArray, true) after someOutline
-   
-   put "all keyword links" into someTitle
-   put intersectArray [someTitle] into hKeys
-   sort hKeys by item 1 of each
-   put hkey_ConstructNameLinks (hKeys) into htmlLines
-   put the number of lines of hKeys into someNum
-   put someTitle && "(" & someNum & ")" into someTitle
-   put someTitle & CR after someOutline
-   put outline_IncreaseIndent (htmlLines, 1) & CR after someOutline 
-   
-   put "ordered keywords" into someTitle
-   put someTitle & CR after someOutline
-   put intersectArray [someTitle] into htmlLines
-   put outline_IncreaseIndent (htmlLines, 1) & CR after someOutline 
-   
-   delete char -1 of someOutline
-   
-   put "Script Keyword Search" into displayTitle
-   put empty into treeMenuTitle
-   put empty into treeLineMenuTitle
-   display_Outline someOutline, displayTitle, treeMenuTitle, treeLineMenuTitle, "and,2,handler keyword,ordered keywords"
-   put the result into treeView
-   put the tree_Field of treeView into treeField
-   
-   put the long id of me into myController
-   put hkey_Construct("tree_MouseDoubleUp", "c", myController) into hKey
-   set the event_Trigger ["mouseDoubleUp"] of treeField to hKey
-end display_ScriptKeywordLinks
-
-private function _ConstructSortedOutlineSection someTitle, intersectArray, tidyHkeys
-   put someTitle & CR after someOutline
-   put intersectArray [someTitle] into titleArray
-   
-   repeat for each key nestedTitle in titleArray
-      put titleArray [nestedTitle] into someNames
-      put the number of lines of someNames into someNum
-      put nestedTitle,someNum & CR after someTable
-   end repeat
-   delete char -1 of someTable
-   -- sort someTable by item 1 of each
-   sort numeric someTable by item 2 of each
-   
-   repeat for each line someLine in someTable
-      put item 1 of someLine into nestedTitle
-      put item 2 of someLine into someNum
-      put titleArray [nestedTitle] into someNames
-      sort someNames by item 1 of each
-      
-      put nestedTitle && "(" & someNum & ")" into nestedTitle
-      if someNames is not empty then
-         if tidyHkeys is true then put hkey_ConstructNameLinks (someNames) into someNames
-         put tab & nestedTitle & CR after someOutline
-         put outline_IncreaseIndent (someNames, 2) & CR after someOutline
-      end if
-   end repeat
-   return someOutline
-end _ConstructSortedOutlineSection
-
-
+/*
 --> Dev | menu
 -
 /*
@@ -629,3 +303,344 @@ function menu_LibraryOutline
     delete char -1 of subMenu
     return subMenu
 end menu_LibraryOutline
+*/
+
+--> Global | Script | Editor | Menu
+-
+on menu_FindLibraryHandler mTarget, findWhat
+   put _getSelectedText (findWhat) into textToFind
+   
+   -- let's look in handler library folder
+   put library_HandlerFolder() into findInsideFolder
+   put spotlight_Find (textToFind, findInsideFolder) into filePaths
+   
+   -- sort filePaths
+   put file_ConstructFolderArray (filePaths, "*/script.txt", findInsideFolder) into pathArray
+   if pathArray is not an array then
+      answer "I cannot find this handler anywhere!"
+      exit to top
+   end if
+   
+   display_Array pathArray, textToFind, "Files with hKey"
+   put the result into displayView
+   set the mouse_DoubleUp of displayView to "launchFile"
+   set the search_Folder of displayView to findInsideFolder
+   set the search_Text of displayView to textToFind
+end menu_FindLibraryHandler
+
+on menu_FindProjectHandler mTarget, findWhat
+   put _getSelectedText (findWhat) into textToFind
+   
+   local findInsideFolder -- let's look everywhere
+   -- put project_HandlerFolder() into findInsideFolder -- let's look in handler any project folder
+   put spotlight_Find (textToFind, findInsideFolder) into filePaths
+   
+   put "Global | Hkey | Send | Menu" into titleMenu
+   put merge ("Files with hKey '[[item 1 of textToFind]]'") into someTitle
+   display_Files filePaths, findInsideFolder, "launchFile", titleMenu, someTitle
+   -- filePaths,"*/script.txt", fads 
+   
+   -- set the search_Folder of treeWidget to findInsideFolder
+   set the search_Text of treeWidget to textToFind
+end menu_FindProjectHandler
+
+on _
+end _
+
+on menu_HierarchyObject mTarget, someThing
+   _SetChoice someThing, someThing, someType
+   put ObjectDictionary [someThing] into scriptObject
+   if someType is "behavior" then
+      put the behavior of scriptObject into scriptObject
+   end if
+   edit the script of scriptObject
+end menu_HierarchyObject
+
+on menu_CardView mTarget, viewThing
+   put view_GetTemplateObject (viewThing) into someView
+   if exists(someView) is false then
+      beep
+      exit to top
+   end if
+   
+   put the behavior of someView into someBehavior
+   if exists(someBehavior) then
+      edit the script of someBehavior
+   else
+      edit the script of someView
+   end if
+end menu_CardView
+
+on _
+end _
+
+on submenu_Script
+   return "Global | Script | Edit | Menu"
+end submenu_Script
+
+on submenu_Behavior
+   return "Global | Script | Behavior | Menu"
+end submenu_Behavior
+
+on submenu_ScriptBehavior
+   return "Global | Dependency | Behavior | Menu"
+end submenu_ScriptBehavior
+
+on submenu_Template
+   return "Global | Script | Template | Menu"
+end submenu_Template
+
+on _
+end _
+
+on menu_Go mTarget, whichStack
+   switch whichStack
+      case "Display Array"
+         go to stack "Display Array"
+         break
+      case "Edit libOPN_Display"
+         edit the script of stack "libOPN_Display"
+         break
+      case "-"
+      case "View Browser"
+         go to stack "libOPN_ViewBrowser"
+         break
+      case "libOPN_Menus"
+         go to stack "libOPN_Menus"
+         --
+         display_EnvironmentMenus
+         --
+         break
+      case "libOPN_GIT"
+         go to stack "libOPN_GIT"
+         break
+   end switch
+end menu_Go
+
+on menu_GoToObject
+   put scriptEditor_Object() into someObject
+   object_GoTo someObject
+end menu_GoToObject
+
+on submenu_Object
+   return "Global | Script | Object | Menu"
+end submenu_Object
+
+on menu_EditBehavior seGroup, whichBehavior
+   switch whichBehavior
+      case "Compile"
+         put scriptEditor_CompileButtonBehavior() into bObject
+         break
+      case "Menu"
+         put scriptEditor_HistoryButtonBehavior() into bObejct
+         break
+      case "Script"
+         put scriptEditor_ScriptFieldBehavior() into bObject
+         break
+      case "Handler"
+         put scriptEditor_HandlerListBehavior() into bObject
+         break
+      case "Search"
+         put scriptEditor_FindFieldBehavior() into bObject
+         break
+   end switch
+   edit the script of bObject
+end menu_EditBehavior
+
+on _
+end _
+
+on submenu_StackHistory
+   return "Global | Git | Stack | History | Menu"
+end submenu_StackHistory
+
+-- on submenu_ScriptHistory
+return "Global | Script | History | Menu"
+end submenu_ScriptHistory
+
+-- on submenu_Teamster
+return "Global | Teamster | Menu"
+end submenu_Teamster
+
+-- on submenu_Script
+return "Global | Script | Menu"
+end submenu_Script
+
+on submenu_Archive
+   return "Global | OPN | Save Count | Menu"
+end submenu_Archive
+
+on _
+end _
+
+on submenu_Library
+   return "Global | Library | Menu"
+end submenu_Library
+
+on submenu_ManageLibrary
+   return "Global | Library | Manage | Menu"
+end submenu_ManageLibrary
+
+on submenu_Stack
+   return "Global | Stack | Menu"
+end submenu_Stack
+
+on _
+end _
+
+on submenu_Dev
+   return menu_DevTitle ("Global | Script | Editor | Menu")
+end submenu_Dev
+
+
+--> Deps
+-
+private command _SetChoice menuChoice, @mainChoice, @secondChoice
+   -- bug - needs to take account of quoted things like stack names with "|" in their name.
+   text_StarQuoted menuChoice
+   put the result into replacedArray
+   put replacedArray ["original text"] into oText
+   
+   put line 1 of menuChoice into menuChoice
+   set the itemdelimiter to "|"
+   put the number of chars of item 1 of menuChoice into firstLength
+   put char 1 to firstLength of oText into mainChoice
+   
+   put firstLength + 2 into secondStart
+   put char secondStart to -1 of oText into secondChoice
+end _SetChoice
+
+command launchFile treeWidget, shortPath
+   -- for "display_Array" in "menu_FindLibraryHandler" and "menu_FindProjectHandler"
+   
+   put the search_Folder of treeWidget into findInsideFolder
+   put the search_Text of treeWidget into textToFind
+   
+   text_AddTrailing findInsideFolder
+   put findInsideFolder & shortPath into somePath
+   set the itemdelimiter to "/"
+   put item 1 of shortPath into shortHandlerFolder
+   put hkey_FromShortFolder (shortHandlerFolder)
+end launchFile
+
+command field_SetSelected scriptField, @textSelected, @someLine, @lineNum, @someScript, @startChar, @endChar
+   put the selectedText into textSelected   
+   put the selectedchunk into chunkSelected
+   put word 2 of the selectedLine into lineNum
+   
+   put word 2 of chunkSelected into startChar
+   put word 4 of chunkSelected into endChar
+   put the text of scriptField into someScript
+   put line lineNum of someScript into someLine
+end field_SetSelected
+
+function hkey_GetSelected scriptField
+   field_SetSelected scriptField, someScript, someLine, lineNum, someScript, startChar, endChar
+   put hkey_FromSelected (someScript, endChar) into shortHkey
+   return shortHkey
+end hkey_GetSelected
+
+function hkey_FromSelected someScript, endChar
+   get char 1 to endChar of someScript
+   put the number of tokens of it into tokenNum
+   
+   put token tokenNum of someScript into thisToken
+   put token (tokenNum + 1) of someScript into nextToken
+   put token (tokenNum - 1) of someScript into previousToken
+   put token (tokenNum - 2) of someScript into setToken
+   
+   if nextToken is "(" then
+      put "f" into handlerType
+   else if previousToken = "the" then
+      if setToken = "set" then
+         put "s" into handlerType
+      else
+         put "g" into handlerType
+      end if
+   else
+      -- what if it is a message?
+      put "c" into handlerType
+   end if
+   
+   -- needs to be short as handler could be anywhere in hierarchy
+   return thisToken, handlerType
+end hkey_FromSelected
+
+
+--> Display | Controllers
+-
+on tree_MouseDoubleUp treeField 
+   if the tree_IsLeaf of treeField is false then
+      -- pass tree_MouseDoubleUp
+      dispatch "tree_Expand" to treeField
+   else
+      put the tree_SelectedLink of treeField into hKey
+      set the clipboarddata to hKey
+      hkey_Edit hKey
+   end if
+end tree_MouseDoubleUp
+
+
+--> Display
+-
+command display_ScriptKeywordLinks intersectArray
+   -- display_Array intersectArray
+   put _ConstructSortedOutlineSection ("and", intersectArray) after someOutline
+   put _ConstructSortedOutlineSection ("handler keyword", intersectArray, true) after someOutline
+   
+   put "all keyword links" into someTitle
+   put intersectArray [someTitle] into hKeys
+   sort hKeys by item 1 of each
+   put hkey_ConstructNameLinks (hKeys) into htmlLines
+   put the number of lines of hKeys into someNum
+   put someTitle && "(" & someNum & ")" into someTitle
+   put someTitle & CR after someOutline
+   put outline_IncreaseIndent (htmlLines, 1) & CR after someOutline 
+   
+   put "ordered keywords" into someTitle
+   put someTitle & CR after someOutline
+   put intersectArray [someTitle] into htmlLines
+   put outline_IncreaseIndent (htmlLines, 1) & CR after someOutline 
+   
+   delete char -1 of someOutline
+   
+   put "Script Keyword Search" into displayTitle
+   put empty into treeMenuTitle
+   put empty into treeLineMenuTitle
+   display_Outline someOutline, displayTitle, treeMenuTitle, treeLineMenuTitle, "and,2,handler keyword,ordered keywords"
+   put the result into treeView
+   put the tree_Field of treeView into treeField
+   
+   put the long id of me into myController
+   put hkey_Construct("tree_MouseDoubleUp", "c", myController) into hKey
+   set the event_Trigger ["mouseDoubleUp"] of treeField to hKey
+end display_ScriptKeywordLinks
+
+private function _ConstructSortedOutlineSection someTitle, intersectArray, tidyHkeys
+   put someTitle & CR after someOutline
+   put intersectArray [someTitle] into titleArray
+   
+   repeat for each key nestedTitle in titleArray
+      put titleArray [nestedTitle] into someNames
+      put the number of lines of someNames into someNum
+      put nestedTitle,someNum & CR after someTable
+   end repeat
+   delete char -1 of someTable
+   -- sort someTable by item 1 of each
+   sort numeric someTable by item 2 of each
+   
+   repeat for each line someLine in someTable
+      put item 1 of someLine into nestedTitle
+      put item 2 of someLine into someNum
+      put titleArray [nestedTitle] into someNames
+      sort someNames by item 1 of each
+      
+      put nestedTitle && "(" & someNum & ")" into nestedTitle
+      if someNames is not empty then
+         if tidyHkeys is true then put hkey_ConstructNameLinks (someNames) into someNames
+         put tab & nestedTitle & CR after someOutline
+         put outline_IncreaseIndent (someNames, 2) & CR after someOutline
+      end if
+   end repeat
+   return someOutline
+end _ConstructSortedOutlineSection

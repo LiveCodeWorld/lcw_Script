@@ -15,6 +15,9 @@ So we can calculate a good guess. Even a bit of a hack is useful in terms of fin
 
 --> Working on
 -
+
+--> Props
+-
 getprop object_Hierarchy [pWhichBehaviors]
    -- this old handler return things the wrong way round
    -- see also "script_Hierarchy" 
@@ -243,20 +246,3 @@ function rev_AppContentsFolder
    put empty into item -1 of appContentsFolder
    return appContentsFolder
 end rev_AppContentsFolder
-
-getprop behavior_Objects
-   put the long id of the target into targetObject
-   put behavior_GetHierarchy (targetObject) into bObjects
-   return bObjects
-end behavior_Objects
-
-function behavior_GetHierarchy targetObject
-   repeat
-      put the behavior of targetObject into bObject
-      if exists(bObject) is false then exit repeat
-      put bObject & CR after bObjects
-      put bObject into targetObject
-   end repeat
-   delete char -1 of bObjects
-   return bObjects
-end behavior_GetHierarchy

@@ -194,7 +194,9 @@ end hkeyLine_GetHandlers
 
 function hkeyLine_GetHandler hkeyLine, hTable, someScript
    -- required by "menu_Update" (was in "lib_MenuAuthoring")
-   htable_ExactLineOffsets hkeyLine, hTable, startLineNum, endLineNum
+   -- htable_ExactLineOffsets hkeyLine, hTable, startLineNum, endLineNum
+   hkeyLine_Deconstruct hKeyLine, hName, hType, hObject
+   htable_OrLineOffsets hName, hType, hTable, startLineNum, endLineNum
    if endLineNum = 0 then return empty
    put line startLineNum to endLineNum of someScript into foundHandler
    return foundHandler

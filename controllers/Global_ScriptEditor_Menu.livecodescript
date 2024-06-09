@@ -74,6 +74,6 @@ on menu_InitLcw
    ide_InitLcw
 end menu_InitLcw
 
-on menu_RestIdeMenus
+on menu_ResetIdeMenus
    ide_ResetMenus
-end menu_RestIdeMenus
+end menu_ResetIdeMenus
