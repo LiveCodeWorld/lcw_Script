@@ -25,23 +25,22 @@ end menu_Target
 
 --> Global | ScriptEditor | List | Watch | Menu
 -
-on menu_HandlerCurlyData hKey
-   put help_HkeyCurlyData (hKey, false) into curlyData
+on menu_Help hKey
+   if the shiftKey is "Down" then
+      launch_HkeyHelp hKey
+   else
+      hkey_Deconstruct hKey, hName, hType, hObject, hNum
+      display_WikiPage "handler.livecode.world", hName
+   end if
    --
-   display_Data curlyData, hKey, "help_HkeyCurlyData()"
-end menu_HandlerCurlyData
+   if (the result is empty) or (the shiftKey is "Down") then
+      draft_HandlerHelp hKey
+   end if
+end menu_Help
 
-on menu_ObjectCurlyData hKey
-   hkey_Deconstruct hKey, hName, hType, hObject, hNum
-   --
-   put the curly_Data of hObject into curlyData
-   --
-   display_Data curlyData, hObject, "curly_Data()"
-end menu_ObjectCurlyData
-
-on submenu_HelpMenu
+on submenu_HelpTools
    return "Global | Hkey | Help | Menu"
-end submenu_HelpMenu
+end submenu_HelpTools
 
 private on _
 end _
@@ -64,6 +63,9 @@ end submenu_HandlerCalls
 on submenu_Files
    return "Global | Script | Folders | Menu"
 end submenu_Files
+
+private on ___
+end ___
 
 on submenu_Dev
    return "Global | Dev | ScriptEditor | List | Authoring | Menu"

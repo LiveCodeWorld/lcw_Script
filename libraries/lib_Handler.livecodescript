@@ -165,6 +165,7 @@ function hkey_GetType hKey, pCheck
          return "private function"
       case "f"
          return "function"
+      case "pc" -- should not be
       case "pm" -- should not be
          return "private command"
       case "g"

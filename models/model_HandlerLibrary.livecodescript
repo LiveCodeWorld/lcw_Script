@@ -37,6 +37,91 @@ The reasons for moving over from old comma based hKeys to new format are:
 
 --> Working on
 -
+function hkey_FromName hName, phType, pWikiDomain
+   -- looks up a handler in wiki
+   if pWikiDomain is empty then put "handler.livecode.world" into pWikiDomain
+   if phType is empty then put "C" into phType
+   
+   # Get pageData of page titles hName from sitemap
+   put wikiSiteMap_GetArray (pWikiDomain) into sMapArray
+   put indexArray_ConstructNameArray (sMapArray, "title") into titleArray
+   
+   put titleArray [hName] into handlerPageData
+   if handlerPageData is not an array then
+      put "Error, cannot locate handler in wiki:" && hName into sError
+   end if
+   
+   put handlerPageData ["synopsis"] into synopsis
+   put wikiText_GetLinkArray (synopsis) into linkArray
+   
+   put wiki_ExtractFirstGitHubLink (linkArray) into permaBit
+   github_DeconstructPermaBit permaBit, repoName, projectName, sPath, sCommit, startLineNum, endLineNum
+   if the result is true then
+      set the itemdelimiter to slash
+      put item 1 of sPath into typeFolder
+      put item 2 of sPath into shortFile
+   end if
+   
+   # Find mController
+   put env_ConstructProjectFolder (projectName) & sPath into sFile
+   if there is a stack sFile then
+      put the name of stack sFile into mController
+      put hKeyLine_Construct (hName, phType, mController) into hKey
+      return hKey
+   else
+      breakpoint
+      put "Error, cannot locate handler:" && permaBit into sError
+      return empty
+   end if
+end hkey_FromName
+
+command dispatch_Controller mHandlerName, mHandlerTarget, mHandlerParam, pWikiDomain
+   -- mHandlerName = the params?
+   if mHandlerName contains quote then
+      put word 1 of mHandlerName into hName
+      put word 2 to -1 of item 1 of mHandlerName into mTarget
+      text_TopAndTail mTarget, quote
+      --
+      put item 2 of mHandlerName into mParam
+      text_TopAndTail mParam, quote
+   else
+      put mHandlerName into hName
+      put mHandlerTarget into mTarget
+      put mHandlerParam into mParam
+   end if
+   --
+   dispatch_NamedHandler hName, mTarget, mParam, pWikiDomain
+   return the result -- not used
+end dispatch_Controller
+
+command dispatch_NamedHandler hName, mTarget, mParam, pWikiDomain
+   -- does not execute handler in context of tObject
+   put hkey_FromName (hName, pWikiDomain) into hKey
+   if hkey is empty then return "Error, cannot locate handler in wiki:" && hName
+   
+   hkeyLine_Deconstruct hKey, hName, hType, mController
+   dispatch hName to mController with mTarget,mParam
+   switch it
+      case "handled"
+         break
+      case "unhandled"
+         break
+      default -- "passed"
+   end switch
+   --
+   return hKey
+end dispatch_NamedHandler
+
+function wiki_ExtractFirstGitHubLink linkArray
+   repeat for each key indexNum in linkArray
+      put linkArray [indexNum]["link"] into gLink
+      if gLink begins with "github.com/" then
+         return gLink
+      end if
+   end repeat
+   return empty
+end wiki_ExtractFirstGitHubLink
+
 
 --> Props
 -

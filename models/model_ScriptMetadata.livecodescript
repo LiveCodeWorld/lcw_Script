@@ -61,6 +61,34 @@ end script_Name
 
 --> Script | Metadata
 -
+getprop script_HkeyArray
+   put the long id of the target into sObject
+   put script_GetHkeyArray (sObject) into hKeyArray
+   return hKeyArray
+end script_HkeyArray
+
+setprop script_HkeyArray hKeyArray
+   put the long id of the target into sObject
+   script_SetHkeyArray sObject, hKeyArray
+   put the result into hkeyArrayFile
+   return hkeyArrayFile
+end script_HkeyArray
+
+function script_GetHkeyArray sObject
+   put the script_HkeyArrayFile of sObject into hkeyArrayFile
+   put array_Get (hkeyArrayFile) into hKeyArray
+   return hKeyArray
+end script_GetHkeyArray
+
+command script_SetHkeyArray sObject, hKeyArray
+   put the script_HkeyArrayFile of sObject into hkeyArrayFile
+   array_Set hkeyArrayFile, hKeyArray
+   return hkeyArrayFile
+end script_SetHkeyArray
+
+
+--> Script | Metadata
+-
 getprop script_MetaData [someKey]
    put the script of the target into someScript
    put script_GetMetadataArray (someScript) into sMetaData -- same as (uRIPArray)

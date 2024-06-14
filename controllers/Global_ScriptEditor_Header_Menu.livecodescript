@@ -49,86 +49,33 @@ private command _Init
    put keys (friendlyArray) into LocalArray ["recentObjects"]
 end _Init
 
-getprop disabled_DisplayLocalChanges [sObject]
-   if LocalArray ["scriptIsDifferent"] then
-      return false
-   else
-      return true -- "delete"
-   end if
-end disabled_DisplayLocalChanges
-
-getprop editIdeMenu_Params
-   return ide_ListMenuElements()
-end editIdeMenu_Params
-
-getprop setMenuGroup_Param
-   return ide_ShortTitle ("Recent")
-end setMenuGroup_Param
-
-getprop setMenuGroup_Params
-   put ide_ListShortMenuTitles ("Recent") into shortNames
-   return shortNames
-end setMenuGroup_Params
-
-getprop recentScripts_Params
-   put LocalArray ["recentObjects"] into recentObjects
-   return recentObjects
-end recentScripts_Params
-
-getprop disabled_ObjectProperties [sObject]
-   put the stack_Name of sObject into stackName
-   if the scriptonly of stack stackName is true then
-      return "delete"
-   else
-      return false
-   end if
+-- getprop disabled_ObjectProperties [sObject]
+put the stack_Name of sObject into stackName
+if the scriptonly of stack stackName is true then
+   return "delete"
+else
+   return false
+end if
 end disabled_ObjectProperties
 
-getprop disabled_RecentScripts
-   put LocalArray ["recentObjects"] into recentObjects
-   if recentObjects is empty then
-      return true
-   else
-      return false
-   end if
-end disabled_RecentScripts
-
-getprop disabled_SaveRecentStacks
-   put LocalArray ["editedStackNames"] into editedStackNames
-   put LocalArray ["friendlyArray"] into friendlyArray
-   --
-   repeat for each line editedStackName in editedStackNames
-      repeat for each key recentObject in friendlyArray
-         if the short name of recentObject = editedStackName then
-            put editedStackName & CR after editedRecentStackNames
-         end if
-      end repeat
+-- getprop disabled_SaveRecentStacks
+put LocalArray ["editedStackNames"] into editedStackNames
+put LocalArray ["friendlyArray"] into friendlyArray
+--
+repeat for each line editedStackName in editedStackNames
+   repeat for each key recentObject in friendlyArray
+      if the short name of recentObject = editedStackName then
+         put editedStackName & CR after editedRecentStackNames
+      end if
    end repeat
-   delete char -1 of editedRecentStackNames
-   if editedRecentStackNames is empty then
-      return true
-   else
-      return false
-   end if
+end repeat
+delete char -1 of editedRecentStackNames
+if editedRecentStackNames is empty then
+   return true
+else
+   return false
+end if
 end disabled_SaveRecentStacks
-
-getprop disabled_MenuTools [sObject]
-   if LocalArray ["scriptType"]= "controller" then
-      return false
-   else
-      return true
-   end if
-end disabled_MenuTools
-
-getprop disabled_SaveEdited
-   put LocalArray ["editedStackNames"] into editedStackNames
-   if editedStackNames is empty then
-      -- return true
-      return "delete"
-   else
-      return false
-   end if
-end disabled_SaveEdited
 
 command objects_MakeFriendly someObjects, @orderedFriendlyObjects, @friendlyArray
    repeat for each line someObject in someObjects
@@ -179,6 +126,14 @@ on menu_DisplayLocalChanges sObject
    display_ScriptIsDifferent sObject
 end menu_DisplayLocalChanges
 
+getprop disabled_DisplayLocalChanges [sObject]
+   if LocalArray ["scriptIsDifferent"] then
+      return false
+   else
+      return true -- "delete"
+   end if
+end disabled_DisplayLocalChanges
+
 on menu_RecentScripts sObject, recentObject
    put LocalArray ["friendlyArray"][recentObject] into someObject
    if exists (someObject) then
@@ -187,6 +142,20 @@ on menu_RecentScripts sObject, recentObject
       breakpoint
    end if
 end menu_RecentScripts
+
+getprop recentScripts_Params
+   put LocalArray ["recentObjects"] into recentObjects
+   return recentObjects
+end recentScripts_Params
+
+getprop disabled_RecentScripts
+   put LocalArray ["recentObjects"] into recentObjects
+   if recentObjects is empty then
+      return true
+   else
+      return false
+   end if
+end disabled_RecentScripts
 
 on menu_Clean sObject
    put LocalArray ["seStack"] into seStack
@@ -205,24 +174,38 @@ on menu_SaveEdited
    stack_SaveEdited "all"
 end menu_SaveEdited
 
+getprop disabled_SaveEdited
+   put LocalArray ["editedStackNames"] into editedStackNames
+   if editedStackNames is empty then
+      -- return true
+      return "delete"
+   else
+      return false
+   end if
+end disabled_SaveEdited
+
 private on _
 end _
-
-on submenu_Display
-   return "Global | Project | Display | Menu"
-end submenu_Display
-
-on submenu_Create
-   return "Global | Project | Create | Menu"
-end submenu_Create
 
 on submenu_MenuTools
    return "Global | MenuTools | Menu"
 end submenu_MenuTools
 
+getprop disabled_MenuTools [sObject]
+   if LocalArray ["scriptType"]= "controller" then
+      return false
+   else
+      return true
+   end if
+end disabled_MenuTools
+
 on submenu_Ide
    return "Global | ScriptEditor | Menu"
 end submenu_Ide
+
+-- getprop editIdeMenu_Params
+return ide_ListMenuElements()
+end editIdeMenu_Params
 
 private on __
 end __
@@ -242,9 +225,22 @@ end submenu_Ide
 private on ___
 end ___
 
+on submenu_Create
+   -- was menu_Create
+   return "Global | ScriptEditor | Create | Menu"
+   return "Global | Project | Create | Menu"
+end submenu_Create
+
+on submenu_Display
+   return "Global | Project | Display | Menu"
+end submenu_Display
+
 on submenu_Git
    return "Global | GIT | Simple | Object | Menu"
 end submenu_Git
+
+private on ____
+end ____
 
 on submenu_Dev
    return menu_DevTitle()

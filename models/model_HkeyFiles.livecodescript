@@ -94,7 +94,7 @@ function hkey_ListShortFolders
    filter tFolders without ".*"
    set the defaultfolder to oFolder  
    return tFolders
-end hkey_ListShortFolders 
+end hkey_ListShortFolders
 
 function hkey_ListShortVersionFolders hKey
    local versionNames
@@ -166,6 +166,11 @@ end hkey_CallsFile
 
 -->  Hkey | Files
 -
+function hkey_ArrayFile hKey
+   put hkey_MetadataFolder (hKey) into hkeyMetadataFolder
+   return hkeyMetadataFolder & "hkey.array"
+end hkey_ArrayFile
+
 function hkey_OverlayDataFile hKey, pDontCreate
    put hkey_MetadataFolder (hKey) into hkeyMetadataFolder
    return hkeyMetadataFolder & "overlaydata.array"

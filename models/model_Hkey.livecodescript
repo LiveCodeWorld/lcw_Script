@@ -14,6 +14,27 @@ The aim is to use this library for key handlers that refer to locally stored han
 
 --> Working on
 -
+function hkey_GetHkeyArray hKey, pOverlayName
+   -- see newer "hKey_GetArray"
+   put hkey_GetOverlayArray (hKey, pOverlayName) into overlayArray
+   put overlayArray ["data"]["linkArray"] into hkeyArray
+   return hkeyArray
+end hkey_GetHkeyArray
+
+function hKey_GetArray hkey
+   -- put hkey_GetHkeyArray (hKey, pOverlayName) into hkeyArray
+   put hkey_ArrayFile (hKey) into hkeyArrayFile
+   put array_Get (hkeyArrayFile) into hKeyArray
+   --
+   return hKeyArray
+end hKey_GetArray
+
+command  hKey_SetArray hkey, hKeyArray
+   put hkey_ArrayFile (hKey) into hkeyArrayFile
+   array_Set hkeyArrayFile, hKeyArray
+   return hkeyArrayFile
+end hKey_SetArray
+
 function hkey_GetDotText hKey, pGraphStyle
    put hkey_DotFile (hKey, pGraphStyle) into someFile
    put url ("file:" & someFile) into dotText
@@ -74,12 +95,6 @@ end hkey_ListVersionNames
 
 --> hKey | Model | Arrays
 -
-function hkey_GetHkeyArray hKey, pOverlayName
-   put hkey_GetOverlayArray (hKey, pOverlayName) into overlayArray
-   put overlayArray ["data"]["linkArray"] into hkeyArray
-   return hkeyArray
-end hkey_GetHkeyArray
-
 function hkey_GetOverlayArray hKey, pOverlayName
    put hkey_FetchOverlayData (hKey) into overlayData
    --

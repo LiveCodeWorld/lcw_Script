@@ -27,6 +27,10 @@ getprop menu_Target [tObject]
    return sObject
 end menu_Target
 
+private function _HkeyArray
+   return LocalArray ["hkeyArray"]
+end _HkeyArray
+
 getprop hkeyArrayGraph_Params
    return "hierarchical,fast undirected spring"
 end hkeyArrayGraph_Params
@@ -39,9 +43,31 @@ end displayDotText_Params
 
 --> Global | Script | Dep | Menu
 -
+on menu_DraftHelp sObject
+   draft_ScriptHelp sObject
+end menu_DraftHelp
+
+private on ____
+end ____
+
+on menu_ScriptHkeyArray sObject
+   put the script_HkeyArrayFile of sObject into sFile
+   if there is not a file sFile then
+      put _HkeyArray() into hkeyArray 
+      set the script_HkeyArray of sObject to hKeyArray
+   else
+      display_ScriptDependencyData sObject
+   end if
+end menu_ScriptHkeyArray
+
+getprop checked_ScriptHkeyArray [sObject]
+   put the script_HkeyArrayFile of sObject into sFile
+   return there is a file sFile
+end checked_ScriptHkeyArray
+
 on menu_HkeyArrayGraph sObject, graphStyle
    put LocalArray ["hkeyArray"] into hkeyArray
-   graph_CreateScriptObjectHkeyArray hkeyArray, sObject, graphStyle
+   graph_CreateFromScriptHkeyArray hkeyArray, sObject, graphStyle
    put the result into svgFile
    --
    put the name of sObject into sLabel

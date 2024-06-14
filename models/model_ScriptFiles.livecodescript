@@ -20,6 +20,9 @@ Working on handlers from "Overlay | File | Props" --- need to check them
 
 --> Working on
 -
+
+--> Props
+-
 getprop script_DotText
    put the long id of the target into sObject
    put the script_DotFile of sObject into dotFile
@@ -30,7 +33,7 @@ end script_DotText
 
 getprop script_DotFile [pOverlayName]
    put the long id of the target into sObject
-   put scriptObject_DotFile (sObject, pOverlayName) into scriptArrayFolder
+   put scriptFile_ConstructDot (sObject, pOverlayName) into scriptArrayFolder
    return scriptArrayFolder
 end script_DotFile
 
@@ -40,16 +43,6 @@ getprop script_DotFiles [pLong]
    filter dotFiles with "*.dot"
    return dotFiles
 end script_DotFiles
-
-command scriptObject_NormalizeGraphName @pOverlayName, overlayFolder
-   -- seems a wrong default?
-   if pOverlayName is empty then
-      put overlay_GetData (overlayFolder) into overlayData
-      put line 1 of keys (overlayData) into pOverlayName
-      if pOverlayName is empty then put "undirected spring" into pOverlayName
-   end if
-   return pOverlayName
-end scriptObject_NormalizeGraphName
 
 
 --> Props
@@ -77,7 +70,7 @@ getprop script_CmapFile [pOverlayName]
    put the long id of the target into sObject
    put the textStack_MetadataFolder [true] of sObject into scriptFolder
    
-   scriptObject_NormalizeGraphName pOverlayName, scriptFolder
+   _NormalizeGraphName pOverlayName, scriptFolder
    put pOverlayName & ".cmapx" into shortFile
    put scriptFolder & shortFile into someFile
    return someFile
@@ -86,6 +79,12 @@ end script_CmapFile
 
 --> Script | File | SVG
 -
+getprop script_HkeyArrayFile
+   put the metadataObject_Folder of the target into metadataFolder
+   put metadataFolder & "scriptHkey.array" into hkeyArrayFile
+   return hkeyArrayFile
+end script_HkeyArrayFile
+
 getprop script_SvgFile [graphStyle]
    if graphStyle is empty then put "hierarchical" into shortFile
    put the long id of the target into sObject
@@ -96,7 +95,10 @@ getprop script_SvgFile [graphStyle]
 end script_SvgFile
 
 getprop script_DotFiles
-   
+   put the script_MetadataFiles of the target into shortDotFiles
+   --
+   filter shortDotFiles with "*.dot"
+   return shortDotFiles
 end script_DotFiles
 
 getprop script_SvgFiles
@@ -135,7 +137,7 @@ end script_MetadataFiles
 
 getprop script_GraphImageFile [pOverlayName]
    put the long id of the target into sObject
-   return scriptObject_ImageFile (sObject, pOverlayName)
+   return scriptFile_ConstructImage (sObject, pOverlayName)
 end script_GraphImageFile
 
 getprop script_ImageFiles
@@ -146,7 +148,7 @@ end script_ImageFiles
 
 getprop script_GraphImageFile [pOverlayName]
    put the long id of the target into sObject
-   return scriptObject_ImageFile (sObject, pOverlayName)
+   return scriptFile_ConstructImage (sObject, pOverlayName)
 end script_GraphImageFile
 
 getprop script_ImageFiles
@@ -328,7 +330,7 @@ end script_OverlayFile
 
 getprop script_DotFile [pOverlayName]
    put the long id of the target into sObject
-   put scriptObject_DotFile (sObject, pOverlayName) into scriptArrayFolder
+   put scriptFile_ConstructDot (sObject, pOverlayName) into scriptArrayFolder
    return scriptArrayFolder
 end script_DotFile
 
@@ -336,7 +338,7 @@ getprop script_CmapFile [pOverlayName]
    put the long id of the target into sObject
    put the textStack_MetadataFolder [true] of sObject into scriptFolder
    
-   scriptObject_NormalizeGraphName pOverlayName, scriptFolder
+   _NormalizeGraphName pOverlayName, scriptFolder
    put pOverlayName & ".cmapx" into shortFile
    put scriptFolder & shortFile into someFile
    return someFile
@@ -350,26 +352,33 @@ getprop script_Files
 end script_Files
 
 
---> Files
+--> ScriptFile
 -
-function scriptObject_GetSvgFile sObject, shortSvgFile, pDontCreate
-   put the metadataObject_Folder [pDontCreate] of sObject into metadataFolder
-   put metadataFolder & shortSvgFile into svgFile
-   return svgFile
-end scriptObject_GetSvgFile
-
-function scriptObject_ImageFile sObject, pOverlayName
+function scriptFile_ConstructImage sObject, pOverlayName
    put the textStack_MetadataFolder [true] of sObject into scriptFolder
-   scriptObject_NormalizeGraphName pOverlayName, scriptFolder
+   _NormalizeGraphName pOverlayName, scriptFolder
    put pOverlayName & "." & "png" into shortFile
    put scriptFolder & shortFile into someFile
    return someFile
-end scriptObject_ImageFile
+end scriptFile_ConstructImage
 
-function scriptObject_DotFile sObject, pOverlayName
+function scriptFile_ConstructDot sObject, pOverlayName
    put the metadataObject_Folder [true] of sObject into scriptFolder
-   scriptObject_NormalizeGraphName pOverlayName, scriptFolder
+   _NormalizeGraphName pOverlayName, scriptFolder
    put pOverlayName & ".dot" into shortFile
    put scriptFolder & shortFile into someFile
    return someFile
-end scriptObject_DotFile
+end scriptFile_ConstructDot
+
+
+--> Private
+-
+private command _NormalizeGraphName @pOverlayName, overlayFolder
+   -- seems a wrong default?
+   if pOverlayName is empty then
+      put overlay_GetData (overlayFolder) into overlayData
+      put line 1 of keys (overlayData) into pOverlayName
+      if pOverlayName is empty then put "undirected spring" into pOverlayName
+   end if
+   return pOverlayName
+end _NormalizeGraphName

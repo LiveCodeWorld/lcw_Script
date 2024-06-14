@@ -26,7 +26,7 @@ command display_ScriptDeps sObject, pGraphStyle
    
    # Draw Graph
    if pGraphStyle is not empty then
-      graph_CreateScriptObjectHkeyArray hkeyArray, sObject, pGraphStyle
+      graph_CreateFromScriptHkeyArray hkeyArray, sObject, pGraphStyle
       put the result into svgFile
       --
       put the name of sObject into sLabel

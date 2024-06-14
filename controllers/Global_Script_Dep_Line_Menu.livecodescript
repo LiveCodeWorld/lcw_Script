@@ -1,11 +1,11 @@
 ﻿script "Global | Script | Dep | Line | Menu"
 --> MetaData
 -
-copyright: Anonymous
+copyright: David Bovill
 license: GPLv3
 name: Global | Script | Dep | Line | Menu
 type: controller
-version: 0.1
+version: 0.2
 
 /*Here you can describe this menu.
 Full help text should be provided on the linked wiki.*/
@@ -31,6 +31,22 @@ on mDoubleUp_ScriptDep dView, someValue, sPath
    --
    return displayView
 end mDoubleUp_ScriptDep
+
+private command _DeconstructPath dView, @pName, @sObject, @depKey, @callKeys
+   put the selected_Path of dView into sPath
+   --
+   put item 1 of sPath into pName
+   put item 2 of sPath into sObject
+   put item 3 of sPath into depKey
+   --
+   -- put item 4 of sPath into callKey -- issue: could be "top"
+   -- put the selected_TopData [item 1 to 3 of sPath] of dView into sArray
+   put the top_Data [3] of dView into sArray
+   delete variable sArray ["top"]
+   put keys(sArray) into callKeys
+   --
+   return sPath
+end _DeconstructPath
 
 command _FindMissing sPath, displayView
    switch the number of lines of sPath
@@ -98,6 +114,21 @@ end disabled_CollectMissing
 
 --> Global | Script | Dep | Line | Menu
 -
+on menu_EditHkey dView
+   _DeconstructPath dView, pName, sObject, depKey, callKeys
+   --
+   hkey_Edit depKey
+end menu_EditHkey
+
+on menu_DraftHelp dView
+   _DeconstructPath dView, pName, sObject, depKey, callKeys
+   --
+   draft_HandlerHelp depKey 
+end menu_DraftHelp
+
+private on _
+end _
+
 on menu_CollectProjectDeps dView
    put _ProjectDepKeys (dView) into depKeys
    put the title_Text of dView into pTitle
@@ -108,11 +139,6 @@ end menu_CollectProjectDeps
 on menu_FindMissing dView
    put the displayed_Object of dView into sObject
    put the displayed_HkeyArray of dView into hkeyArray
-   put the selected_Path of dView into sPath
-   --
-   put item -1 of sPath into hKey
-   put item -2 of sPath into shortMissingHkey
-   put item 2 of sPath into sObject
    
    put the found_Hkey [shortMissingHkey] of sObject into foundKey
    if foundKey is empty then
@@ -122,7 +148,13 @@ on menu_FindMissing dView
    end if
 end menu_FindMissing
 
-on menu_EditHkey dView
-   put the selected_Line of dView into hKey
-   hkey_Edit hKey
-end menu_EditHkey
+private on __
+end __
+
+on menu_Info dView
+   _DeconstructPath dView, pName, sObject, depKey, callKeys
+   --
+   get pName,sObject,depKey,callKeys
+   replace comma with CR in it
+   put it
+end menu_Info
