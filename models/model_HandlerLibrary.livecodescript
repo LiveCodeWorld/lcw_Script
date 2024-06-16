@@ -37,45 +37,32 @@ The reasons for moving over from old comma based hKeys to new format are:
 
 --> Working on
 -
-function hkey_FromName hName, phType, pWikiDomain
-   -- looks up a handler in wiki
-   if pWikiDomain is empty then put "handler.livecode.world" into pWikiDomain
-   if phType is empty then put "C" into phType
+command dispatch_NamedHandler hName, mTarget, mParam
+   -- does not execute handler in context of tObject
+   put handlerWiki_FindKey (hName) into hKey
+   if hKey is empty then return "Error, cannot locate handler in wiki:" && hName
    
-   # Get pageData of page titles hName from sitemap
-   put wikiSiteMap_GetArray (pWikiDomain) into sMapArray
-   put indexArray_ConstructNameArray (sMapArray, "title") into titleArray
-   
-   put titleArray [hName] into handlerPageData
-   if handlerPageData is not an array then
-      put "Error, cannot locate handler in wiki:" && hName into sError
-   end if
-   
-   put handlerPageData ["synopsis"] into synopsis
-   put wikiText_GetLinkArray (synopsis) into linkArray
-   
-   put wiki_ExtractFirstGitHubLink (linkArray) into permaBit
-   github_DeconstructPermaBit permaBit, repoName, projectName, sPath, sCommit, startLineNum, endLineNum
-   if the result is true then
-      set the itemdelimiter to slash
-      put item 1 of sPath into typeFolder
-      put item 2 of sPath into shortFile
-   end if
-   
-   # Find mController
-   put env_ConstructProjectFolder (projectName) & sPath into sFile
-   if there is a stack sFile then
-      put the name of stack sFile into mController
-      put hKeyLine_Construct (hName, phType, mController) into hKey
-      return hKey
-   else
-      breakpoint
-      put "Error, cannot locate handler:" && permaBit into sError
-      return empty
-   end if
-end hkey_FromName
+   hkeyLine_Deconstruct hKey, hName, hType, mController
+   switch hType
+      case "M"
+      case "C"
+         dispatch hName to mController with mTarget,mParam
+         put the result into sResult
+         return sResult
+      case "F"
+         put hName & "(" & kwote (mParam) & ")" into sExp
+         put value (sExp, mTarget) into sResult
+         return sResult
+      case "G"
+         put hName & "[" & kwote(mParam) & "]" into gProp
+         put the gProp of mTarget into sResult
+         return sResult
+      default
+         return empty
+   end switch
+end dispatch_NamedHandler
 
-command dispatch_Controller mHandlerName, mHandlerTarget, mHandlerParam, pWikiDomain
+command dispatch_Controller mHandlerName, mHandlerTarget, mHandlerParam
    -- mHandlerName = the params?
    if mHandlerName contains quote then
       put word 1 of mHandlerName into hName
@@ -90,37 +77,91 @@ command dispatch_Controller mHandlerName, mHandlerTarget, mHandlerParam, pWikiDo
       put mHandlerParam into mParam
    end if
    --
-   dispatch_NamedHandler hName, mTarget, mParam, pWikiDomain
+   dispatch_NamedHandler hName, mTarget, mParam
    return the result -- not used
 end dispatch_Controller
 
-command dispatch_NamedHandler hName, mTarget, mParam, pWikiDomain
-   -- does not execute handler in context of tObject
-   put hkey_FromName (hName, pWikiDomain) into hKey
-   if hkey is empty then return "Error, cannot locate handler in wiki:" && hName
+function hkey_TypeFromWord hTypeWords
+   -- similar function exists somewhere
+   local hType
    
-   hkeyLine_Deconstruct hKey, hName, hType, mController
-   dispatch hName to mController with mTarget,mParam
-   switch it
-      case "handled"
+   switch word 1 of hTypeWords
+      case "getprop"
+         return "G"
+      case "setprop"
+         return "S"
+      case "private"
+         put "P" into hType
+         put word 2 of hTypeWords into hTypeWord
          break
-      case "unhandled"
-         break
-      default -- "passed"
+      default
+         put word 1 of hTypeWords into hTypeWord
    end switch
-   --
-   return hKey
-end dispatch_NamedHandler
+   
+   switch hTypeWord
+      case "command"
+         put "C" after hType
+         return hType
+      case "function"
+         put "F" after hType
+         return hType
+   end switch
+end hkey_TypeFromWord
 
-function wiki_ExtractFirstGitHubLink linkArray
+function handlerWiki_FindKey hName, pWikiArray
+   -- looks up a handler in wiki
+   if pWikiArray is not an array then
+      put handlerWiki_Array ("handler.livecode.world") into pWikiArray
+   end if
+   
+   # Find handlerPageData from sitemap
+   put pWikiArray [hName] into handlerPageData
+   if handlerPageData is not an array then return empty
+   
+   # Extract info from synopsis
+   put handlerPageData ["synopsis"] into synopsis
+   put handlerWiki_HkeyFromSynopsis (hName, synopsis) into hKey
+   return hKey
+end handlerWiki_FindKey
+
+function handlerWiki_HkeyFromSynopsis hName, synopsis
+   put wikiText_GetLinkArray (synopsis) into linkArray
+   
+   # Find first (should only be one "github.com/")
    repeat for each key indexNum in linkArray
-      put linkArray [indexNum]["link"] into gLink
-      if gLink begins with "github.com/" then
-         return gLink
+      put linkArray [indexNum]["link"] into permaLink
+      --
+      if permaLink begins with "github.com/" then
+         # Construct Hkey
+         put linkArray [indexNum]["text"] into hTypeWords
+         put hkey_TypeFromWord (hTypeWords) into hType
+         --
+         github_DeconstructPermaBit permaLink, repoName, projectName, sPath, sCommit, startLineNum, endLineNum
+         if the result is false then return empty
+         
+         # Assuming sPath is a stack
+         put env_ConstructProjectFolder (projectName) & sPath into sFile
+         if exists (stack sFile) is false then
+            return empty
+         else
+            put the name of stack sFile into mController
+         end if
+         --
+         put hKeyLine_Construct (hName, hType, mController) into hKey
+         return hKey
       end if
    end repeat
    return empty
-end wiki_ExtractFirstGitHubLink
+end handlerWiki_HkeyFromSynopsis
+
+function handlerWiki_Array pWikiDomain
+   if pWikiDomain is empty then put "handler.livecode.world" into pWikiDomain
+   
+   # Get pageData of page titles hName from sitemap
+   put wikiSiteMap_GetArray (pWikiDomain) into sMapArray
+   put indexArray_ConstructNameArray (sMapArray, "title") into wikiArray
+   return wikiArray
+end handlerWiki_Array
 
 
 --> Props

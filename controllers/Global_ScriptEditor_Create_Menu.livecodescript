@@ -33,13 +33,9 @@ end module_MenuNameFromViewOrMenuTitle
 --> Global | ScriptEditor | Create | Menu
 -
 on menu_CreateNewProject
-   dispatch_Controller the params
-   
-   /*
    project_AskCreate
    put the result into newProjectName
    display_Project newProjectName
-   */
 end menu_CreateNewProject
 
 on menu_CreateModule sObject
@@ -63,57 +59,6 @@ getprop testDispatch_Params
    return "1,2,3"
 end testDispatch_Params
 
-command dispatch_Controller mHandlerName, mHandlerTarget, mHandlerParam 
-   put wikiSiteMap_GetArray ("handler.livecode.world") into sMapArray
-   put indexArray_ConstructNameArray (sMapArray, "title") into titleArray
-   put the name of the target into tObject
-   
-   if mHandlerName contains quote then
-      -- assume mHandlerName = the params
-      put word 1 of mHandlerName into hName
-      put word 2 to -1 of item 1 of mHandlerName into mTarget
-      text_TopAndTail mTarget, quote
-      --
-      put item 2 of mHandlerName into mParam
-      text_TopAndTail mParam, quote
-   else
-      put mHandlerName into hName
-      put mHandlerTarget into mTarget
-      put mHandlerParam into mParam
-   end if
-   --
-   put titleArray [hName] into handlerPageData
-   put handlerPageData ["synopsis"] into synopsis
-   put wikiText_GetLinkArray (synopsis) into linkArray
-   --
-   -- display_Data linkArray
-   put _ExtractFirstGitHubLink (linkArray) into permaLink
-   github_DeconstructPermalink permaLink, sRepo, sPath, sCommit, startLineNum, endLineNum
-   
-   set the itemdelimiter to slash
-   put sRepo into projectName
-   put item 1 of sPath into hType
-   put item 2 of sPath into shortFile
-   -- display_Data handlerPageData
-   
-   
-   # Check recursion
-   if dsaf is not mTarget then
-      -- dispatch hName to hObject with mTarget
-   end if
-end dispatch_Controller
-
-function _ExtractFirstGitHubLink linkArray
-   repeat for each key indexNum in linkArray
-      -- [https://github.com/LiveCodeWorld/lcw_Script/blob/a1aade15b73b6748b51b2172ee1585b8122acc3e/controllers/Global_ScriptEditor_Create_Menu.livecodescript#L35-L39 github]
-      -- put linkArray [indexNum]["text"]
-      put linkArray [indexNum]["link"] into gLink
-      if gLink begins with "github.com/" then
-         return gLink
-      end if
-   end repeat
-   return empty
-end _ExtractFirstGitHubLink
 
 /*
 on menu_CreateView scriptObject

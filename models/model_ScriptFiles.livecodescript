@@ -33,8 +33,8 @@ end script_DotText
 
 getprop script_DotFile [pOverlayName]
    put the long id of the target into sObject
-   put scriptFile_ConstructDot (sObject, pOverlayName) into scriptArrayFolder
-   return scriptArrayFolder
+   get scriptFile_ConstructDot (sObject, pOverlayName)
+   return it
 end script_DotFile
 
 getprop script_DotFiles [pLong]
@@ -327,12 +327,6 @@ getprop script_OverlayFile [pDontCreate]
    put overlay_ArrayFile (overlayFolder) into someFile
    return someFile
 end script_OverlayFile
-
-getprop script_DotFile [pOverlayName]
-   put the long id of the target into sObject
-   put scriptFile_ConstructDot (sObject, pOverlayName) into scriptArrayFolder
-   return scriptArrayFolder
-end script_DotFile
 
 getprop script_CmapFile [pOverlayName]
    put the long id of the target into sObject
