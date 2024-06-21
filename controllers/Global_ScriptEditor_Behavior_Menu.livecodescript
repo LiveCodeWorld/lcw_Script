@@ -75,16 +75,9 @@ on menu_RecentButton mTarget
 end menu_RecentButton
 
 on menu_HandlerField mTarget
-   put rev_HandlerTreeField() into topHanderField
-   put scriptEditor_HandlerListBehavior() into bObject
+   put menu_GetChecked (the params) is false into sBoolean
    --
-   put menu_GetChecked (the params) into isChecked
-   --
-   if isChecked then
-      set the behavior of topHanderField to empty
-   else
-      set the behavior of topHanderField to bObject
-   end if
+   ide_SetHanderFiledBehavior sBoolean
 end menu_HandlerField
 
 private command _
