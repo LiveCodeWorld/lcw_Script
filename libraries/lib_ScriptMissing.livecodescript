@@ -42,7 +42,9 @@ function scriptMissing_FindObjectDepArray missingShortHkeys, searchObjects
          next repeat
       end if
       
-      put hkey_PublicFind (missingShortHkey, searchObjects) into foundMissingHkey
+      -- put hkey_PublicFind (missingShortHkey, searchObjects) into foundMissingHkey
+      put hkey_FindPublicOrPrivate (missingShortHkey, searchObjects) into foundMissingHkey
+      -- comment
       switch
          case foundMissingHkey is empty
             put "Still Missing" into cantFindArray [missingShortHkey]

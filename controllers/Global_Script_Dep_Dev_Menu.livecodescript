@@ -29,9 +29,60 @@ getprop menu_CheckTarget [mTarget]
    return exists (mTarget)
 end menu_CheckTarget
 
+private command _DisplaySvgFile svgFile, sLabel
+   display_SVG svgFile, sLabel
+   put the result into displayView
+   if exists (displayView) is false then
+      lcw_AnswerWarning "SVG file is empty!", displayView
+   end if
+end _DisplaySvgFile
+
 
 --> Global | Script | Dep | Dev | Menu
 -
+on menu_OldDeps displayView
+   put the displayed_HkeyArray of displayView into hkeyArray
+   put the title_Text of displayView into hKey
+   put "Deps for" && hKey into pTitle
+   --
+   display_ScriptFromHkeyArray hkeyArray, pTitle, hKey
+end menu_OldDeps
+
+private on _
+end _
+
+on menu_TestStackDeps sObject
+   put the dep_Stacks of sObject
+end menu_TestStackDeps
+
+on menu_ListDepStacks sObject
+   put LocalArray ["hkeyArray"] into hkeyArray
+   put hkeyArray_GetStackDepArray (hkeyArray) into depObjectData
+   --
+   delete variable depObjectData [sObject]
+   --
+   put keys (depObjectData) into depStacks
+   repeat for each line stackObject in depStacks
+      put the short name of stackObject into libName
+      put libName & ", " after libNames
+      put the project_Name of stackObject into projectName
+      put libName into projectArray [projectName]
+   end repeat
+   delete char -2 to -1 of libNames
+   sort libNames
+   put keys (projectArray) into projectNames
+   sort projectNames
+   replace CR with ", " in projectNames
+   --
+   put "libs:" && libNames into libDepLine -- dep_StackNames
+   put "projects:" && projectNames into projectDepLine -- dep_StackNames
+   
+   put libDepLine & CR & projectDepLine
+end menu_ListDepStacks
+
+private on __
+end __
+
 on submenu_Display
    return "Global | Project | Display | Menu"
 end submenu_Display
@@ -62,8 +113,8 @@ on menu_DisplayObjectSvg sObject
    end if
 end menu_DisplayObjectSvg
 
-on _
-end _
+private on ___
+end ___
 
 on menu_DisplayTextStackHkeyArray sObject
    put the projectOverlay_Array ["processedHkey.array"] of sObject into processedHkeyArray
@@ -81,8 +132,8 @@ on menu_DisplayTextstackHkeyObjectArray sObject
    display_Array depObjectArray, "the textstack_HkeyObjectArray"
 end menu_DisplayTextstackHkeyObjectArray
 
-on _
-end _
+private on ____
+end ____
 
 on menu_ScriptLibraryDependencies sObject
    -- put the missing_HkeyArray of scriptObject into missingHkeyArray
@@ -95,8 +146,8 @@ on menu_DisplayStackDepArray sObject
    display_StackDeps sObject
 end menu_DisplayStackDepArray
 
-on _
-end _
+private on _____
+end _____
 
 on menu_DisplayProjectSvg sObject
    put the projectOverlay_SvgFile of sObject into svgFile
@@ -112,8 +163,8 @@ on menu_ProjectOverlaySvgFile sObject
    finder_Reveal svgFile
 end menu_ProjectOverlaySvgFile
 
-on _
-end _
+private on ______
+end ______
 
 on menu_CreateTransporterGraphs sObject
    transporter_CreateGraph sObject, true, true
@@ -148,15 +199,3 @@ on menu_DisplayStackDeps hObject
    breakpoint
    display_StackDeps hObject -- lib_DisplayStack
 end menu_DisplayStackDeps
-
-
---> Deps
--
-private command _DisplaySvgFile svgFile, sLabel
-   display_SVG svgFile, sLabel
-   put the result into displayView
-   if exists (displayView) is false then
-      lcw_AnswerWarning "SVG file is empty!", displayView
-   end if
-end _DisplaySvgFile
-

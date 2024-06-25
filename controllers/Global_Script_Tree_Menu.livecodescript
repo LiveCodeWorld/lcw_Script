@@ -4,7 +4,7 @@
 license: GPLv3
 name: Global | Script | Tree | Menu
 type: controller
-target: scriptObject
+target: sObject
 version: 0.2
 deps: model_PageArray, lib_MediaWiki, lib_PageArray
 
@@ -12,7 +12,7 @@ deps: model_PageArray, lib_MediaWiki, lib_PageArray
 --> Menu | Init
 -
 getprop menu_Target [tObject]
-   -- put the title_Text of displayView into scriptObject
+   -- put the title_Text of displayView into sObject
    put the displayed_Object of tObject into sObject
    return sObject
 end menu_Target
@@ -36,15 +36,28 @@ end disabled_EditObjectBehavior
 
 --> Global | Script | Tree | Menu
 -
-on menu_ListScriptDeps sObject
+on menu_DisplayScriptDeps sObject
    display_ScriptDeps sObject
-end menu_ListScriptDeps
+end menu_DisplayScriptDeps
 
-on menu_DisplayLocalChanges scriptObject
-   put the script of scriptObject into nowScript
-   put the exported_Script of scriptObject into exportedScript
+getprop checked_DisplayScriptDeps [sObject]
+   put the script_HkeyArrayFile of sObject into sFile
+   return there is a file sFile
+end checked_DisplayScriptDeps
+
+on menu_BehaviorDepScript sObject
+   display_ScriptDeps sObject
+end menu_BehaviorDepScript
+
+on menu_DisplayLocalChanges sObject
+   put the script of sObject into nowScript
+   put the exported_Script of sObject into exportedScript
    terminal_Diff exportedScript, nowScript, "the exported_Script of mTarget", "the script of mTarget"
 end menu_DisplayLocalChanges
+
+getProp disabled_DisplayLocalChanges [sObject]
+   return the script_IsDifferent of sObject is false
+end disabled_DisplayLocalChanges
 
 private on _
 end _

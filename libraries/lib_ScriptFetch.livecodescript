@@ -20,7 +20,9 @@ A modern library for getting and fetching scripts.
 function hkey_CollectFromObjects hKeys, pSort
    local newScript
    put word 1 to -1 of hKeys into hKeys
-   if pSort is true then hkey_SortIndex hKeys
+   if pSort is true then
+      hkey_SortIndex hKeys
+   end if
    repeat for each line hKey in hKeys
       put handler_Get (hKey) into someHandler
       text_AddParagraph someHandler, newScript
@@ -60,7 +62,7 @@ end script_FetchFromHkeys
 command hkeyArray_ConstructDependencySuite hkeyArray, pStripScriptObject, @depSuite, pStripObjects, pStripProps, pMakePrivate
    local depScript
    
-   put array_AllNodes (hkeyArray) into allCalls
+   put array_ListKeys (hkeyArray) into allCalls
    -- hkey_StripDuplicates allCalls
    put the result into duplicateHkeyArray
    

@@ -23,10 +23,10 @@ Working on handlers from "Overlay | File | Props" --- need to check them
 
 --> Props
 -
-getprop script_DotText
+getprop script_DotText [pOverlayName]
    put the long id of the target into sObject
-   put the script_DotFile of sObject into dotFile
-   -- put text_Get (dotFile) into dotText
+   put the script_DotFile [pOverlayName] of sObject into dotFile
+   --
    put url ("file:" & dotFile) into dotText
    return dotText
 end script_DotText

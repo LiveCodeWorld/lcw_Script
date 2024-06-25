@@ -4,9 +4,11 @@
 license: GPLv3
 name: Global | Script | Dep | Menu
 type: controller
-version: 0.2
+version: 0.3
 
-/*This menu is for processing whole scripts to extract their dependencies.*/
+/*
+This menu is for processing whole scripts to extract their dependencies.
+*/
 
 
 --> Variables
@@ -17,23 +19,29 @@ local LocalArray
 --> Menu | Props
 -
 getprop menu_Target [tObject]
-   put the display_View of tObject into displayView
-   put the displayed_Object of displayView into sObject
-   put the displayed_HkeyArray of displayView into hkeyArray
+   put the display_View of tObject into dView
+   put the displayed_Object of dView into sObject
+   put the displayed_HkeyArray of dView into hkeyArray
    --
    put hkeyArray into LocalArray ["hkeyArray"]
-   put displayView into LocalArray ["displayView"]
+   put dView into LocalArray ["dView"]
    --
    return sObject
 end menu_Target
 
-private function _HkeyArray
-   return LocalArray ["hkeyArray"]
+private function _HkeyArray sObject
+   if the shiftkey is "down" then
+      put the script_HkeyArray of sObject into hKeyArray
+      return hKeyArray
+   else
+      return LocalArray ["hkeyArray"]
+   end if
 end _HkeyArray
 
-getprop hkeyArrayGraph_Params
-   return "hierarchical,fast undirected spring"
-end hkeyArrayGraph_Params
+private function _GraphStyles
+   -- return "hierarchical,fast undirected spring"
+   return dot_ListGraphStyles()
+end _GraphStyles
 
 getprop displayDotText_Params [sObject]
    put the script_DotFiles [false] of sObject into shortFiles
@@ -43,12 +51,105 @@ end displayDotText_Params
 
 --> Global | Script | Dep | Menu
 -
-on menu_DraftHelp sObject
-   draft_ScriptHelp sObject
+on menu_DraftHelp sObject, overlayName
+   draft_ScriptHelp sObject, overlayName
 end menu_DraftHelp
+
+getprop draftHelp_Params [sObject]
+   put the script_DotFiles [false] of sObject into overlayNames
+   replace ".dot" with empty in overlayNames
+   return overlayNames
+end draftHelp_Params
+
+private function _HkeyArray sObject
+   if the shiftKey is "Down" then
+      put the script_HkeyArray of sObject into hkeyArray
+   else 
+      put LocalArray ["dView"] into dView
+      put the displayed_HkeyArray of dView into hkeyArray
+   end if
+   return hkeyArray
+end _HkeyArray
+
+on menu_Show sObject, showHow
+   put LocalArray ["dView"] into dView
+   put the strip_MissingProps of dView into stripMissingProps
+   put the title_Text of dView into hKey
+   --
+   put _HkeyArray (sObject) into hkeyArray
+   put hkeyArray_DisplayData (hkeyArray, showHow, stripMissingProps, hKey) into dData
+   --
+   set the displayed_Data of dView to dData
+   set the show_How of dView to showHow
+end menu_Show
+
+getprop show_Param [sObject]
+   put LocalArray ["dView"] into dView
+   put the show_How of dView into showHow
+   if showHow is empty then put "projects" into showHow
+   return showHow
+end show_Param
+
+getprop show_Params
+   return "projects,stacks,hKeys,depKeys,-,hkeyArray"
+end show_Params
+
+on submenu_Missing
+   return "Global | HkeyArray | Tree | Menu"
+end submenu_Missing
 
 private on ____
 end ____
+
+on menu_ListDepHkeys sObject
+   put LocalArray ["dView"] into dView
+   --
+   put the displayed_HkeyArray of dView into hkeyArray
+   put array_ListKeys (hkeyArray) into hKeys
+   --
+   put the number of lines of hKeys into keyNum
+   put keyNum && "Hkeys" into sTitle
+   
+   set the displayed_Data [sTitle] of dView to hKeys
+   --
+   sort lines of hKeys
+   return hKeys
+end menu_ListDepHkeys
+
+on menu_CreateDepScript sObject
+   put the module_BehaviorDepScript of sObject into depScript
+   --
+   module_CreateBehaviorDepStack sObject, depScript
+   if item 1 of the result = "Error" then
+      display_Text depScript, the name of sObject, "Dependency Script"
+      --
+      put LocalArray ["dView"] into dView
+      lcw_AnswerWarning "Cannot create behavior stack as it already exists!", dView
+   else
+      put the result into depStackName
+   end if
+   edit the script of stack depStackName
+   return depHkeyArray
+end menu_CreateDepScript
+
+on menu_DisplayMissing sObject
+   put LocalArray ["hkeyArray"] into hkeyArray
+   --
+   display_MissingHkey hkeyArray, sObject
+end menu_DisplayMissing
+
+on menu_DisplayWalkHierarchy sObject
+   put the walk_Hierarchy of sObject into searchObjects
+   --
+   display_Data searchObjects, the name of sObject, "Search Objects"
+end menu_DisplayWalkHierarchy
+
+on submenu_HkeyArray
+   return "Global | HkeyArray | Tree | Filter | Menu"
+end submenu_HkeyArray
+
+private on _
+end _
 
 on menu_ScriptHkeyArray sObject
    put the script_HkeyArrayFile of sObject into sFile
@@ -67,6 +168,7 @@ end checked_ScriptHkeyArray
 
 on menu_HkeyArrayGraph sObject, graphStyle
    put LocalArray ["hkeyArray"] into hkeyArray
+   --
    graph_CreateFromScriptHkeyArray hkeyArray, sObject, graphStyle
    put the result into svgFile
    --
@@ -74,25 +176,43 @@ on menu_HkeyArrayGraph sObject, graphStyle
    display_SVG svgFile, sLabel
 end menu_HkeyArrayGraph
 
-on menu_DisplayMissing sObject
-   put LocalArray ["hkeyArray"] into hkeyArray
+getprop hkeyArrayGraph_Params
+   return _GraphStyles()
+end hkeyArrayGraph_Params
+
+on menu_GraphModuleBehavior sObject, graphStyle
+   put the walk_ModuleBehaviorHkeyArray of sObject into hkeyArray
    --
-   display_MissingHkey hkeyArray, sObject
-end menu_DisplayMissing
+   graph_CreateFromScriptHkeyArray hkeyArray, sObject, graphStyle
+   put the result into svgFile
+   --
+   put the name of sObject into sLabel
+   display_SVG svgFile, sLabel
+end menu_GraphModuleBehavior
 
-private on _
-end _
-
-on submenu_Show
-   return "Global | HkeyArray | Tree | Menu"
-end submenu_Show
-
-on menu_Refresh sObject
-   display_ScriptDeps sObject
-end menu_Refresh
+getprop graphModuleBehavior_Params
+   return _GraphStyles()
+end graphModuleBehavior_Params
 
 private on __
 end __
+
+on menu_ModuleBehaviorHierarchy sObject
+   put the module_BehaviorHierarchy of sObject into oIndex
+   display_Data oIndex, the name of sObject, "the module_BehaviorHierarchy"
+end menu_ModuleBehaviorHierarchy
+
+on menu_ReconstructHkeyArray sObject
+   put name of sObject into sName
+   put LocalArray ["dView"] into dView
+   lcw_Answer "Walk scrip hierarchy and save hkeyarray for [[var]]?", dView, sName
+   --
+   put the walk_HkeyArray of sObject into hKeyArray
+   put the script_HkeyArray of sObject into hKeyArray
+end menu_ReconstructHkeyArray
+
+private on ___
+end ___
 
 on menu_DisplayDotText sObject
    put the script_DotFile of sObject into dotFile
@@ -121,37 +241,37 @@ on menu_OverlayFolder sObject
    finder_Reveal objectFolder
 end menu_OverlayFolder
 
-private on ___
-end ___
+private on _____
+end _____
 
-on menu_TestStackDeps sObject
-   put the dep_Stacks of sObject
-end menu_TestStackDeps
+on menu_Recreate sObject
+   put the walk_ModuleBehaviorHkeyArray of sObject into hkeyArray
+   display_ScriptHkeyArrayDeps hkeyArray, sObject
+   put the result into dView
+   --
+   put the module_Name of sObject into mName
+   lcw_Answer "Save the hkey array for module '[[var]]' and replace the script_HkeyArray?", dView, mName
+   --
+   set the script_HkeyArray of sObject to hKeyArray
+   --
+   return dView
+end menu_Recreate
 
-on menu_ListDepStacks sObject
-   put LocalArray ["hkeyArray"] into hkeyArray
-   put hkeyArray_GetStackDepArray (hkeyArray) into depObjectData
+on menu_Refresh sObject
+   put LocalArray ["dView"] into dView
+   lock screen
+   put the displayed_Object of dView into sObject
+   set the title_Text of dView  to the name of sObject
    --
-   delete variable depObjectData [sObject]
-   --
-   put keys (depObjectData) into depStacks
-   repeat for each line stackObject in depStacks
-      put the short name of stackObject into libName
-      put libName & ", " after libNames
-      put the project_Name of stackObject into projectName
-      put libName into projectArray [projectName]
-   end repeat
-   delete char -2 to -1 of libNames
-   sort libNames
-   put keys (projectArray) into projectNames
-   sort projectNames
-   replace CR with ", " in projectNames
-   --
-   put "libs:" && libNames into libDepLine -- dep_StackNames
-   put "projects:" && projectNames into projectDepLine -- dep_StackNames
-   
-   put libDepLine & CR & projectDepLine
-end menu_ListDepStacks
+   if the shiftKey is "Down" then
+      put the dep_ProjectArray of sObject into hKeyArray
+      set the script_HkeyArray of sObject to hKeyArray
+   else
+      put the script_HkeyArray of sObject into hKeyArray
+   end if
+   display_ScriptHkeyArrayDeps hkeyArray, sObject
+   unlock screen
+end menu_Refresh
 
 on submenu_Dev
    return menu_DevTitle ("Global | Script | Dep | Menu")

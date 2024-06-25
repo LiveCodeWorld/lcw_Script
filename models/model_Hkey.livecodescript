@@ -218,7 +218,7 @@ command hKey_DeconstructStoredArray hKey, @hKeyCalls, @backLinks, @allCalls, pVe
    overlayArray_DeconstructData overlayArray, linkArray, idArray, idLinkArray, reverseIdArray, dotClusterArray
    
    put linkArray [hKey] into hKeyCalls
-   put array_AllNodes (linkArray) into allCalls
+   put array_ListKeys (linkArray) into allCalls
    sort allCalls
    line_Delete hKey, allCalls -- just in case
 end hKey_DeconstructStoredArray

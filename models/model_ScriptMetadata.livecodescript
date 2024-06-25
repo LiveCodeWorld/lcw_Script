@@ -165,13 +165,13 @@ command script_DeconstructMetaDataSuite metaDataSuite, @metadataBit, @commentBit
    repeat with lineNum = 1 to the number of lines of metaDataSuite
       put line lineNum of metaDataSuite into someLine
       switch
-         case word 1 of someLine = "/*"
+         case char 1 to 2 of word 1 of someLine = "/*"
             put true into commentBlock
             put lineNum into startCommentLine
             break
          case commentBlock is true
             -- keep looping till end of block
-            if word -1 of someLine = "*/" then
+            if char -2 to -1 of word -1 of someLine = "*/" then
                -- could put this commented out section in the index?
                put lineNum into endCommentLine
                put line (startCommentLine + 1) to (endCommentLine - 1) of metaDataSuite into commentBit
