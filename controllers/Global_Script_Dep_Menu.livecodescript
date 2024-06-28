@@ -29,9 +29,28 @@ getprop menu_Target [tObject]
    return sObject
 end menu_Target
 
+private function _dView
+   return LocalArray ["dView"]
+end _dView
+
+private function _DisplayedData
+   put LocalArray ["dView"] into dView
+   put the displayed_Data of dView into dData
+   return dData
+end _DisplayedData
+
+private function _AllDepKeys sObject
+   put LocalArray ["dView"] into dView
+   --
+   put _HkeyArray (sObject) into hkeyArray
+   put array_ListKeys (hkeyArray) into hKeys
+   return hKeys
+end _AllDepKeys
+
 private function _HkeyArray sObject
    if the shiftkey is "down" then
-      put the script_HkeyArray of sObject into hKeyArray
+      put the module_BehaviorDepHkeyArray [true] of sObject into hKeyArray
+      -- put the script_HkeyArray of sObject into hKeyArray
       return hKeyArray
    else
       return LocalArray ["hkeyArray"]
@@ -42,6 +61,10 @@ private function _GraphStyles
    -- return "hierarchical,fast undirected spring"
    return dot_ListGraphStyles()
 end _GraphStyles
+
+private command _DisplayDepScript depScript, sObject
+   display_Text depScript, the name of sObject, "Dependency Script"
+end _DisplayDepScript
 
 getprop displayDotText_Params [sObject]
    put the script_DotFiles [false] of sObject into shortFiles
@@ -98,39 +121,63 @@ on submenu_Missing
    return "Global | HkeyArray | Tree | Menu"
 end submenu_Missing
 
-private on ____
-end ____
+private on _
+end _
 
-on menu_ListDepHkeys sObject
-   put LocalArray ["dView"] into dView
+on menu_CreateBehaviorHkeyArray sObject
+   put the module_BehaviorDepHkeyArray [true] of sObject into hKeyArray
+   if fromFolder is true then
+      set the script_HkeyArray of sObject to hKeyArray
+   end if
    --
-   put the displayed_HkeyArray of dView into hkeyArray
-   put array_ListKeys (hkeyArray) into hKeys
+   display_ScriptHkeyArrayDeps hkeyArray, sObject
+end menu_CreateBehaviorHkeyArray
+
+on menu_AllDepHkeys sObject
+   put _AllDepKeys() into hKeys
+   hkey_SortIndex hKeys
    --
    put the number of lines of hKeys into keyNum
    put keyNum && "Hkeys" into sTitle
-   
+   put LocalArray ["dView"] into dView
    set the displayed_Data [sTitle] of dView to hKeys
-   --
-   sort lines of hKeys
-   return hKeys
-end menu_ListDepHkeys
+end menu_AllDepHkeys
 
-on menu_CreateDepScript sObject
+on menu_FilteredDepKeys sObject
+   put _HkeyArray (sObject) into hkeyArray
+   --
+   put the module_ExternalHkeys [hKeyArray] of sObject into hKeys
+   --
+   put the number of lines of hKeys into keyNum
+   put "Filtered Deps" && keyNum && "Hkeys" into sTitle
+   set the displayed_Data [sTitle] of _dView() to hKeys
+end menu_FilteredDepKeys
+
+on menu_CollectDisplayed sObject
+   put _DisplayedData() into hKeys
+   put hkey_CollectFromObjects (hKeys, true) into depScript
+   --
+   _DisplayDepScript depScript, sObject
+end menu_CollectDisplayed
+
+on menu_CreateDepScriptStack sObject
    put the module_BehaviorDepScript of sObject into depScript
+   put empty into  depScript
    --
    module_CreateBehaviorDepStack sObject, depScript
    if item 1 of the result = "Error" then
-      display_Text depScript, the name of sObject, "Dependency Script"
+      _DisplayDepScript depScript, sObject
       --
-      put LocalArray ["dView"] into dView
-      lcw_AnswerWarning "Cannot create behavior stack as it already exists!", dView
+      lcw_AnswerWarning "Cannot create behavior stack as it already exists!", LocalArray ["dView"]
    else
       put the result into depStackName
    end if
    edit the script of stack depStackName
    return depHkeyArray
-end menu_CreateDepScript
+end menu_CreateDepScriptStack
+
+private on __
+end __
 
 on menu_DisplayMissing sObject
    put LocalArray ["hkeyArray"] into hkeyArray
@@ -148,8 +195,8 @@ on submenu_HkeyArray
    return "Global | HkeyArray | Tree | Filter | Menu"
 end submenu_HkeyArray
 
-private on _
-end _
+private on ___
+end ___
 
 on menu_ScriptHkeyArray sObject
    put the script_HkeyArrayFile of sObject into sFile
@@ -194,8 +241,8 @@ getprop graphModuleBehavior_Params
    return _GraphStyles()
 end graphModuleBehavior_Params
 
-private on __
-end __
+private on ____
+end ____
 
 on menu_ModuleBehaviorHierarchy sObject
    put the module_BehaviorHierarchy of sObject into oIndex
@@ -211,8 +258,8 @@ on menu_ReconstructHkeyArray sObject
    put the script_HkeyArray of sObject into hKeyArray
 end menu_ReconstructHkeyArray
 
-private on ___
-end ___
+private on _____
+end _____
 
 on menu_DisplayDotText sObject
    put the script_DotFile of sObject into dotFile
@@ -241,8 +288,8 @@ on menu_OverlayFolder sObject
    finder_Reveal objectFolder
 end menu_OverlayFolder
 
-private on _____
-end _____
+private on ______
+end ______
 
 on menu_Recreate sObject
    put the walk_ModuleBehaviorHkeyArray of sObject into hkeyArray
