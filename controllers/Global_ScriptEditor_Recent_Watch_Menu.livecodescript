@@ -23,6 +23,10 @@ local LocalArray
 
 --> Global | ScriptEditor | Recent | Watch | Menu
 -
+on menu_RecentWatch seHistoryButton
+   put the name of seHistoryButton
+end menu_RecentWatch
+
 on insert_HeaderMenu
    return "Global | ScriptEditor | Header | Menu"
 end insert_HeaderMenu

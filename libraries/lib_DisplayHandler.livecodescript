@@ -30,7 +30,7 @@ command display_HandlerDeps hKeyLine
    -- put hkeyLine_WalkExportedHkeyArray (hKeyLine) into hKeyArray
    -- display_HandlerDepArrays hKeyLine, hKeyArray
    
-   put walk_GetHkeyArray (hKeyLine) into hKeyArray
+   put walk_ConstructHkeyArray (hKeyLine) into hKeyArray
    --
    display_HkeyArrayDeps hkeyArray, hKeyLine
    put the result into displayView

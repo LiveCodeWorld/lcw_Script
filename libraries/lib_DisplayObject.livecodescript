@@ -48,11 +48,9 @@ command display_ScriptDeps sObject, pGraphStyle
       put the script_HkeyArray of sObject into hKeyArray
       lcw_Notify "Using already created hkeyArray file!"
    else if the module_Name of sObject is empty then
-      breakpoint
       put the walk_HkeyArray of sObject into hKeyArray
       set the script_HkeyArray of sObject to hKeyArray
    else
-      breakpoint
       put the module_BehaviorDepHkeyArray of sObject into hKeyArray
       set the script_HkeyArray of sObject to hKeyArray
    end if

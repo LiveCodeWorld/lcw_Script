@@ -28,15 +28,6 @@ getprop editMenu_Params
    return shortNames
 end editMenu_Params
 
-getprop menuSet_Param
-   return ide_ShortTitle ("Recent")
-end menuSet_Param
-
-getprop menuSet_Params
-   put ide_ListShortMenuTitles ("Recent") into shortNames
-   return shortNames
-end menuSet_Params
-
 getprop editIdeBehavior_Params
    return ide_ListToolBarBehaviorNames()
 end editIdeBehavior_Params
@@ -51,6 +42,15 @@ end menu_EditMenu
 on menu_MenuSet mTarget, mTitle
    ide_SetScriptEditorTitles mTitle
 end menu_MenuSet
+
+getprop menuSet_Param
+   return ide_ShortTitle ("Recent")
+end menuSet_Param
+
+getprop menuSet_Params
+   put ide_ListShortMenuTitles ("Recent") into shortNames
+   return shortNames
+end menuSet_Params
 
 private command _
 end _
