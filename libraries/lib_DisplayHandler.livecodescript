@@ -14,6 +14,142 @@ These values are stored in the handler_Folder, and retrieved using "hkey_FetchCa
 
 --> Working on
 -
+command svg_BrowserNavigate clickedURL
+   put the svg_View of the target into svgView
+   
+   # Hkey from clicked url
+   set the itemdelimiter to slash
+   if item 3 of clickedURL is not "libbrowser_dummy_url" then return false
+   put item -1 of clickedURL into urlEncodedHKey
+   put urldecode (urlEncodedHKey) into hKey
+   replace "'" with quote in hKey
+   
+   # Graph props from "display_ScriptHkeyArrayDeps" and 
+   put the displayed_Object of svgView into sObject
+   put the displayed_HkeyArray of svgView into hkeyArray
+   put the displayed_GraphStyle of svgView into pGraphStyle
+   --
+   put the svg_File of svgView into svgFile
+   
+   # Do something
+   hkey_Deconstruct hKey, hName, hType, hObject, hNum
+   --
+   switch hObject
+      case empty
+         put clickedURL
+         break
+      case "missing"
+         put hkey_Find (hKey) into foundHkey
+         if foundHkey is empty then
+            -- find in hKeyArray?
+            breakpoint
+            display_SpotlightHandler hKey
+         else
+            hKey_Edit foundHkey
+         end if
+         break
+      default
+         hKey_Edit hKey
+   end switch
+end svg_BrowserNavigate
+
+
+--> Display
+-
+command display_CollectedHkeys hKeys, sTitle
+   # Collect and display script
+   put hkey_CollectFromObjects (hKeys, true) into newDepScript
+   display_Text newDepScript, sTitle, "Found but Outside Script"
+   return teh result
+end display_CollectedHkeys
+
+function collection_GetData
+   put the model_Array ["collection.array"] of stack "lcw_Script" into collectionData
+   return collectionData
+end collection_GetData
+
+command collection_SetData collectionData
+   set the model_Array ["collection.array"] of stack "lcw_Script" to collectionData
+   return the result
+end collection_SetData
+
+command display_CallsOutside hkeyArray, sObject, pHkey
+   put array_ListKeys (hkeyArray) into hKeys
+   put hkeyIndex_FilterOutside (hKeys, sObject, true) into outsideKeys
+   
+   put collection_GetData() into collectionData
+   --
+   if pHkey is empty then
+      put revRuggedId(sObject) into sObject
+      put hkeyArray into collectionData ["collection"][sObject]
+   else
+      put hkeyArray into collectionData ["collection"][pHkey]
+   end if
+   --
+   repeat for each line hKey in outsideKeys
+      hkeyLine_Deconstruct hKey, hName, hType, hObject
+      put the result into shortHkey
+      --
+      put empty into collectionData ["shortkeyArray"][shortHkey]["hkey"][hKey]
+   end repeat   
+   --
+   collection_SetData collectionData
+   
+   -- put the name of sObject into sTitle
+   display_Tool collectionData, "Collection Data", "Hkey Calls Outside", "lcw_Script"
+   put the result into dView
+   --
+   return dView
+end display_CallsOutside
+
+function colour_RgbToHSV
+   return true
+end colour_RgbToHSV
+
+function hkey_ConstructMissingData hKeys, sObject, searchObjects, pDisplayView
+   put hkey_ListShort (hKeys) into allShortHkeys
+   --
+   repeat with lineNum = 1 to the number of lines of hKeys
+      if the commandKey is "down" then breakpoint
+      if the shiftKey is "down" then exit repeat
+      --
+      put line lineNum of hKeys into hKey
+      --
+      if exists (pDisplayView) then
+         set the hilited_Element of pDisplayView to hKey
+      end if
+      
+      # List handler calls = allHandlerKeys
+      put walk_ConstructHkeyArray (hKey, searchObjects) into handlerHkeyArray
+      put array_ListKeys (handlerHkeyArray) into allHandlerKeys
+      
+      repeat for each line handlerHkey in allHandlerKeys
+         put word 1 to 2 of handlerHkey into shortHandlerKey
+         --
+         switch
+            case handlerHkey is among the lines of hKeys
+               put empty into foundArray [handlerHkey]
+               break
+            case word -1 of handlerHkey = "Missing"
+               put empty into missingArray [handlerHkey]
+               break
+            case shortHandlerKey is among the lines of allShortHkeys
+               put empty into inShortArray [handlerHkey]
+               break
+            default
+               put empty into foundButOutsideArray [handlerHkey]
+         end switch
+      end repeat
+   end repeat
+   --
+   put foundArray into missingData ["foundArray"]
+   put missingArray into missingData ["missingArray"]
+   put inShortArray into missingData ["inShortArray"]
+   put foundButOutsideArray into missingData ["foundButOutsideArray"]
+   --
+   return missingData
+end hkey_ConstructMissingData
+
 command display_CreateFastHandlerGraph hKey
    display_CreateHandlerGraph hKey, "fast undirected spring"
 end display_CreateFastHandlerGraph
@@ -37,34 +173,6 @@ command display_HandlerDeps hKeyLine
    --
    return displayView
 end display_HandlerDeps
-
-command svg_BrowserNavigate clickedURL
-   --need to turn it into a cutomisable event handler
-   set the itemdelimiter to slash
-   if item 3 of clickedURL is not "libbrowser_dummy_url" then return false
-   put item -1 of clickedURL into urlEncodedHKey
-   put urldecode (urlEncodedHKey) into hKey
-   replace "'" with quote in hKey
-   
-   hkey_Deconstruct hKey, hName, hType, hObject, hNum
-   --
-   switch hObject
-      case empty
-         put clickedURL
-         break
-      case "missing"
-         put hkey_Find (hKey) into foundHkey
-         if foundHkey is empty then
-            breakpoint
-            display_SpotlightHandler hKey
-         else
-            hKey_Edit foundHkey
-         end if
-         break
-      default
-         hKey_Edit hKey
-   end switch
-end svg_BrowserNavigate
 
 
 --> Props

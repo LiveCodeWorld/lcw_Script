@@ -153,6 +153,12 @@ on menu_EditHkey dView
          put item 4 of sPath into hKey
          break
       case pName is "Missing"
+         put item 2 of sPath into sObject
+         if exists (sObject) is true then
+            put shortHkey && "of" && sObject into hKey
+         else
+            breakpoint
+         end if
          break
       case pNum = 3
          put item 2 of sPath into sObject

@@ -45,13 +45,13 @@ getprop checked_DisplayScriptDeps [sObject]
    return there is a file sFile
 end checked_DisplayScriptDeps
 
-on menu_CreateBehaviorHkeyArray sObject
-   put the shiftkey is "down" into fromFolder
+on menu_DisplayBehaviorHkeyArray sObject
+   put the shiftkey is not "down" into fromFolder
    put the module_BehaviorDepHkeyArray [fromFolder] of sObject into hKeyArray
    set the script_HkeyArray of sObject to hKeyArray
    --
-   display_ScriptHkeyArrayDeps hkeyArray, sObject
-end menu_CreateBehaviorHkeyArray
+   display_ScriptHkeyArrayDeps hkeyArray, sObject, "hierarchy" -- "fdp"
+end menu_DisplayBehaviorHkeyArray
 
 on menu_DisplayLocalChanges sObject
    put the script of sObject into nowScript
@@ -100,7 +100,7 @@ private on ___
 end ___
 
 on menu_Refresh sObject
-   display_Script sObject
+   display_ScriptTools sObject
 end menu_Refresh
 
 on menu_DisplayGitStatus sObject

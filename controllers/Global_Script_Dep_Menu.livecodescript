@@ -261,6 +261,10 @@ end menu_ReconstructHkeyArray
 private on _____
 end _____
 
+on menu_ScriptTools sObject
+   display_ScriptTools sObject
+end menu_ScriptTools
+
 on menu_DisplayDotText sObject
    put the script_DotFile of sObject into dotFile
    --

@@ -30,7 +30,7 @@ end displayTemplate_Params
 --> Global | ScriptEditor | Script | Menu
 -
 on menu_ScriptTools sObject
-   display_Script sObject
+   display_ScriptTools sObject
 end menu_ScriptTools
 
 on menu_DisplayRigControllers

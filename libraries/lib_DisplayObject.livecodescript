@@ -44,7 +44,7 @@ end display_MissingHkey
 -
 command display_ScriptDeps sObject, pGraphStyle
    put the script_HkeyArrayFile of sObject into sFile
-   if there is a file sFile then
+   if (there is a file sFile) AND (the shiftkey is "Up") then
       put the script_HkeyArray of sObject into hKeyArray
       lcw_Notify "Using already created hkeyArray file!"
    else if the module_Name of sObject is empty then
@@ -76,6 +76,11 @@ command display_ScriptHkeyArrayDeps hkeyArray, sObject, pGraphStyle
       --
       put the name of sObject into sLabel
       display_SVG svgFile, sLabel
+      put the result into svgView
+      --
+      set the displayed_Object of svgView to sObject
+      set the displayed_HkeyArray of svgView to hkeyArray
+      set the displayed_GraphStyle of svgView to pGraphStyle
    end if
    return dView
 end display_ScriptHkeyArrayDeps
