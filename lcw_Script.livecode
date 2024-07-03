@@ -16,6 +16,13 @@ end project_Deps
 
 --> Events
 -
+command project_PostInit
+   set the cursor to watch
+   --
+   breakpoint
+   ide_InitLcw
+end project_PostInit
+
 on preOpenStack 
    if the short name of the defaultstack is not the short name of me then
       pass preOpenStack

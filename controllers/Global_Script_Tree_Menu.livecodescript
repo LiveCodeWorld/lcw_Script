@@ -37,7 +37,10 @@ end disabled_EditObjectBehavior
 --> Global | Script | Tree | Menu
 -
 on menu_DisplayScriptDeps sObject
-   display_ScriptDeps sObject
+   if the shiftKey is "Down" then
+      put "hierarchical" into graphStyle
+   end if
+   display_ScriptDeps sObject, graphStyle
 end menu_DisplayScriptDeps
 
 getprop checked_DisplayScriptDeps [sObject]

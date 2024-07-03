@@ -33,9 +33,27 @@ end menu_CheckTarget
 
 --> Global | Rename | Menu | Menu
 -
-on menu_RenameMenu dView
-   put the params
-end menu_RenameMenu
+on menu_EditMenu dView
+   put the displayed_Data of dView into dData
+   put dData ["mTitle"] into mTitle
+   --
+   menu_Edit mTitle
+end menu_EditMenu
+
+on menu_EnvironmentMenus dView
+   put the displayed_Data of dView into dData
+   put dData ["mTitle"] into mTitle
+   --
+   display_EnvironmentMenus false, mTitle
+end menu_EnvironmentMenus
+
+getprop disabled_EditMenu [dView]
+   put the displayed_Data of dView into dData
+   put dData ["mTitle"] into mTitle
+   --
+   put menu_GetGlobalController(mTitle) into mController
+   return exists (mController) is false
+end disabled_EditMenu
 
 on menu_FixControllerName dView
    put the displayed_Data of dView into dData

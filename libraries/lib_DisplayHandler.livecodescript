@@ -42,6 +42,7 @@ command svg_BrowserNavigate clickedURL
          put hkey_Find (hKey) into foundHkey
          if foundHkey is empty then
             -- find in hKeyArray?
+            put hKey
             breakpoint
             display_SpotlightHandler hKey
          else
