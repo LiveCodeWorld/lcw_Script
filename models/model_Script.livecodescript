@@ -49,55 +49,6 @@ getprop script_FunctionHandlers
    return script_ExtractFunctionHandlers (someScript, scriptObject)
 end script_FunctionHandlers
 
-
---> Script | Handler | Model
--
-/*
-These handlers extract handlers from an objects script.
-For handlers that work on exported handlers see "model_HandlerLibrary"
-*/
-
-getprop script_HandlerExists [shortHKey]
-   if shortHKey is empty then return empty
-   put the revAvailableHandlers of the target into hTable
-   --
-   put space after word 1 to -1 of shortHKey
-   if lineOffset (shortHKey, hTable) = 0 then
-      return false
-   else
-      return true
-   end if
-end script_HandlerExists
-
-getprop script_Handler [shortHKey]
-   if shortHKey is empty then return empty
-   -- hkey_Normalize shortHKey
-   
-   put the long id of the target into hObject
-   put the revAvailableHandlers of hObject into hTable
-   put the script of hObject into someScript
-   put hkeyLine_GetHandler (shortHKey, hTable, someScript) into foundHandler
-   return foundHandler
-end script_Handler
-
-setprop script_Handler [shortHKey] someHandler
-   if shortHKey is empty then return empty
-   hkey_Normalize shortHKey
-   
-   put the long id of the target into hObject
-   put the revAvailableHandlers of hObject into hTable
-   put the script of hObject into someScript
-   
-   if someHandler is empty then
-      script_DeleteHandler someScript, shortHKey, hTable
-   else
-      htable_ExactLineOffsets shortHKey, hTable, startLineNum, endLineNum
-      put someHandler into line startLineNum to endLineNum of someScript
-   end if
-   set the script of hObject to someScript
-   return someScript
-end script_Handler
-
 command script_StripPropHandlers @someScript, hTable
    sort descending numeric lines of hTable by word 3 of each
    repeat for each line hTableLine in hTable
@@ -108,47 +59,9 @@ command script_StripPropHandlers @someScript, hTable
    end repeat
 end script_StripPropHandlers
 
-command script_DeleteHandler @someScript, hkeyLine, hTable
-   htable_ExactLineOffsets hkeyLine, hTable, startLineNum, endLineNum
-   put endLineNum + 1 into afterEndLineNum
-   put word 1 to -1 of line afterEndLineNum of someScript into lineAfterEnd
-   if lineAfterEnd is empty then add 1 to endLineNum
-   delete line startLineNum to endLineNum of someScript
-   return startLineNum,endLineNum
-end script_DeleteHandler
-
 
 --> Script | Handler | More
 -
-getprop script_Handlers [whichType]
-   try
-      put the long id of the target into tObject
-      put the revAvailableHandlers of tObject into handlerTable
-      sort numeric handlerTable by word 3 of each
-      repeat for each line someLine in handlerTable
-         put word 1 of someLine into item 2 of shortHkey
-         put word 2 of someLine into item 1 of shortHkey
-         
-         switch whichType
-            case "markdown"
-               --    - [G mobile_VerticalScroller](../blob/master/libraries/lib_MobileControls.livecodescript#L35-L42)
-               put "- [" & word 1 to 2 of someLine & "]" & CR after hLines
-               -- put "* [[" & shortHkey & "]]" & CR after hLines
-               break
-            case "start line"
-               put _ScriptHandlersStart (shortHkey) into hLine
-               put hLine & CR after hLines
-            default
-               put word 2 of someLine & CR after hLines
-         end switch
-      end repeat
-      delete char -1 of hLines
-      return hLines
-   catch someError
-      return empty -- a locked stack
-   end try
-end script_Handlers
-
 getprop script_Hkeys [fetchHow]
    switch fetchHow
       case "short"

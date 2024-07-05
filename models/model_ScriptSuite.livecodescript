@@ -261,6 +261,26 @@ setprop script_Suite [suiteName] newSuite
 end script_Suite
 
 
+--> ScriptArray
+-
+function scriptArray_ShortHkeys scriptArray
+   put scriptArray_ShortHkeyArray(scriptArray) into shortHkeyArray
+   put keys (shortHkeyArray) into shorHkeys
+   sort shorHkeys
+   return shorHkeys
+end scriptArray_ShortHkeys
+
+function scriptArray_ShortHkeyArray scriptArray
+   local shortHkeyArray
+   --
+   repeat for each key suiteName in scriptArray
+      put scriptArray [suiteName] into suiteHkeyArray
+      union shortHkeyArray with suiteHkeyArray
+   end repeat
+   return shortHkeyArray
+end scriptArray_ShortHkeyArray
+
+
 --> Script | Suite | Suite Array
 -
 /*

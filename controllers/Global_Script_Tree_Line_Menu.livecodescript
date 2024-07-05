@@ -25,21 +25,26 @@ end mDoubleUp_DisplayShortHkey
 
 getprop menu_Target [tObject]
    put the tree_View of tObject into treeView
-   get the selected_Path of treeView
-   put treeView into LocalArray ["treeView"]
-   --
-   put item 1 of it into LocalArray ["suiteTitle"]
-   put item 2 of it into shortHkey
-   put shortHkey into LocalArray ["shortHkey"]
-   --
    put the displayed_Object of treeView into hObject
+   --
+   if the tree_IsIndex of treeView is true then
+      put the selected_Line of treeView into shortHkey
+   else
+      get the selected_Path of treeView
+      put treeView into LocalArray ["treeView"]
+      --
+      put item 1 of it into LocalArray ["suiteTitle"]
+      put item 2 of it into shortHkey
+   end if
+   --
+   put shortHkey into LocalArray ["shortHkey"]
    put shortHkey && "of" && hObject into hKey
    put hKey into LocalArray ["hKey"]
    --
-   return treeView
+   return hObject
 end menu_Target
 
-getprop disabled_HandlerSvg
+getprop disabled_HandlerSvg [hObject]
    put LocalArray ["hKey"] into hKey
    --
    put hkey_SvgFile (hKey) into svgFile
@@ -64,6 +69,13 @@ end disabled_HandlerOverlayArray
 
 --> Global | Script | Tree | Line | Menu
 -
+on menu_CheckHandler
+   put LocalArray ["hKey"] into hKey
+   --
+   put handler_Get (hKey, true)
+   script_DeleteHandler someScript, hKey, hTable
+end menu_CheckHandler
+
 on menu_EditHandler hObject
    put LocalArray ["hKey"] into hKey
    --
@@ -77,7 +89,7 @@ on menu_EditHandler hObject
    end if
 end menu_EditHandler
 
-on _
+private on _
 end _
 
 on menu_GraphHandler hObject
@@ -92,8 +104,8 @@ on menu_GraphHandler hObject
    display_HkeySVG hkey
 end menu_GraphHandler
 
-on _
-end _
+private on __
+end __
 
 on menu_HandlerSvg hObject
    put LocalArray ["hKey"] into hKey
@@ -112,8 +124,8 @@ on menu_HandlerOverlayArray hObject
    display_Array overlayArray, shortHkey
 end menu_HandlerOverlayArray
 
-on _
-end _
+private on ___
+end ___
 
 on menu_HandlerFolder hObject
    put LocalArray ["hKey"] into hKey

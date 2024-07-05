@@ -9,10 +9,15 @@ version: 0.2
 deps: model_PageArray, lib_MediaWiki, lib_PageArray
 
 
---> Menu | Init
+--> Variable
+-
+local LocalArray
+
+
+--> Menu | Props
 -
 getprop menu_Target [tObject]
-   -- put the title_Text of displayView into sObject
+   put the display_View of tObject into LocalArray ["dView"]
    put the displayed_Object of tObject into sObject
    return sObject
 end menu_Target
@@ -33,9 +38,113 @@ getprop disabled_EditObjectBehavior [sObject]
    end switch
 end disabled_EditObjectBehavior
 
+private function _TitleKeys sTitle
+   put _EmptyHkeyArray(sTitle) into shortHkeyArray
+   put keys (shortHkeyArray) into hKeys
+   sort hKeys
+   return hKeys
+end _TitleKeys
+
+private function _MyKeys
+   put _MyEmptyHkeyArray() into shortHkeyArray
+   put keys (shortHkeyArray) into hKeys
+   sort hKeys
+   return hKeys
+end _MyKeys
+
+private function _EmptyHkeyArray sTitle
+   put display_FindView ("Script", sTitle) into fView
+   put the displayed_ScriptArray of fView into minusScriptArray
+   put scriptArray_ShortHkeyArray(minusScriptArray) into minusArray
+   return minusArray
+end _EmptyHkeyArray
+
+private function _MyEmptyHkeyArray
+   put LocalArray ["dView"] into dView
+   put the displayed_ScriptArray of dView into scriptArray
+   put scriptArray_ShortHkeyArray(scriptArray) into shortHkeyArray
+   return shortHkeyArray
+end _MyEmptyHkeyArray
+
+private function _OtherNames
+   put display_ListViews ("Script") into sViews
+   put LocalArray ["dView"] into dView
+   line_Delete dView, sViews
+   --
+   repeat for each line sView in sViews
+      -- put the stack_Label of sView into sLabel
+      put the title_Text of sView into sTitle
+      put sTitle & CR after sTitles
+   end repeat
+   delete char -1 of sTitles
+   return sTitles
+end _OtherNames
+
 
 --> Global | Script | Tree | Menu
 -
+on menu_Compare sObject, rightObject
+   put _MyKeys() into leftKeys
+   put _TitleKeys (rightObject) into rightKeys
+   
+   # Title
+   put hkey_ConstructCompareArray (leftKeys, rightKeys) into cArray
+   --
+   put revRuggedID(sObject) into leftObject
+   put leftObject && "vs" && rightObject into sTitle
+   
+   display_Tool cArray, sTitle, "Script Compare", "lcw_Script"
+   put the result into dView
+   
+   # Props
+   set the displayed_Object of dView to sObject
+   set the script_CompareArray of dView to cArray
+   put the displayed_RightObject of dView to rightObject
+   return dView
+end menu_Compare
+
+getprop compare_Params
+   return _OtherNames()
+end compare_Params
+
+on menu_Subtract sObject, sTitle
+   local minusArray
+   local leftArray
+   
+   put _EmptyHkeyArray(sTitle) into minusArray
+   put _MyEmptyHkeyArray() into shortHkeyArray
+   
+   # Subtract
+   difference shortHkeyArray with minusArray into leftArray
+   --
+   -- set the displayed_Data of dView to leftHkeys
+   display_Data leftArray, "Left", "Script"
+end menu_Subtract
+
+getprop subtract_Params
+   return _OtherNames()
+end subtract_Params
+
+on menu_DisplayShortHkeys
+   put LocalArray ["dView"] into dView
+   put the displayed_ScriptArray of dView into scriptArray
+   --
+   if the tree_IsIndex of dView is true then
+      set the displayed_Data of dView to scriptArray
+   else
+      put scriptArray_ShortHkeys(scriptArray) into shortHkeys
+      set the displayed_Data of dView to shortHkeys
+   end if
+end menu_DisplayShortHkeys
+
+getprop checked_DisplayShortHkeys
+   put LocalArray ["dView"] into dView
+   return the tree_IsIndex of dView
+end checked_DisplayShortHkeys
+
+private on __
+end __
+
 on menu_DisplayScriptDeps sObject
    if the shiftKey is "Down" then
       put "hierarchical" into graphStyle
@@ -99,8 +208,8 @@ on submenu_MenuTools
    return "Global | MenuTools | Menu"
 end submenu_MenuTools
 
-private on ___
-end ___
+private on ____
+end ____
 
 on menu_Refresh sObject
    display_ScriptTools sObject
@@ -110,8 +219,8 @@ on menu_DisplayGitStatus sObject
    display_GitStatus sObject
 end menu_DisplayGitStatus
 
-private on ____
-end ____
+private on _____
+end _____
 
 on menu_CreateScriptObjectGraph sObject
    local pGraphStyle, pProcessObject, projectName
@@ -133,8 +242,15 @@ on submenu_Folders
    return "Global | Script | Folders | Menu"
 end submenu_Folders
 
-private on _____
-end _____
+private on ______
+end ______
+
+on menu_SaveDisplayedScriptArray
+   put LocalArray ["dView"] into dView
+   put the displayed_Data of dView into scriptArray
+   --
+   set the displayed_ScriptArray of dView to scriptArray
+end menu_SaveDisplayedScriptArray
 
 on submenu_Dev
    return menu_Create ("Global | Script | Dev | Menu")

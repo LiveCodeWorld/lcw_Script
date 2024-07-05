@@ -3,8 +3,8 @@
 -
 license: GPLv3
 name: lib_Hkey
-type: script library
-version: 0.1
+type: library
+version: 0.2
 
 /*
 A library for script analysis using hKeys.
@@ -447,42 +447,6 @@ command hkey_StripDuplicates @hKeys
    put uniqueKeys into hKeys
    return duplicateArray
 end hkey_StripDuplicates
-
-function hkey_ConstructCompareArray leftKeys, rightKeys
-   line_SetUnique leftKeys
-   line_SetUnique rightKeys
-   
-   put leftKeys into onlyLeft
-   put rightKeys into onlyRight
-   set the wholematches to false
-   repeat with leftLineLineNum = the number of lines of leftKeys down to 1
-      set the cursor to busy
-      put line leftLineLineNum of leftKeys into longKey
-      put item 1 to 2 of longKey into shortHkey
-      
-      put lineoffset (shortHkey, rightKeys) into rightLineLineNum
-      if rightLineLineNum is not 0 then
-         if shortHkey is not among the lines of shortCommonKeys then
-            put shortHkey & CR after shortCommonKeys
-            put longKey & CR after longCommonKeys
-         end if
-         
-         delete line leftLineLineNum of onlyLeft
-         delete line rightLineLineNum of onlyRight
-      end if
-      
-   end repeat
-   delete last char of longCommonKeys
-   
-   sort longCommonKeys
-   sort onlyLeft
-   sort onlyRight
-   
-   put longCommonKeys into compareArray ["common"]
-   put onlyLeft into compareArray ["onlyLeft"]
-   put onlyRight into compareArray ["onlyRight"]
-   return compareArray   
-end hkey_ConstructCompareArray
 
 function hkey_DontRecurse hKey, pOriginalHkey
    -- should check hkey database and allow manual customisation
@@ -1090,16 +1054,3 @@ function handler_GetIndex scriptStem
    sort handlerIndex
    return word 1 to -1 of handlerIndex
 end handler_GetIndex
-
-function handler_StemIndex handlerIndex
-   if handlerIndex is empty then put handler_GetIndex() into handlerIndex
-   filter handlerIndex with "*_*"
-   
-   -- this is case sensitive (so get  keys applescript and appleScript)!
-   split handlerIndex with CR and "_"
-   put keys(handlerIndex) into stemIndex
-   put line_UniqueIndex(stemIndex) into stemIndex
-   
-   sort stemIndex
-   return word 1 to -1 of stemIndex
-end handler_StemIndex

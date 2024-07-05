@@ -19,7 +19,6 @@ end project_Deps
 command project_PostInit
    set the cursor to watch
    --
-   breakpoint
    ide_InitLcw
 end project_PostInit
 

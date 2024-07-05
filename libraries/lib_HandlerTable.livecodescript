@@ -46,45 +46,38 @@ getprop hkey_Exact [shortHkey]
    return foundHkey
 end hkey_Exact
 
-getprop handler_Names [hFilter]
-   put the revAvailableHandlers of the target into hTable
-   put hTable_ListHanderNames (hTable, hFilter) into hNames
-   return hNames
-end handler_Names
-
-getprop handler_From [hKeyOrNumber]
-   put the revAvailableHandlers of the target into hTable
-   --
-   if hKeyOrNumber is a number then
-      put hTable_GetHandler (hTable, hKeyOrNumber) into someHandler
-   else
-      put word 5 to -1 of line 1 of hTable into scriptObject
-      --
-      put hKeyLine_AddObject (hKeyOrNumber, scriptObject) into hKey
-      htable_ExactLineOffsets hKey, hTable, startLineNum, endLineNum
-      if the result is false then return empty
-      
-      put the script of scriptObject into someScript
-      put line startLineNum to endLineNum of someScript into someHandler
-   end if
-   return someHandler
-end handler_From
-
 
 --> Working on
 -
-function hTable_GetHandler hTable, lineNum, pSomeScript
+function hTable_GetHandler hkeyLine, hTable, pSomeScript
+   if pSomeScript is empty then
+      put word 5 to -1 of line 1 of hTable into scriptObject
+      if exists (scriptObject) is false then return "Error, cannot find object in hTable:" && scriptObject
+      put the script of scriptObject into pSomeScript
+   end if
+   hkeyLine_Deconstruct hKeyLine, hName, hType, hObject
+   
+   # Line numbers
+   htable_OrLineOffsets hName, hType, hTable, startLineNum, endLineNum
+   -- htable_ExactLineOffsets hkeyLine, hTable, startLineNum, endLineNum
+   if endLineNum = 0 then return empty
+   
+   # Handler
+   put line startLineNum to endLineNum of pSomeScript into foundHandler
+   return foundHandler
+end hTable_GetHandler
+
+function hTable_HandlerFromLineNum hTable, lineNum, pSomeScript
    hTable_SetHandlerOffsets hTable, lineNum, startLineNum, endLineNum, scriptObject
    if the result is false then return empty
-   --
    if pSomeScript is empty then put the script of scriptObject into pSomeScript
    --
    put line startLineNum to endLineNum of pSomeScript into someHandler
    return someHandler
-end hTable_GetHandler
+end hTable_HandlerFromLineNum
 
 command hTable_SetHandlerOffsets hTable, lineNum, @startLineNum, @endLineNum, @scriptObject
-   -- given a lineNum within a handler return the handler lineNum offset
+   -- Given a lineNum within a handler return the handler lineNum offset
    put word 5 to -1 of line 1 of hTable into scriptObject
    put 0 into startLineNum
    put 0 into endLineNum

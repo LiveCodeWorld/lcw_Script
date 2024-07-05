@@ -51,7 +51,7 @@ getprop handler_PublicCalls [shortHkey]
    put the long id of the target into hObject
    put the revAvailableHandlers of hObject into hTable
    put the script of hObject into someScript
-   put hkeyLine_GetHandler (shortHKey, hTable, someScript) into someHandler
+   put htable_GetHandler (shortHKey, hTable, someScript) into someHandler
    if someHandler is empty then return empty
    put handler_ExtractCalls (someHandler) into handlerCalls
    

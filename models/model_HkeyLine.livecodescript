@@ -180,29 +180,6 @@ function hkeyLine_ScriptLineToType scriptLine
 end hkeyLine_ScriptLineToType
 
 
---> hKeyLine | Handler
--
-function hkeyLine_GetHandlers hkeyLines, hTable, someScript
-   repeat for each line hkeyLine in hkeyLines
-      put hkeyLine_GetHandler (hkeyLine, hTable, someScript) into foundHandler
-      if foundHandler is empty then next repeat
-      put foundHandler & CR & CR after foundHandlers
-   end repeat
-   delete char -2 to -1 of foundHandlers
-   return foundHandlers
-end hkeyLine_GetHandlers
-
-function hkeyLine_GetHandler hkeyLine, hTable, someScript
-   -- required by "menu_Update" (was in "lib_MenuAuthoring")
-   -- htable_ExactLineOffsets hkeyLine, hTable, startLineNum, endLineNum
-   hkeyLine_Deconstruct hKeyLine, hName, hType, hObject
-   htable_OrLineOffsets hName, hType, hTable, startLineNum, endLineNum
-   if endLineNum = 0 then return empty
-   put line startLineNum to endLineNum of someScript into foundHandler
-   return foundHandler
-end hkeyLine_GetHandler
-
-
 --> Private
 -
 private function _ScriptLineToType onWord
