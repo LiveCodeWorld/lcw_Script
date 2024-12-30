@@ -16,6 +16,61 @@ but for now this is one single flat array.
 See also "Old | Suite" of stack "model_ScriptMenu"
 */
 
+--> Script | Collect
+-
+function script_FromShortKeyArray sKeyArray
+   put script_CollectFromObjects(hKeys, pSort)
+   
+   put keys (sKeyArray) into sKeys
+   sort lines of sKeys
+   --
+   repeat for each line shortKey in sKeys
+      put the handler_From [shortKey] of sObject into sHandler
+      if sHandler is empty then
+         breakpoint -- should not be
+      end if
+      put sHandler & CR&CR after cScript
+   end repeat
+   delete char -2 to -1 of cScript
+   return cScript
+end script_FromShortKeyArray
+
+function script_FromShortKeyArray sKeyArray
+   put keys (sKeyArray) into sKeys
+   sort lines of sKeys
+   --
+   repeat for each line shortKey in sKeys
+      put the handler_From [shortKey] of sObject into sHandler
+      if sHandler is empty then
+         breakpoint -- should not be
+      end if
+      put sHandler & CR&CR after cScript
+   end repeat
+   delete char -2 to -1 of cScript
+   return cScript
+end script_FromShortKeyArray
+
+
+--> ScriptArray
+-
+function scriptArray_ShortHkeys scriptArray
+   put scriptArray_ShortHkeyArray(scriptArray) into shortHkeyArray
+   put keys (shortHkeyArray) into shorHkeys
+   sort shorHkeys
+   return shorHkeys
+end scriptArray_ShortHkeys
+
+function scriptArray_ShortHkeyArray scriptArray
+   local shortHkeyArray
+   --
+   repeat for each key suiteName in scriptArray
+      put scriptArray [suiteName] into suiteHkeyArray
+      union shortHkeyArray with suiteHkeyArray
+   end repeat
+   return shortHkeyArray
+end scriptArray_ShortHkeyArray
+
+
 --> Menu | Not Simple
 -
 /*
@@ -259,26 +314,6 @@ setprop script_Suite [suiteName] newSuite
    put script_ReplaceSuite (suiteName, someScript, newSuite) into newScript
    set the script of targetObject to newScript
 end script_Suite
-
-
---> ScriptArray
--
-function scriptArray_ShortHkeys scriptArray
-   put scriptArray_ShortHkeyArray(scriptArray) into shortHkeyArray
-   put keys (shortHkeyArray) into shorHkeys
-   sort shorHkeys
-   return shorHkeys
-end scriptArray_ShortHkeys
-
-function scriptArray_ShortHkeyArray scriptArray
-   local shortHkeyArray
-   --
-   repeat for each key suiteName in scriptArray
-      put scriptArray [suiteName] into suiteHkeyArray
-      union shortHkeyArray with suiteHkeyArray
-   end repeat
-   return shortHkeyArray
-end scriptArray_ShortHkeyArray
 
 
 --> Script | Suite | Suite Array

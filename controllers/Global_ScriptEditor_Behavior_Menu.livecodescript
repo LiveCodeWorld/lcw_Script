@@ -77,7 +77,7 @@ end menu_RecentButton
 on menu_HandlerField mTarget
    put menu_GetChecked (the params) is false into sBoolean
    --
-   ide_SetHanderFiledBehavior sBoolean
+   ide_SetHanderFieldBehavior sBoolean
 end menu_HandlerField
 
 private command _

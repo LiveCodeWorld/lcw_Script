@@ -80,9 +80,32 @@ private function _OtherNames
    return sTitles
 end _OtherNames
 
+command scriptArray_AddLong @longHkeyArray, shortHkeyArray, sObject
+   repeat for each key shortHkey in shortHkeyArray
+      put shortHkey && "of" && sObject into hKey
+      put empty into longHkeyArray [hKey]
+   end repeat
+end scriptArray_AddLong
+
 
 --> Global | Script | Tree | Menu
 -
+on menu_CombineAll sObject
+   local longHkeyArray
+   put display_ListViews ("Script") into dViews
+   repeat for each line dView in dViews
+      put the title_Text of dView into sObject
+      put the displayed_ScriptArray of dView into scriptArray
+      --
+      put scriptArray_ShortHkeyArray(scriptArray) into shortHkeyArray
+      scriptArray_AddLong longHkeyArray, shortHkeyArray, sObject
+   end repeat
+   --
+   -- display_Tool longHkeyArray, "All", "Script Compare", "lcw_Script"
+   display_ScriptFromHkeys longHkeyArray, "Script Compare"
+   put the result into dView
+end menu_CombineAll
+
 on menu_Compare sObject, rightObject
    put _MyKeys() into leftKeys
    put _TitleKeys (rightObject) into rightKeys

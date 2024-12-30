@@ -155,7 +155,7 @@ end menu_FilteredDepKeys
 
 on menu_CollectDisplayed sObject
    put _DisplayedData() into hKeys
-   put hkey_CollectFromObjects (hKeys, true) into depScript
+   put script_CollectFromObjects (hKeys, true) into depScript
    --
    _DisplayDepScript depScript, sObject
 end menu_CollectDisplayed

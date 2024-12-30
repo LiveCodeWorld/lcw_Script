@@ -59,9 +59,9 @@ end svg_BrowserNavigate
 -
 command display_CollectedHkeys hKeys, sTitle
    # Collect and display script
-   put hkey_CollectFromObjects (hKeys, true) into newDepScript
+   put script_CollectFromObjects (hKeys, true) into newDepScript
    display_Text newDepScript, sTitle, "Found but Outside Script"
-   return teh result
+   return the result
 end display_CollectedHkeys
 
 function collection_GetData
@@ -160,6 +160,13 @@ command display_CreateHandlerGraph hKey, pGraphStyle
    put the result into svgFile
    --
    display_SVG svgFile, hKey
+   put the result into svgView
+   --
+   put hKey_GetArray (hkey) into hkeyArray
+   set the link_Array of svgView to hkeyArray
+   set the displayed_Hkey of svgView to hKey
+   set the displayed_GraphStyle of svgView to pGraphStyle
+   --
    return hKey
 end display_CreateHandlerGraph
 

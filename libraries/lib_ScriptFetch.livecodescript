@@ -17,18 +17,30 @@ A modern library for getting and fetching scripts.
 
 --> Script | Get
 -
-function hkey_CollectFromObjects hKeys, pSort
+function script_CollectFromObjects hKeys, pSort
    local newScript
-   put word 1 to -1 of hKeys into hKeys
-   if pSort is true then
+   if hKeys is an array then
+      put keys (hKeys) into hKeys
+      hkey_SortIndex hKeys
+   else if pSort is true then
       hkey_SortIndex hKeys
    end if
+   put word 1 to -1 of hKeys into hKeys
+   
+   # Messages first
+   filter hKeys with "M *" into messagekeys
+   repeat for each line hKey in messagekeys
+      put handler_Get (hKey) into someHandler
+      text_AddParagraph someHandler, newScript
+   end repeat
+   
+   filter hKeys without "M *"
    repeat for each line hKey in hKeys
       put handler_Get (hKey) into someHandler
       text_AddParagraph someHandler, newScript
    end repeat
    return newScript
-end hkey_CollectFromObjects
+end script_CollectFromObjects
 
 
 --> Script | Library | Fetch
