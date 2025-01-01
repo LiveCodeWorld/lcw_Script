@@ -30,7 +30,8 @@ on menu_Help hKey
       launch_HkeyHelp hKey
    else
       hkey_Deconstruct hKey, hName, hType, hObject, hNum
-      display_WikiPage "handler.livecode.world", hName
+      put platform_WikiDomain ("handler") into wikiDomain
+      display_WikiPage wikiDomain, hName
    end if
    --
    if (the result is empty) or (the shiftKey is "Down") then
