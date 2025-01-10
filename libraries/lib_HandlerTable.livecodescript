@@ -17,6 +17,75 @@ We distingusish between the following forms of search:
 The "Flexible" handlers are not fully tested, and the logic might be not quite right.
 */
 
+--> Working on
+-
+getprop handlerLine_Index [hFilter]
+   put the revAvailableHandlers of the target into hTable
+   sort numeric lines of hTable by word 3 of each
+   if hFilter is not empty then filter hTable with hFilter
+   --
+   repeat for each line someLine in hTable
+      put hkeyLine_ToHandlerLine (someLine) & CR after hLines
+   end repeat
+   delete char -1 of hLines
+   return hLines
+end handlerLine_Index
+
+getprop handlerLine_Bullets [hFilter]
+   put the revAvailableHandlers of the target into hTable
+   sort numeric lines of hTable by word 3 of each
+   if hFilter is not empty then filter hTable with hFilter
+   --
+   repeat for each line someLine in hTable
+      -- put word 1 to 2 of someLine into shortHkey
+      put hkeyLine_ToHandlerLine (someLine) into handlerLine
+      put "- [[" & handlerLine & "]]" & CR after handlerLineBullets
+   end repeat
+   delete char -1 of handlerLineBullets
+   return handlerLineBullets
+end handlerLine_Bullets
+
+function hkeyLine_ToHandlerLine hkeyLine
+   put word 1 of hkeyLine into hkeyBit
+   put word 2 of hkeyLine into hName
+   --
+   if char 1 of hkeyBit = "P" then
+      put "private" & space into handlerLine
+      delete char 1 of hkeyBit
+   else
+      put empty into handlerLine
+   end if
+   
+   switch hkeyBit
+      case "A"
+         put "after" after handlerLine
+         break
+      case "N"
+         put "before" after handlerLine
+         break
+      case "F"
+         put "function" after handlerLine
+         break
+      case "M"
+         put "on" after handlerLine
+         break
+      case "C"
+         put "command" after handlerLine
+         break
+      case "G"
+         put "getprop" after handlerLine
+         break
+      case "S"
+         put "setprop" after handlerLine
+         break
+      default
+         return empty
+   end switch
+   
+   put space & hName after handlerLine
+   return handlerLine
+end hkeyLine_ToHandlerLine
+
 
 --> Props
 -
