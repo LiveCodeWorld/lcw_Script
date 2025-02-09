@@ -1,0 +1,48 @@
+(function(){
+
+"use strict";
+
+var Widget = require("$:/core/modules/widgets/widget.js").widget;
+
+var CallLivecodeWidget = function(parseTreeNode, options) {
+    this.initialise(parseTreeNode, options);
+};
+
+CallLivecodeWidget.prototype = new Widget();
+
+window.liveCode = window.liveCode || {};
+window.liveCode.livecodeResultHandler = function(result) {
+    // Update the "test" tiddler with the result from Livecode
+    $tw.wiki.addTiddler(new $tw.Tiddler({
+        title: "test",
+        text: result || "No response from Livecode",
+        type: "text/plain"
+    }));
+};
+
+CallLivecodeWidget.prototype.invokeAction = function(triggeringWidget, event) {
+    this.computeAttributes();
+    var message = this.getAttribute("message", "Default Message");
+
+    try {
+        liveCode.tiddlyButton_Call(message);
+
+        $tw.wiki.addTiddler(new $tw.Tiddler({
+            title: "test-log",
+            text: "Called Livecode with message: " + message,
+            type: "text/plain"
+        }));
+    } catch (e) {
+        $tw.wiki.addTiddler(new $tw.Tiddler({
+            title: "test-log",
+            text: "Error calling Livecode: " + e.message,
+            type: "text/plain"
+        }));
+    }
+
+    return true;
+};
+
+exports.wikiscript = CallLivecodeWidget;
+
+})();

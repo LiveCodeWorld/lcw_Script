@@ -1,0 +1,7 @@
+This module is part of the <$link to="ProjectName"> {{ProjectName}}</$link> project. You can view it's [[structure|Module Structure]],  Roadmap project status here.
+
+* [[moduleName]]
+* [[projectName]]
+* [[projectFolder]]
+
+{{$:/plugins/nico/projectify/ui/dashboard/Dashboard}}
