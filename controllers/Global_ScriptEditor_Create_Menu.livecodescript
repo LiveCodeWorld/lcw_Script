@@ -50,14 +50,9 @@ end menu_CreateModule
 private on _
 end _
 
-on menu_TestDispatch sObject
-   dispatch_Controller the params
-   -- dispatch_Controller "ScriptEditor|Create", sObject, "test"
-end menu_TestDispatch
-
-getprop testDispatch_Params
-   return "1,2,3"
-end testDispatch_Params
+on insert_CreateMenu
+   return "Global | Project | Create | Menu"
+end insert_CreateMenu
 
 
 /*
