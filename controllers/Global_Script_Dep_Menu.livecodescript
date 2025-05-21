@@ -71,6 +71,21 @@ getprop displayDotText_Params [sObject]
    return shortFiles
 end displayDotText_Params
 
+private command _DisplayHkeys hKeys, pTitle
+   put _dView() into dView
+   put the displayed_Object of dView into sObject
+   if pTitle is not empty then put the short name of sObject into pTitle
+   
+   # Display
+   display_HkeyLines hKeys, pTitle
+   put the result into dView
+   
+   set the displayed_Object of dView to sObject
+   set the hkey_Array of dView to LocalArray ["hkeyArray"]
+   --
+   return dView
+end _DisplayHkeys
+
 
 --> Global | Script | Dep | Menu
 -
@@ -143,37 +158,59 @@ on menu_AllDepHkeys sObject
    set the displayed_Data [sTitle] of dView to hKeys
 end menu_AllDepHkeys
 
-on menu_FilteredDepKeys sObject
+on menu_GraphHkeyArray sObject, graphStyle
+   put _dView() into dView
+   put _HkeyArray (sObject) into hkeyArray
+   
+   # Draw and Display Graph
+   displayGraph_HkeyArray hkeyArray, sObject, graphStyle
+end menu_GraphHkeyArray
+
+getprop graphHkeyArray_Params
+   return _GraphStyles()
+end graphHkeyArray_Params
+
+on menu_ModuleExternalHkeys sObject
    put _HkeyArray (sObject) into hkeyArray
    --
-   put the module_ExternalHkeys [hKeyArray] of sObject into hKeys
+   display_HkeyArrayLines hkeyArray, sObject
+end menu_ModuleExternalHkeys
+
+on menu_SortDisplayedHkeys
+   put _dView() into dView
    --
-   put the number of lines of hKeys into keyNum
-   put "Filtered Deps" && keyNum && "Hkeys" into sTitle
-   set the displayed_Data [sTitle] of _dView() to hKeys
-end menu_FilteredDepKeys
+   put the displayed_Data of dView into hKeys
+   hkey_SortIndex hKeys
+   put the number of lines of hKeys
+   
+   # To Display custom sort we need an index field display
+   _DisplayHkeys hKeys
+end menu_SortDisplayedHkeys
 
 on menu_CollectDisplayed sObject
    put _DisplayedData() into hKeys
    put script_CollectFromObjects (hKeys, true) into depScript
+   put script_CollectFromObjects (hkeyDeps, true) into depScript
    --
    _DisplayDepScript depScript, sObject
 end menu_CollectDisplayed
 
 on menu_CreateDepScriptStack sObject
-   put the module_BehaviorDepScript of sObject into depScript
-   put empty into  depScript
+   module_CreateBehaviorDepStack sObject
    --
-   module_CreateBehaviorDepStack sObject, depScript
    if item 1 of the result = "Error" then
+      put the module_BehaviorDepScript of sObject into depScript
       _DisplayDepScript depScript, sObject
+      
+      put the module_DepStackName of sObject into depStackName
+      edit the script of stack depStackName
       --
       lcw_AnswerWarning "Cannot create behavior stack as it already exists!", LocalArray ["dView"]
    else
       put the result into depStackName
+      edit the script of stack depStackName
+      return depHkeyArray
    end if
-   edit the script of stack depStackName
-   return depHkeyArray
 end menu_CreateDepScriptStack
 
 private on __
@@ -212,20 +249,6 @@ getprop checked_ScriptHkeyArray [sObject]
    put the script_HkeyArrayFile of sObject into sFile
    return there is a file sFile
 end checked_ScriptHkeyArray
-
-on menu_HkeyArrayGraph sObject, graphStyle
-   put LocalArray ["hkeyArray"] into hkeyArray
-   --
-   graph_CreateFromScriptHkeyArray hkeyArray, sObject, graphStyle
-   put the result into svgFile
-   --
-   put the name of sObject into sLabel
-   display_SVG svgFile, sLabel
-end menu_HkeyArrayGraph
-
-getprop hkeyArrayGraph_Params
-   return _GraphStyles()
-end hkeyArrayGraph_Params
 
 on menu_GraphModuleBehavior sObject, graphStyle
    put the walk_ModuleBehaviorHkeyArray of sObject into hkeyArray

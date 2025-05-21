@@ -4,8 +4,11 @@
 license: GPLv3
 name: lib_DisplayObject
 type: library
-version: 0.1
+version: 0.2
 
+
+--> Working on
+-
 
 --> Display | Missing
 -
@@ -71,16 +74,7 @@ command display_ScriptHkeyArrayDeps hkeyArray, sObject, pGraphStyle
    
    # Draw and Display Graph
    if pGraphStyle is not empty then
-      graph_CreateFromScriptHkeyArray hkeyArray, sObject, pGraphStyle
-      put the result into svgFile
-      --
-      put the name of sObject into sLabel
-      display_SVG svgFile, sLabel
-      put the result into svgView
-      --
-      set the displayed_Object of svgView to sObject
-      set the displayed_HkeyArray of svgView to hkeyArray
-      set the displayed_GraphStyle of svgView to pGraphStyle
+      display_HkeyArrayGraph hkeyArray, sObject, pGraphStyle
    end if
    return dView
 end display_ScriptHkeyArrayDeps

@@ -185,7 +185,7 @@ on menu_DisplayBehaviorHkeyArray sObject
    put the module_BehaviorDepHkeyArray [fromFolder] of sObject into hKeyArray
    set the script_HkeyArray of sObject to hKeyArray
    --
-   display_ScriptHkeyArrayDeps hkeyArray, sObject, "hierarchy" -- "fdp"
+   display_ScriptHkeyArrayDeps hkeyArray, sObject
 end menu_DisplayBehaviorHkeyArray
 
 on menu_DisplayLocalChanges sObject

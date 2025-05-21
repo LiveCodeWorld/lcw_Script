@@ -73,6 +73,13 @@ end menu_CollectDepScript
 on _
 end _
 
+on menu_PutHandlerCalls hKey
+   hkeyLine_Deconstruct hKey, hName, hType, hObject
+   put the result into shortHkey
+   --
+   put the handler_Calls [shortHkey] of hObject
+end menu_PutHandlerCalls
+
 on menu_RevealHandlerFolder hKey
    put hkey_Folder (hKey) into handlerFolder
    finder_Reveal handlerFolder

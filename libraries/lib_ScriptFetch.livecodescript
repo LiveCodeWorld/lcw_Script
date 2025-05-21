@@ -15,6 +15,7 @@ A modern library for getting and fetching scripts.
 --> Working on
 -
 
+
 --> Script | Get
 -
 function script_CollectFromObjects hKeys, pSort

@@ -25,6 +25,15 @@ Eventually should decide which to use (probably get rid of links.txt, and maybe 
 
 --> Working on
 -
+command handler_UnsplitScriptLines @someHandler
+   put "\" & CR into toReplace 
+   
+   -- should use whitespace regExp
+   -- put replaceText (stringToChange, matchExpression, replacementString)
+   replace toReplace with empty in someHandler
+end handler_UnsplitScriptLines
+
+
 --> Hkey | Calls
 -
 getprop handler_Calls [shortHkey]
@@ -34,7 +43,7 @@ getprop handler_Calls [shortHkey]
    put the long id of the target into tObject
    --
    put the revAvailableHandlers of tObject into hTable
-   htable_ExactLineOffsets hkeyLine, hTable, startLineNum, endLineNum
+   htable_ExactLineOffsets shortHkey, hTable, startLineNum, endLineNum
    if endLineNum = 0 then return empty
    --
    put the script of tObject into someScript
@@ -82,6 +91,8 @@ function handler_ConstructCallArray someHandler, pSkipHkeyComponents, pSkipHkeyP
    local allCalls
    
    put word 1 to -1 of someHandler into someHandler
+   handler_UnsplitScriptLines someHandler
+   --
    delete line 1 of someHandler
    delete line -1 of someHandler
    
