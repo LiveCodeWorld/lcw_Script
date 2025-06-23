@@ -111,7 +111,7 @@ end hkey_TypeFromWord
 function handlerWiki_FindKey hName, pWikiArray
    -- looks up a handler in wiki
    if pWikiArray is not an array then
-      put platform_WikiDomain ("handler") into wikiDomain
+      put platform_LivecodeDomain ("handler") into wikiDomain
       put handlerWiki_Array (wikiDomain) into pWikiArray
    end if
    
@@ -156,7 +156,7 @@ function handlerWiki_HkeyFromSynopsis hName, synopsis
 end handlerWiki_HkeyFromSynopsis
 
 function handlerWiki_Array pWikiDomain
-   if pWikiDomain is empty then put platform_WikiDomain ("handler") into pWikiDomain
+   if pWikiDomain is empty then put platform_LivecodeDomain ("handler") into pWikiDomain
    
    # Get pageData of page titles hName from sitemap
    put wikiSiteMap_GetArray (pWikiDomain) into sMapArray

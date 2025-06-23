@@ -30,7 +30,7 @@ on menu_Help hKey
       launch_HkeyHelp hKey
    else
       hkey_Deconstruct hKey, hName, hType, hObject, hNum
-      put platform_WikiDomain ("handler") into wikiDomain
+      put platform_LivecodeDomain ("handler") into wikiDomain
       display_WikiPage wikiDomain, hName
    end if
    --
