@@ -114,9 +114,38 @@ getprop menu_Target [tObject]
    return dView
 end menu_Target
 
+private command _GetInfo dView, @hKey, @hName, @hObject, @hkeyArray
+   get the selected_Path of dView
+   put item -1 of it into hKey
+   put the displayed_HkeyArray of dView into hkeyArray
+   --
+   hkeyLine_Deconstruct hKey, hName, hType, hObject
+end _GetInfo
+
 
 --> Global | Script | Dep | Line | Menu
 -
+on menu_DisplaySubGraph dView
+   _GetInfo dView, hKey, hName, hObject, hkeyArray
+   
+   put hkeyArray_ExtractSubArray (hKey, hKeyArray) into subArray
+   display_Data subArray, hKey, "subArray"
+   --   
+   displayGraph_HkeyArray subArray, hObject, "hierarchical"
+end menu_DisplaySubGraph
+
+on menu_DeleteSubGraph dView
+   _GetInfo dView, hKey, hName, hObject, hkeyArray
+   
+   put hkeyArray_DeleteSubArray (hKey, hkeyArray, hKey) into sHkeyArray
+   displayGraph_HkeyArray sHkeyArray, hObject, "hierarchical"
+   display_HkeyArrayDeps sHkeyArray, sTitle
+   -- display_CreateHandlerSvgFolder hKey, sHkeyArray
+end menu_DeleteSubGraph
+
+private on ___
+end ___
+
 on menu_FindMissing dView
    put the displayed_Object of dView into sObject
    put the selected_Line of dView into shortMissingHkey
@@ -220,10 +249,6 @@ on menu_AddToExtraDictionary dView
    --
    menu_Refresh dView
 end menu_AddToExtraDictionary
-
-on menu_DeleteElement dView
-   put the selected_Path of dView
-end menu_DeleteElement
 
 on menu_Refresh dView
    put the displayed_Object of dView into sObject
